@@ -88,6 +88,16 @@
         "frameworkReferences": [
           "Microsoft.AspNetCore.App"
         ]
+      },
+      "shuttleasy.data/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/shuttleasy.data.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/shuttleasy.data.dll": {}
+        }
       }
     }
   },
@@ -216,11 +226,17 @@
         "swashbuckle.aspnetcore.swaggerui.6.2.3.nupkg.sha512",
         "swashbuckle.aspnetcore.swaggerui.nuspec"
       ]
+    },
+    "shuttleasy.data/1.0.0": {
+      "type": "project",
+      "path": "../shuttleasy.data/shuttleasy.data.csproj",
+      "msbuildProject": "../shuttleasy.data/shuttleasy.data.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "Swashbuckle.AspNetCore >= 6.2.3"
+      "Swashbuckle.AspNetCore >= 6.2.3",
+      "shuttleasy.data >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -249,7 +265,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Dell\\source\\repos\\shuttleasy_backend\\shuttleasy\\shuttleasy.data\\shuttleasy.data.csproj": {
+              "projectPath": "C:\\Users\\Dell\\source\\repos\\shuttleasy_backend\\shuttleasy\\shuttleasy.data\\shuttleasy.data.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
