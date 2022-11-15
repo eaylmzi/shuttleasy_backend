@@ -1,0 +1,15 @@
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\bin\Debug\net6.0\shuttleasy.LOGIC.deps.json
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\bin\Debug\net6.0\shuttleasy.LOGIC.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\bin\Debug\net6.0\shuttleasy.LOGIC.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.csproj.AssemblyReference.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.AssemblyInfoInputs.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.AssemblyInfo.cs
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.csproj.CoreCompileInputs.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\refint\shuttleasy.LOGIC.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\ref\shuttleasy.LOGIC.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\bin\Debug\net6.0\shuttleasy.DAL.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\bin\Debug\net6.0\shuttleasy.DAL.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.LOGIC\obj\Debug\net6.0\shuttleasy.LOGIC.csproj.CopyComplete
