@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using shuttleasy.DAL.Models;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.Models.dto.Passengers.dto;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace shuttleasy.Controllers
@@ -22,22 +23,38 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> AddPassenger(PassengerRegisterDto passengerRegisterDto)
+        public ActionResult<bool> AddPassenger(PassengerRegisterDto passengerRegisterDto)
         {
             Passenger newPassenger = new Passenger();
+            
 
-            if (passengerRegisterDto.Password != null )
+            if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
             {
-                CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-                newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
-                newPassenger.QrString = Guid.NewGuid();
-                newPassenger.PasswordHash = passwordHash;
-                newPassenger.PasswordSalt = passwordSalt;
-                //string bitString = BitConverter.ToString(passwordHash);
-                //newPassenger.Password = bitString;            
+                ValidationResponse validationResponse = ValidatePassword(passengerRegisterDto.Password);
+                if (validationResponse.Successful)
+                {
+                    CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+                    newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
+                    newPassenger.QrString = Guid.NewGuid();
+                    newPassenger.PasswordHash = passwordHash;
+                    newPassenger.PasswordSalt = passwordSalt;
+                    //string bitString = BitConverter.ToString(passwordHash);
+                    //newPassenger.Password = bitString;
+                    bool result = _passengerLogic.Add(newPassenger);
+                    return Ok(result);
+
+                }
+                else
+                {
+                    return BadRequest(validationResponse.Information);
+                }               
             }
-            bool result = _passengerLogic.Add(newPassenger);
-            return Ok(result);
+            else
+            {
+                return BadRequest("Password requirements is not provided");
+            }
+            
+
         }
 
 
@@ -48,7 +65,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Passenger>> Login(string email,string password)
+        public ActionResult<Passenger> Login(string email,string password)
         {
            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
            if(string.IsNullOrEmpty(passenger.Email))
@@ -86,7 +103,63 @@ namespace shuttleasy.Controllers
                 return isMatched;
             }
         }
-      
-        
+        private ValidationResponse ValidatePassword(string password)
+        {
+            ValidationResponse validationResponse;
+
+            if (password.Length < 8 || password.Length > 15) //Min max password
+            {
+                validationResponse = new ValidationResponse();
+                validationResponse.Successful = false;
+                validationResponse.Information = "Password lenght must be between 8 and 15";
+                return validationResponse;
+            }
+            if (!(password.Any(char.IsUpper))) //One upper case requirement
+            {
+                validationResponse = new ValidationResponse();
+                validationResponse.Successful = false;
+                validationResponse.Information = "Password must include one upper case";
+                return validationResponse;
+            }
+            if (!(password.Any(char.IsLower))) //One lower case requirement
+            {
+                validationResponse = new ValidationResponse();
+                validationResponse.Successful = false;
+                validationResponse.Information = "Password must include one lower case";
+                return validationResponse;
+            }
+            if (password.Contains(" ")) //Check white space
+            {
+                validationResponse = new ValidationResponse();
+                validationResponse.Successful = false;
+                validationResponse.Information = "Password must not contain gap";
+                return validationResponse;
+            }
+
+            string specialChars = @"%!@#$%^&*()?/>.<,:;'\|}]{[_~`+=-" + "\"";
+            char[] specialCharsArray = specialChars.ToCharArray();
+            
+            if (password.IndexOfAny(specialCharsArray)!=-1) // IndexOfAny returns -1 when the password does not include character
+            {
+                validationResponse = new ValidationResponse();
+                validationResponse.Successful = false;
+                validationResponse.Information = "Password must not include special characters";
+                return validationResponse;
+            }
+
+            validationResponse = new ValidationResponse();
+            validationResponse.Successful = true;
+            validationResponse.Information = "Password is valid";
+            return validationResponse;
+        }
+
+       
+
+
     }
+}
+public class ValidationResponse
+{
+    public bool Successful { get; set; }
+    public string Information { get; set; } = null!;
 }
