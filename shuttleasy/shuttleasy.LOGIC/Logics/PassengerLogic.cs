@@ -15,28 +15,22 @@ namespace shuttleasy.LOGIC.Logics
     {
         private PassengerFunction _passenger = new shuttleasy.DAL.Functions.PassengerFunction();
 
-
-
         public bool Add(Passenger passenger)
         {
-            _passenger.AddPassenger(passenger);
-            return true;
+            bool isAdded = _passenger.Add(passenger);
+            return isAdded;
         }
 
         public Passenger GetPassengerWithEmail(string email)
         {
-            return _passenger.GetPassengerWithEmail(email);
+            Passenger isFound = _passenger.GetPassengerWithEmail(email) ?? throw new ArgumentNullException();
+            return isFound;      
         }
 
-        public Passenger Get(string id)
+        public Passenger GetPassengerWithId(string id)
         {
-            if (id.Length == 11)
-            {
-                return _passenger.GetPassenger(id);
-            }
-            return new Passenger();
-
-
+            Passenger isFound = _passenger.GetPassengerWithId(id) ?? throw new ArgumentNullException();
+            return isFound;
         }
     }
 }

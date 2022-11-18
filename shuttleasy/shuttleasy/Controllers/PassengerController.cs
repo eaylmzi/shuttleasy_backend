@@ -2,10 +2,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Resource.String;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.Models.dto.Passengers.dto;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace shuttleasy.Controllers
@@ -16,70 +20,79 @@ namespace shuttleasy.Controllers
     {
         private PassengerLogic _passengerLogic = new shuttleasy.LOGIC.Logics.PassengerLogic();
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
+        PassengerString message = new PassengerString();
 
-        public PassengerController(IMapper mapper)
+        public PassengerController(IMapper mapper,IConfiguration configuration)
         {
             _mapper = mapper;
+            _configuration = configuration;
+        }
+
+        [HttpPost]
+        public ActionResult<Passenger> GetPassenger(string id)
+        {
+            try
+            {
+                return _passengerLogic.GetPassengerWithId(id);
+            }
+
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
         }
 
         [HttpPost]
         public ActionResult<bool> AddPassenger(PassengerRegisterDto passengerRegisterDto)
         {
-            Passenger newPassenger = new Passenger();
-            
-
-            if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
+            Passenger newPassenger = new Passenger(); 
+            try
             {
-                ValidationResponse validationResponse = ValidatePassword(passengerRegisterDto.Password);
-                if (validationResponse.Successful)
+                if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
                 {
                     CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
                     newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
                     newPassenger.QrString = Guid.NewGuid();
                     newPassenger.PasswordHash = passwordHash;
                     newPassenger.PasswordSalt = passwordSalt;
+                    newPassenger.IsPayment = false;
+                    newPassenger.Verified = false;
                     //string bitString = BitConverter.ToString(passwordHash);
                     //newPassenger.Password = bitString;
                     bool result = _passengerLogic.Add(newPassenger);
                     return Ok(result);
 
                 }
+
                 else
                 {
-                    return BadRequest(validationResponse.Information);
-                }               
+                 
+                    return BadRequest(message.passwordNull);
+
+                }
             }
-            else
-            {
-                return BadRequest("Password requirements is not provided");
+            catch (Exception) { 
+                return StatusCode(500) ;
             }
             
 
         }
 
-
-        [HttpPost]
-        public ActionResult<Passenger> GetPassenger(string id)
-        {
-            return _passengerLogic.Get(id);
-        }
-
         [HttpPost]
         public ActionResult<Passenger> Login(string email,string password)
         {
-           Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
-           if(string.IsNullOrEmpty(passenger.Email))
-            {
-                return BadRequest("Email is not in the list");
-            }
+            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
+
             bool isMatched = VerifyPasswordHash(passenger, password);
             if (isMatched)
             {
-                return Ok("Login is successfull");
+                string token = CreateToken(passenger);
+                return Ok(token);
             }
             else
             {
-                return BadRequest("Password is not matched");
+                return BadRequest(message.loginUnsuccesful);
             }
            
         }
@@ -102,64 +115,31 @@ namespace shuttleasy.Controllers
                 bool isMatched = computedHash.SequenceEqual(passenger.PasswordHash);
                 return isMatched;
             }
-        }
-        private ValidationResponse ValidatePassword(string password)
+        }       
+
+        private string CreateToken(Passenger passenger)
         {
-            ValidationResponse validationResponse;
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name,passenger.Name)
+            };
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+               _configuration.GetSection("AppSettings:Token").Value ));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            if (password.Length < 8 || password.Length > 15) //Min max password
-            {
-                validationResponse = new ValidationResponse();
-                validationResponse.Successful = false;
-                validationResponse.Information = "Password lenght must be between 8 and 15";
-                return validationResponse;
-            }
-            if (!(password.Any(char.IsUpper))) //One upper case requirement
-            {
-                validationResponse = new ValidationResponse();
-                validationResponse.Successful = false;
-                validationResponse.Information = "Password must include one upper case";
-                return validationResponse;
-            }
-            if (!(password.Any(char.IsLower))) //One lower case requirement
-            {
-                validationResponse = new ValidationResponse();
-                validationResponse.Successful = false;
-                validationResponse.Information = "Password must include one lower case";
-                return validationResponse;
-            }
-            if (password.Contains(" ")) //Check white space
-            {
-                validationResponse = new ValidationResponse();
-                validationResponse.Successful = false;
-                validationResponse.Information = "Password must not contain gap";
-                return validationResponse;
-            }
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds
+                ) ;
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-            string specialChars = @"%!@#$%^&*()?/>.<,:;'\|}]{[_~`+=-" + "\"";
-            char[] specialCharsArray = specialChars.ToCharArray();
-            
-            if (password.IndexOfAny(specialCharsArray)!=-1) // IndexOfAny returns -1 when the password does not include character
-            {
-                validationResponse = new ValidationResponse();
-                validationResponse.Successful = false;
-                validationResponse.Information = "Password must not include special characters";
-                return validationResponse;
-            }
 
-            validationResponse = new ValidationResponse();
-            validationResponse.Successful = true;
-            validationResponse.Information = "Password is valid";
-            return validationResponse;
+
+            return jwt;
         }
-
        
 
 
     }
-}
-public class ValidationResponse
-{
-    public bool Successful { get; set; }
-    public string Information { get; set; } = null!;
 }

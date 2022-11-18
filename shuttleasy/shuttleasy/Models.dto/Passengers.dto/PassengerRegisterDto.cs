@@ -10,7 +10,6 @@
         public string? Password { get; set; }
         public string City { get; set; } = null!;
         public string PassengerAddress { get; set; } = null!;
-        public bool IsPayment { get; set; }
-        public bool Verified { get; set; }
+
     }
 }

@@ -10,7 +10,7 @@ namespace shuttleasy.DAL.Interfaces
     {
 
         public bool Add(T entity);
-        public T GetSingle(Func<T, bool> metot);
+        public T? GetSingle(Func<T, bool> metot);
         public List<T> Get(string id);
         public bool Update(T entity);
         public bool Delete(T entity);

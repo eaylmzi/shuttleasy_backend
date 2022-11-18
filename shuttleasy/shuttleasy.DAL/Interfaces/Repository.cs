@@ -45,7 +45,6 @@ namespace shuttleasy.DAL.Interfaces
         {
             if (entity != null)
             {
-
                 query.Add(entity);
                 _context.SaveChangesAsync();
                 return true;
@@ -57,18 +56,14 @@ namespace shuttleasy.DAL.Interfaces
             };
         }
 
-        public T GetSingle(Func<T, bool> metot)
+        public T? GetSingle(Func<T, bool> metot)
         {
             T? entity = query
-                       .Where(metot)
-                       .Select(m => m)
-                       .SingleOrDefault();
-            if (entity != null)
-            {
-                return entity;
-            }
+                      .Where(metot)
+                      .Select(m => m)
+                      .SingleOrDefault();
 
-            throw new ArgumentNullException("Email is not in the list");
+            return entity;
         }
     }
 }
