@@ -18,17 +18,10 @@ namespace shuttleasy.DAL.Interfaces
             query = _context.Set<T>();
         }
 
-        public List<T> Get(string id)
+        public List<T>? Get()
         {
-            
             var entity = query.ToList();
-
-            if (entity != null)
-            {
-                return entity;
-            }
-
-            return null;
+            return entity;
         }
 
         public bool Update(T entity)

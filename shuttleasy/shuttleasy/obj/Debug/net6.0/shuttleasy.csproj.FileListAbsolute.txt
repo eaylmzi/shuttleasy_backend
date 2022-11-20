@@ -70,3 +70,8 @@ C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\ne
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\AutoMapper.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Scrutor.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

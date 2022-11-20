@@ -1,16 +1,20 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
+using shuttleasy.Encryption;
+using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.Models.dto.Passengers.dto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace shuttleasy.Controllers
 {
@@ -18,23 +22,48 @@ namespace shuttleasy.Controllers
     [ApiController]
     public class PassengerController : ControllerBase
     {
-        private PassengerLogic _passengerLogic = new shuttleasy.LOGIC.Logics.PassengerLogic();
+        private IPassengerLogic _passengerLogic;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         PassengerString message = new PassengerString();
 
-        public PassengerController(IMapper mapper,IConfiguration configuration)
+        public PassengerController(IMapper mapper,IConfiguration configuration, IPassengerLogic passengerLogic)
         {
             _mapper = mapper;
             _configuration = configuration;
+            _passengerLogic = passengerLogic;
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
         public ActionResult<Passenger> GetPassenger(string id)
         {
             try
             {
                 return _passengerLogic.GetPassengerWithId(id);
+            }
+            catch(ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
+        [HttpPost,Authorize(Roles = $"{Roles.Passenger},{Roles.Driver}")]
+        public ActionResult<List<Passenger>> GetAllPassengers()
+        {
+            try
+            {
+                return _passengerLogic.Get();
+            }
+            catch(ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
             }
 
             catch (Exception)
@@ -43,35 +72,47 @@ namespace shuttleasy.Controllers
             }
         }
 
+
+
         [HttpPost]
         public ActionResult<bool> AddPassenger(PassengerRegisterDto passengerRegisterDto)
         {
-            Passenger newPassenger = new Passenger(); 
+            Passenger newPassenger = new Passenger();
+            PasswordEncryption passwordEncryption = new PasswordEncryption();
+            IJwtTokenManager jwtToken = new JwtTokenManager();
             try
             {
+                newPassenger.QrString = Guid.NewGuid();
+                newPassenger.IsPayment = false;
                 if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
                 {
-                    CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+                    passwordEncryption.CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
                     newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
-                    newPassenger.QrString = Guid.NewGuid();
                     newPassenger.PasswordHash = passwordHash;
                     newPassenger.PasswordSalt = passwordSalt;
-                    newPassenger.IsPayment = false;
-                    newPassenger.Verified = false;
-                    //string bitString = BitConverter.ToString(passwordHash);
-                    //newPassenger.Password = bitString;
-                    bool result = _passengerLogic.Add(newPassenger);
-                    return Ok(result);
+                    newPassenger.Verified = true;
 
+                    string token = jwtToken.CreateToken(newPassenger, _configuration);
+                    newPassenger.Token = token;
                 }
-
                 else
                 {
-                 
-                    return BadRequest(message.passwordNull);
-
+                    newPassenger.Verified = false;
                 }
+
+                bool result = _passengerLogic.Add(newPassenger);
+                return Ok(result);
             }
+            catch(ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            //catch (EncoderFallback ex)           
             catch (Exception) { 
                 return StatusCode(500) ;
             }
@@ -81,65 +122,59 @@ namespace shuttleasy.Controllers
 
         [HttpPost]
         public ActionResult<Passenger> Login(string email,string password)
-        {
-            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
+        {          
+            PasswordEncryption passwordEncryption = new PasswordEncryption();
+            JwtTokenManager jwtToken = new JwtTokenManager();
+            try
+            {
+                Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
+                bool isMatched = passwordEncryption.VerifyPasswordHash(passenger, password);
+                if (isMatched)
+                {
+                    string token = jwtToken.CreateToken(passenger, _configuration);
+                    return Ok(passenger);
+                }
+                else
+                {
+                    return BadRequest(message.loginUnsuccesful);
+                }
 
-            bool isMatched = VerifyPasswordHash(passenger, password);
-            if (isMatched)
-            {
-                string token = CreateToken(passenger);
-                return Ok(token);
             }
-            else
+            catch (ArgumentNullException ex)
             {
-                return BadRequest(message.loginUnsuccesful);
+                return BadRequest(ex.Message);
             }
-           
+            catch (ObjectDisposedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(ArgumentOutOfRangeException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(SecurityTokenEncryptionFailedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+
+
+
         }
 
-
-        private void CreatePasswordHash(string password,out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using(var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;               
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                
-            }               
-        }
-        private bool VerifyPasswordHash(Passenger passenger,string password)
-        {
-            using (var hmac = new HMACSHA512(passenger.PasswordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                bool isMatched = computedHash.SequenceEqual(passenger.PasswordHash);
-                return isMatched;
-            }
-        }       
-
-        private string CreateToken(Passenger passenger)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name,passenger.Name)
-            };
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-               _configuration.GetSection("AppSettings:Token").Value ));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds
-                ) ;
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-
-
-            return jwt;
-        }
-       
-
-
+    }
+    public static class Roles
+    {
+        public const string Passenger = "Passenger";
+        public const string Driver = "Driver";
+        public const string Admin = "Admin";
+        public const string SuperAdmin = "SuperAdmin";
     }
 }

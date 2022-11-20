@@ -3,34 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using shuttleasy.DAL.Interfaces;
-using shuttleasy.DAL.Functions;
+using shuttleasy.DAL.EFRepositories;
 using shuttleasy.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace shuttleasy.LOGIC.Logics
 {
-    public class PassengerLogic
+    public class PassengerLogic : IPassengerLogic
     {
-        private PassengerFunction _passenger = new shuttleasy.DAL.Functions.PassengerFunction();
+        private IPassengerRepository _passenger;
+
+        public PassengerLogic(IPassengerRepository passenger)
+        {
+            _passenger = passenger;
+        }
 
         public bool Add(Passenger passenger)
         {
             bool isAdded = _passenger.Add(passenger);
             return isAdded;
         }
+        public List<Passenger> Get()
+        {
+            var passengerList = _passenger.Get() ?? throw new ArgumentNullException();
+            return passengerList;
+        }
 
         public Passenger GetPassengerWithEmail(string email)
         {
-            Passenger isFound = _passenger.GetPassengerWithEmail(email) ?? throw new ArgumentNullException();
-            return isFound;      
+            Func<Passenger, bool> getPassenger = pas => pas.Email == email;
+            Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();
+            return passenger;
         }
 
         public Passenger GetPassengerWithId(string id)
         {
-            Passenger isFound = _passenger.GetPassengerWithId(id) ?? throw new ArgumentNullException();
-            return isFound;
+            Func<Passenger, bool> getPassenger = pas => pas.IdentityNum == id;
+            Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();
+            return passenger;
         }
     }
 }

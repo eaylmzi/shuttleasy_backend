@@ -249,6 +249,8 @@ namespace shuttleasy.DAL.Models
 
                 entity.Property(e => e.ProfilePic).HasColumnName("profile_pic");
 
+                entity.Property(e => e.Token).HasColumnName("token");
+
                 entity.Property(e => e.QrString).HasColumnName("qr_string");
 
                 entity.Property(e => e.Surname)
