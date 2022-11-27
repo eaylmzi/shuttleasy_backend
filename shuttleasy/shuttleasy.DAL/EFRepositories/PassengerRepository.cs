@@ -10,6 +10,6 @@ namespace shuttleasy.DAL.EFRepositories
         {         
             throw new NotImplementedException();
         }
-   
+        
     }
 }

@@ -55,6 +55,7 @@ namespace shuttleasy.DAL.Interfaces
                       .Where(metot)
                       .Select(m => m)
                       .SingleOrDefault();
+            
 
             return entity;
         }

@@ -10,7 +10,7 @@ namespace shuttleasy.LOGIC.Logics
     public interface IPassengerLogic
     {
         public bool Add(Passenger passenger);
-        public List<Passenger> Get();
+        public List<Passenger> GetAllPassengers();
         public Passenger GetPassengerWithEmail(string email);
         public Passenger GetPassengerWithId(string id);
     }

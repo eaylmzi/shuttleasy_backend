@@ -25,20 +25,29 @@ namespace shuttleasy.LOGIC.Logics
             bool isAdded = _passenger.Add(passenger);
             return isAdded;
         }
-        public List<Passenger> Get()
+        public List<Passenger> GetAllPassengers()// yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
             var passengerList = _passenger.Get() ?? throw new ArgumentNullException();
             return passengerList;
         }
 
-        public Passenger GetPassengerWithEmail(string email)
+        public Passenger GetPassengerWithEmail(string email) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
             Func<Passenger, bool> getPassenger = pas => pas.Email == email;
-            Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();
-            return passenger;
+            try
+            {
+                Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();
+                return passenger;
+            }
+            catch(Exception)
+            {
+                return new Passenger();
+            }
+            
+            
         }
 
-        public Passenger GetPassengerWithId(string id)
+        public Passenger GetPassengerWithId(string id) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
             Func<Passenger, bool> getPassenger = pas => pas.IdentityNum == id;
             Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();

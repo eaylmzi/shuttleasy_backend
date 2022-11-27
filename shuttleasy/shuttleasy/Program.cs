@@ -1,16 +1,23 @@
+global using shuttleasy.Services.UserServices;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using shuttleasy.Controllers;
 using shuttleasy.DAL.EFRepositories;
+using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
+using shuttleasy.Mail;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
 builder.Services.AddScoped<IPassengerLogic, PassengerLogic>();
-
-
+builder.Services.AddScoped<IPassengerService, PassengerService>();
+builder.Services.AddScoped<IMailManager, MailManager>();
+builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
+builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -42,6 +49,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
+var hangfireConnectionString = "Server=.\\SQLSERVER;Database=DbCronJobHangfire;Trusted_Connection=true;";
+builder.Services.AddHangfire(x => {
+    x.UseSqlServerStorage(hangfireConnectionString);
+    RecurringJob.AddOrUpdate<MailManager>(j => j.notifyPassengersPaymentDay(), "* * * * *");
+
+});
+builder.Services.AddHangfireServer();
 
 
 var app = builder.Build();
@@ -57,6 +71,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+app.UseHangfireDashboard();
 
 app.MapControllers();
 
