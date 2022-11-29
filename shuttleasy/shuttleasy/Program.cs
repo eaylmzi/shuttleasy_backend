@@ -5,18 +5,33 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using shuttleasy.Controllers;
 using shuttleasy.DAL.EFRepositories;
+using shuttleasy.DAL.EFRepositories.Driver;
+using shuttleasy.DAL.EFRepositories.PasswordReset;
+using shuttleasy.Encryption;
 using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
+using shuttleasy.LOGIC.Logics.Driver;
+using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.Mail;
+using shuttleasy.Services;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
 builder.Services.AddScoped<IPassengerLogic, PassengerLogic>();
+
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
+builder.Services.AddScoped<IDriverLogic, DriverLogic>();
+
+builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
+builder.Services.AddScoped<IPasswordResetLogic, PasswordResetLogic>();
+
 builder.Services.AddScoped<IPassengerService, PassengerService>();
 builder.Services.AddScoped<IMailManager, MailManager>();
 builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPasswordEncryption, PasswordEncryption>();
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 

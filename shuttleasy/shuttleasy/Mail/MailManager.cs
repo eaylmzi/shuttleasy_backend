@@ -16,7 +16,7 @@ namespace shuttleasy.Mail
             _configuration = configuration;
         }
 
-        public bool sendMail(string emailAddress , IConfiguration configuration)
+        public bool sendMail(string emailAddress ,string subject,string body, IConfiguration configuration)
         {
             try
             {
@@ -26,10 +26,10 @@ namespace shuttleasy.Mail
                      configuration.GetSection("CompanyEmail:Email").Value ?? throw new ArgumentNullException()
                     ));
                 email.To.Add(MailboxAddress.Parse(emailAddress));
-                email.Subject = "Hellllo";
+                email.Subject = subject;
                 email.Body = new TextPart(TextFormat.Html)
                 {
-                    Text = "<a href=\"https://www.google.com\">Visit Google</a>"
+                    Text = "<a href=\"https://www.google.com\">"+body+"</a>"
                 };
 
                 using var smtp = new SmtpClient();
@@ -43,7 +43,7 @@ namespace shuttleasy.Mail
                 return true;
 
             }
-            catch (Exception)
+            catch (Exception) //shuttleasy2spawn atıyo amk düzelt
             {
                 return false;
             }
@@ -55,9 +55,11 @@ namespace shuttleasy.Mail
             var passengersList = _passengerLogic.GetAllPassengers();
             foreach (var passenger in passengersList) //Observer pattern yapçan 
             {
-                sendMail(passenger.Email , _configuration);
+                sendMail(passenger.Email ,"d","s",_configuration); //BURAYI DÜZELT
             }
 
         }
+
+        
     }
 }

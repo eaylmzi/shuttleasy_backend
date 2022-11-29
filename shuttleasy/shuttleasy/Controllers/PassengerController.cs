@@ -22,6 +22,7 @@ using MimeKit.Text;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using shuttleasy.Mail;
+using shuttleasy.Services;
 
 namespace shuttleasy.Controllers
 {
@@ -36,12 +37,16 @@ namespace shuttleasy.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMailManager _mailManager;
         private readonly IJwtTokenManager _jwtTokenManager;
+        private readonly IUserService _userService;
+        private readonly IPasswordEncryption _passwordEncryption;
         PassengerString message = new PassengerString();
+        
 
         public PassengerController(IMapper mapper,IConfiguration configuration, IPassengerLogic passengerLogic,
             IPassengerService passengerService, IHttpContextAccessor httpContextAccessor,IMailManager mailManager,
-            IJwtTokenManager jwtTokenManager)
+            IJwtTokenManager jwtTokenManager,IUserService userService,IPasswordEncryption passwordEncryption)
         {
+
             _mapper = mapper;
             _configuration = configuration;
             _passengerLogic = passengerLogic;
@@ -49,6 +54,8 @@ namespace shuttleasy.Controllers
             _httpContextAccessor = httpContextAccessor;
             _mailManager = mailManager;
             _jwtTokenManager = jwtTokenManager;
+            _userService = userService;
+            _passwordEncryption = passwordEncryption;
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
@@ -104,47 +111,21 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost]
-        public ActionResult<bool> AddPassenger(PassengerRegisterDto passengerRegisterDto)
-        {
-            Passenger newPassenger = new Passenger();
-            PasswordEncryption passwordEncryption = new PasswordEncryption();
+        public ActionResult<bool> SignUp(PassengerRegisterDto passengerRegisterDto)
+        {           
             try
             {
-                newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
-                newPassenger.QrString = Guid.NewGuid();
-                newPassenger.IsPayment = false;
-                if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
+                Passenger newPassenger = _userService.SignUp(passengerRegisterDto,Roles.Passenger);
+                if(newPassenger != null)
                 {
-                    passwordEncryption.CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-                   
-                    newPassenger.PasswordHash = passwordHash;
-                    newPassenger.PasswordSalt = passwordSalt;
-                    newPassenger.Verified = true;
-
-                    string token = _jwtTokenManager.CreateToken(newPassenger, _configuration);
-                    newPassenger.Token = token;
+                    return Ok(newPassenger);
                 }
-                else
-                {
-                    newPassenger.Verified = false;
-                }
-
-                bool result = _passengerLogic.Add(newPassenger);
-                return Ok(result);
-            }
-            catch(ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ObjectDisposedException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            //catch (EncoderFallback ex)
-          
-            catch (Exception) { //Kendi kendiliğine 401 403 atıyo ama döndürmek istersek nasıl olacak
-                return StatusCode(500) ;
+                return BadRequest("Not Added");
+            
+               
+            }  
+            catch (Exception ex) { //Kendi kendiliğine 401 403 atıyo ama döndürmek istersek nasıl olacak
+                return BadRequest(ex.Message) ; //Bİr sıkıntı var 400 401 403 dönmek istediği zaman ne yapacam
             }
             
 
@@ -155,56 +136,32 @@ namespace shuttleasy.Controllers
             PasswordEncryption passwordEncryption = new PasswordEncryption();
             try
             {
-                Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
-                bool isMatched = passwordEncryption.VerifyPasswordHash(passenger, password);
-                if (isMatched)
+                bool isLogin = _userService.LoginPassenger(email, password);
+                if (isLogin)
                 {
-                    string token = _jwtTokenManager.CreateToken(passenger, _configuration);
-                    return Ok(token);
+                    Passenger passenger = _passengerLogic.GetPassengerWithEmail(email) ?? throw new ArgumentNullException();
+                    return Ok(passenger);
                 }
-                else
-                {
-                    return BadRequest(message.loginUnsuccesful);
-                }
+                return BadRequest("Requirements not valid");
 
-            }
-            catch (ArgumentNullException ex) // bunların hepsi yerine Exception ex yazsam aynı işlevi görür ?
+            }         
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch (ObjectDisposedException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch(ArgumentOutOfRangeException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch(ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch(SecurityTokenEncryptionFailedException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (SqlNullValueException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-
-
-
         }
+
+        [HttpPost]
+        public IActionResult BlaBla(string email)
+        {
+            _userService.sendOTP(email);
+            return Ok();
+        }
+
         [HttpPost]
         public IActionResult AuthenticateUser()
         {
-            var result = _mailManager.sendMail("emreyilmaz0999@hotmail.com", _configuration);
+            var result = _mailManager.sendMail("emreyilmaz0999@hotmail.com","aa","aa", _configuration);
             if (result)
             {
                 return Ok();
@@ -217,21 +174,11 @@ namespace shuttleasy.Controllers
         }
 
 
-
-
-
-
     }
 
 
 
 
 
-    public static class Roles
-    {
-        public const string Passenger = "Passenger";
-        public const string Driver = "Driver";
-        public const string Admin = "Admin";
-        public const string SuperAdmin = "SuperAdmin";
-    }
+    
 }

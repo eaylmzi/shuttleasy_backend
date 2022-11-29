@@ -1,7 +1,7 @@
 ﻿namespace shuttleasy.Models.dto.Passengers.dto
 {
     public class PassengerRegisterDto
-    {
+    {      
         public string IdentityNum { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string Surname { get; set; } = null!;

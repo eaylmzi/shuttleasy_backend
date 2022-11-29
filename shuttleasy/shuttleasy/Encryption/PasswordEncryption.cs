@@ -1,9 +1,10 @@
 ﻿using shuttleasy.DAL.Models;
+using System;
 using System.Security.Cryptography;
 
 namespace shuttleasy.Encryption
 {
-    public class PasswordEncryption
+    public class PasswordEncryption : IPasswordEncryption
     {
         public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -14,12 +15,12 @@ namespace shuttleasy.Encryption
 
             }
         }
-        public bool VerifyPasswordHash(Passenger passenger, string password)
+        public bool VerifyPasswordHash(byte[] passwordHash, byte[] passwordSalt, string password)
         {
-            using (var hmac = new HMACSHA512(passenger.PasswordSalt))
+            using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                bool isMatched = computedHash.SequenceEqual(passenger.PasswordHash);
+                bool isMatched = computedHash.SequenceEqual(passwordHash);
                 return isMatched;
             }
         }

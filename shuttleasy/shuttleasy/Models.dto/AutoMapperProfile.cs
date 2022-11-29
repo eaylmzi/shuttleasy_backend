@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using shuttleasy.DAL.Models;
+using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
 
 namespace shuttleasy.Models.dto
@@ -14,6 +15,7 @@ namespace shuttleasy.Models.dto
         public AutoMapperProfile()
         {          
             CreateMap<PassengerRegisterDto, Passenger>();
+            CreateMap<DriverRegisterDto, CompanyWorker>();
         }
     }
 }

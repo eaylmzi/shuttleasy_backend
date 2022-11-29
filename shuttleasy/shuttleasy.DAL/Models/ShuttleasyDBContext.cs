@@ -101,9 +101,9 @@ namespace shuttleasy.DAL.Models
                     .HasMaxLength(11)
                     .HasColumnName("name");
 
-                entity.Property(e => e.Password)
-                    .HasMaxLength(15)
-                    .HasColumnName("password");
+                entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
+
+                entity.Property(e => e.PasswordSalt).HasColumnName("password_salt");
 
                 entity.Property(e => e.PhoneNumber)
                     .HasMaxLength(10)
