@@ -67,7 +67,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var hangfireConnectionString = "Server=.\\SQLSERVER;Database=DbCronJobHangfire;Trusted_Connection=true;";
 builder.Services.AddHangfire(x => {
     x.UseSqlServerStorage(hangfireConnectionString);
-    RecurringJob.AddOrUpdate<MailManager>(j => j.notifyPassengersPaymentDay(), "* * * * *");
+    RecurringJob.AddOrUpdate<MailManager>(j => j.notifyPassengersPaymentDay(), "0 0 * * *");
 
 });
 builder.Services.AddHangfireServer();

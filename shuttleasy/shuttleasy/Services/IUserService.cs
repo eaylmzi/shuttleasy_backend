@@ -10,6 +10,8 @@ namespace shuttleasy.Services
         public bool LoginPassenger(string email, string password);
         public Passenger SignUp(PassengerRegisterDto passengerRegisterDto, string role);
         public CompanyWorker SignUp(DriverRegisterDto driverRegisterDto, string role);
-        public void sendOTP(string email);
+        public ResetPassword sendOTP(string email);
+        public string ValidateOTP(string email, string otp);
+        public void resetPassword(string email, string password);
     }
 }

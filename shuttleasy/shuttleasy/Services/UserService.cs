@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using shuttleasy.DAL.EFRepositories;
+using shuttleasy.DAL.EFRepositories.Driver;
+using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
@@ -19,20 +22,22 @@ namespace shuttleasy.Services
         private readonly IPassengerLogic _passengerLogic;
         private readonly IDriverLogic _driverLogic;
         private readonly IPasswordResetLogic _passwordResetLogic;
-
-
+        private readonly IPasswordResetRepository _passwordResetRepository;
+        private readonly IDriverRepository _driverRepository;
         private readonly IPasswordEncryption _passwordEncryption;
         private readonly IMapper _mapper;
         private readonly IJwtTokenManager _jwtTokenManager;
         private readonly IConfiguration _configuration;
         private readonly IMailManager _mailManager;
-        
+        private readonly IPassengerRepository _passengerRepository;
+
 
 
 
         public UserService(IPassengerLogic passengerLogic, IPasswordEncryption passwordEncryption, IMapper mapper,
             IJwtTokenManager jwtTokenManager, IConfiguration configuration, IDriverLogic driverLogic,
-            IMailManager mailManager,IPasswordResetLogic passwordResetLogic)
+            IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
+            IDriverRepository driverRepository,IPassengerRepository passengerRepository)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -42,6 +47,9 @@ namespace shuttleasy.Services
             _driverLogic = driverLogic;
             _mailManager = mailManager;
             _passwordResetLogic = passwordResetLogic;
+            _passwordResetRepository = passwordResetRepository;
+            _driverRepository = driverRepository;
+            _passengerRepository = passengerRepository;
         }
         public bool LoginPassenger(string email, string password)
         {          
@@ -147,17 +155,67 @@ namespace shuttleasy.Services
 
 
 
-        public void sendOTP(string email)
+        public ResetPassword sendOTP(string email)
         {
             string otp = GetRandomOTP(6);
-            _mailManager.sendMail(email,"Forgot your password ??",otp,_configuration);
+           // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
+            ResetPassword resetPassword = new ResetPassword();
+            resetPassword.Id = Guid.NewGuid();
+            resetPassword.Email = email;
+            resetPassword.Date = DateTime.Now;
+            resetPassword.ResetKey = otp;
+            resetPassword.PhoneNumber = "4352147687";
+            _passwordResetLogic.Add(resetPassword);
+            return resetPassword;
+
 
         }
-        public void ValidateOTP()
+        public string ValidateOTP(string email,string otp)//gençler bir sonraki ekrana email bilgisini geçirmeniz gerekiyo
         {
+            ResetPassword resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email);
+            if (resetPassword != null)
+            {
+                if (resetPassword.ResetKey.Equals(otp))
+                {
+                    var remainingTime = DateTime.Now - resetPassword.Date;
+                    int day = remainingTime.Days * 86400;
+                    int hours = remainingTime.Hours * 3600;
+                    int minutes = remainingTime.Minutes * 60;
+                    int seconds = remainingTime.Seconds;
+
+
+                    int time = day+hours+minutes+seconds;
+                    if( time < 180)
+                    {
+                        return email;
+                    }
+                }
+            }
+            return string.Empty;        
 
         }
 
+        public void resetPassword(string email,string password)
+        {
+            if(_passengerLogic.GetPassengerWithEmail(email) != null)
+            {
+                Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
+                _passwordEncryption.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                passenger.PasswordHash = passwordHash;
+                passenger.PasswordSalt = passwordSalt;
+                _passengerLogic.UpdatePassengerWithEmail(passenger,email);
+               
+            }
+            else if (_driverLogic.GetCompanyWorkerWithEmail(email) != null)
+            {
+                CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                _passwordEncryption.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                companyWorker.PasswordHash = passwordHash;
+                companyWorker.PasswordSalt = passwordSalt;
+               // _driverLogic.Update(companyWorker);
+
+            }
+        }
 
 
 

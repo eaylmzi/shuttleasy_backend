@@ -53,5 +53,16 @@ namespace shuttleasy.LOGIC.Logics
             Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();
             return passenger;
         }
+
+        public Passenger UpdatePassengerWithEmail(Passenger uptatedPassenger,string email)
+        {
+            Func<Passenger, bool> getPassenger = pas => pas.Email == email;
+            bool isUptated = _passenger.Update(uptatedPassenger, getPassenger);
+            if (isUptated)
+            {
+                return uptatedPassenger;
+            }
+            return new Passenger();
+        }
     }
 }

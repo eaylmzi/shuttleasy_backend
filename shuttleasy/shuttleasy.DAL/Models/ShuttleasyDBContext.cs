@@ -326,9 +326,11 @@ namespace shuttleasy.DAL.Models
 
             modelBuilder.Entity<ResetPassword>(entity =>
             {
-                entity.HasNoKey();
+                
 
                 entity.ToTable("reset_password");
+
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Date)
                     .HasColumnType("datetime")

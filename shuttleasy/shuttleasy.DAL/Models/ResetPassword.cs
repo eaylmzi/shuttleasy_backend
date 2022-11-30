@@ -1,13 +1,16 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 
+
 namespace shuttleasy.DAL.Models
-{
+{ 
     public partial class ResetPassword
     {
+        public Guid Id { get; set; }
         public string Email { get; set; } = null!;
         public string? PhoneNumber { get; set; }
-        public Guid ResetKey { get; set; }
+        public string ResetKey { get; set; } = null!;
         public DateTime Date { get; set; }
 
         public virtual Passenger Email1 { get; set; } = null!;

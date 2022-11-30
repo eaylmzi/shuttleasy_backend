@@ -172,7 +172,24 @@ namespace shuttleasy.Controllers
             }
             
         }
-
+        [HttpPost]
+        public IActionResult One(string email)
+        {
+            ResetPassword res = _userService.sendOTP(email);
+                return Ok(res);      
+        }
+        [HttpPost]
+        public IActionResult Two(string email, string otp)
+        {
+            string email2 = _userService.ValidateOTP(email,otp);
+            return Ok(email2);
+        }
+        [HttpPost]
+        public IActionResult Three(string email,string password)
+        {
+            _userService.resetPassword(email, password);
+            return Ok();
+        }
 
     }
 

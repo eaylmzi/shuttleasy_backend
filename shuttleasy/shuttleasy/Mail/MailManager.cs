@@ -29,7 +29,8 @@ namespace shuttleasy.Mail
                 email.Subject = subject;
                 email.Body = new TextPart(TextFormat.Html)
                 {
-                    Text = "<a href=\"https://www.google.com\">"+body+"</a>"
+                    Text = "<p>"+body+"</p>"
+                    //"<a href=\"https://www.google.com\">"+body+"</a>"
                 };
 
                 using var smtp = new SmtpClient();

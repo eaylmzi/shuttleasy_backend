@@ -2,6 +2,7 @@
 using shuttleasy.DAL.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,9 +25,23 @@ namespace shuttleasy.DAL.Interfaces
             return entity;
         }
 
-        public bool Update(T entity)
-        {
-            throw new NotImplementedException();
+        public bool Update(T updatedEntity, Func<T, bool> metot)
+        {          
+           
+            T? entity = query
+                      .Where(metot)
+                      .Select(m => m)
+                      .SingleOrDefault();
+
+            if (entity != null)
+            {
+                entity = updatedEntity;
+                _context.SaveChangesAsync();
+                return true;
+            }
+              
+                return false;
+
         }
 
         public bool Delete(T entity)
