@@ -23,6 +23,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using shuttleasy.Mail;
 using shuttleasy.Services;
+using shuttleasy.Models.dto.Credentials.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -59,7 +60,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public ActionResult<Passenger> GetPassenger(string id)
+        public ActionResult<Passenger> GetPassenger(int id)
         {
             try
             {
@@ -105,7 +106,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost]
-        public ActionResult<bool> Validate(string jwt)
+        public ActionResult<bool> ValidateToken(string jwt)
         {
             return _jwtTokenManager.validateToken(jwt,_configuration);
         }
@@ -152,43 +153,41 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost]
-        public IActionResult BlaBla(string email)
+        public IActionResult SendOTPEmail(string email)
         {
-            _userService.sendOTP(email);
-            return Ok();
-        }
-
-        [HttpPost]
-        public IActionResult AuthenticateUser()
-        {
-            var result = _mailManager.sendMail("emreyilmaz0999@hotmail.com","aa","aa", _configuration);
-            if (result)
+            try
             {
-                return Ok();
+                ResetPassword res = _userService.sendOTP(email);
+                return Ok(res);
             }
-            else
+            catch(Exception ex) {
+                return BadRequest(ex.Message);
+            }
+               
+        }
+        [HttpPost]
+        public IActionResult ValidateOTP(string email, string otp)
+        {
+            try { 
+            EmailTokenDto emailTokenDto = _userService.ValidateOTP(email,otp) ?? throw new ArgumentNullException();
+            return Ok(emailTokenDto);
+            }
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
-            
         }
         [HttpPost]
-        public IActionResult One(string email)
+        public IActionResult ResetPassword(string email,string password)
         {
-            ResetPassword res = _userService.sendOTP(email);
-                return Ok(res);      
-        }
-        [HttpPost]
-        public IActionResult Two(string email, string otp)
-        {
-            string email2 = _userService.ValidateOTP(email,otp);
-            return Ok(email2);
-        }
-        [HttpPost]
-        public IActionResult Three(string email,string password)
-        {
+            try { 
             _userService.resetPassword(email, password);
             return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

@@ -15,7 +15,6 @@ namespace shuttleasy.JwtToken
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role,role),
-                new Claim(ClaimTypes.NameIdentifier,passenger.IdentityNum),
                 new Claim(ClaimTypes.Name,passenger.Name)
 
             };
@@ -38,7 +37,6 @@ namespace shuttleasy.JwtToken
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role,role),
-                new Claim(ClaimTypes.NameIdentifier,worker.IdentityNum),
                 new Claim(ClaimTypes.Name,worker.Name)
 
             };

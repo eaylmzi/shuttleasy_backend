@@ -24,7 +24,7 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public ActionResult<bool> SignUpDriver(DriverRegisterDto driverRegisterDto)
+        public ActionResult<bool> CreateDriver(DriverRegisterDto driverRegisterDto)
         {
             try
             {

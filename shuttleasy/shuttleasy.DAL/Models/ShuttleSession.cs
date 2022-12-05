@@ -16,7 +16,5 @@ namespace shuttleasy.DAL.Models
         public DateTime SessionDate { get; set; }
         public bool IsActive { get; set; }
 
-        public virtual ShuttleBu Bus { get; set; } = null!;
-        public virtual Company Company { get; set; } = null!;
     }
 }

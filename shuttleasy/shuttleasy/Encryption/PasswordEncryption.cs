@@ -24,5 +24,35 @@ namespace shuttleasy.Encryption
                 return isMatched;
             }
         }
+        public bool ResetPassengerPassword(string password,Passenger passenger)
+        {
+            try
+            {
+                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                passenger.PasswordHash = passwordHash;
+                passenger.PasswordSalt = passwordSalt;
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+
+        }
+        public bool ResetDriverPassword(string password, CompanyWorker companyWorker)
+        {
+            try
+            {
+                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                companyWorker.PasswordHash = passwordHash;
+                companyWorker.PasswordSalt = passwordSalt;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+        }
     }
 }

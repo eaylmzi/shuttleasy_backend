@@ -38,5 +38,16 @@ namespace shuttleasy.LOGIC.Logics.Driver
 
 
         }
+
+        public CompanyWorker UpdateDriverWithEmail(CompanyWorker updatedCompanyWorker, string email)
+        {
+            Func<CompanyWorker, bool> getDriver = pas => pas.Email == email;
+            bool isUpdated = _driverRepository.Update(updatedCompanyWorker, getDriver);
+            if (isUpdated)
+            {
+                return updatedCompanyWorker;
+            }
+            return new CompanyWorker();
+        }
     }
 }

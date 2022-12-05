@@ -12,6 +12,8 @@ using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.Driver;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.Mail;
+using shuttleasy.Models;
+using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
 
@@ -126,8 +128,7 @@ namespace shuttleasy.Services
         {
             CompanyWorker newCompanyWorker = new CompanyWorker();
             try
-            {
-                
+            {             
                 newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
                 string randomPassword = GetRandomString(10);
 
@@ -136,9 +137,11 @@ namespace shuttleasy.Services
                 newCompanyWorker.PasswordSalt = passwordSalt;
 
                 newCompanyWorker.Verified = true;
-                
+                newCompanyWorker.WorkerType = role;
+               
                 string token = _jwtTokenManager.CreateToken(newCompanyWorker, role, _configuration);
                 newCompanyWorker.Token = token;
+
 
                 bool result = _driverLogic.Add(newCompanyWorker);
                 return newCompanyWorker;
@@ -160,19 +163,23 @@ namespace shuttleasy.Services
             string otp = GetRandomOTP(6);
            // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
             ResetPassword resetPassword = new ResetPassword();
-            resetPassword.Id = Guid.NewGuid();
             resetPassword.Email = email;
             resetPassword.Date = DateTime.Now;
             resetPassword.ResetKey = otp;
-            resetPassword.PhoneNumber = "4352147687";
             _passwordResetLogic.Add(resetPassword);
             return resetPassword;
 
 
         }
-        public string ValidateOTP(string email,string otp)//gençler bir sonraki ekrana email bilgisini geçirmeniz gerekiyo
+        public EmailTokenDto? ValidateOTP(string email,string otp)//gençler bir sonraki ekrana email bilgisini geçirmeniz gerekiyo
         {
             ResetPassword resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email);
+            Passenger passenger;
+            CompanyWorker companyWorker;
+            try
+            {
+
+            
             if (resetPassword != null)
             {
                 if (resetPassword.ResetKey.Equals(otp))
@@ -187,35 +194,70 @@ namespace shuttleasy.Services
                     int time = day+hours+minutes+seconds;
                     if( time < 180)
                     {
-                        return email;
+                        EmailTokenDto emailTokenDto;
+                        if (_passengerLogic.GetPassengerWithEmail(email) != null)
+                        {
+                            
+                            passenger = _passengerLogic.GetPassengerWithEmail(email);
+                            emailTokenDto = new EmailTokenDto();
+                            emailTokenDto.Email = email;
+                            emailTokenDto.Token = passenger.Token;
+                        }
+                        else
+                        {
+                            companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                            emailTokenDto = new EmailTokenDto();
+                            emailTokenDto.Email = email;
+                            emailTokenDto.Token = companyWorker.Token;
+                        }
+                        
+                        
+                        return emailTokenDto;
                     }
                 }
             }
-            return string.Empty;        
+            return null;
+            }
+            catch (Exception)
+            {
+                return null;
+
+            }
 
         }
-
-        public void resetPassword(string email,string password)
+        public object resetPassword(string email,string password)
         {
+         
             if(_passengerLogic.GetPassengerWithEmail(email) != null)
             {
                 Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
-                _passwordEncryption.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-                passenger.PasswordHash = passwordHash;
-                passenger.PasswordSalt = passwordSalt;
+                _passwordEncryption.ResetPassengerPassword(password, passenger);
                 _passengerLogic.UpdatePassengerWithEmail(passenger,email);
+                return passenger;
                
             }
-            else if (_driverLogic.GetCompanyWorkerWithEmail(email) != null)
+            else
             {
                 CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
-                _passwordEncryption.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-                companyWorker.PasswordHash = passwordHash;
-                companyWorker.PasswordSalt = passwordSalt;
-               // _driverLogic.Update(companyWorker);
-
+                _passwordEncryption.ResetDriverPassword(password, companyWorker);
+                _driverLogic.UpdateDriverWithEmail(companyWorker,email);
+                return companyWorker;
             }
         }
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

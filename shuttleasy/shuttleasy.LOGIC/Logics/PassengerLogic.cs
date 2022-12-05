@@ -47,20 +47,20 @@ namespace shuttleasy.LOGIC.Logics
             
         }
 
-        public Passenger GetPassengerWithId(string id) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
+        public Passenger GetPassengerWithId(int id) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
-            Func<Passenger, bool> getPassenger = pas => pas.IdentityNum == id;
+            Func<Passenger, bool> getPassenger = pas => pas.Id == id;
             Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();
             return passenger;
         }
 
-        public Passenger UpdatePassengerWithEmail(Passenger uptatedPassenger,string email)
+        public Passenger UpdatePassengerWithEmail(Passenger updatedPassenger,string email)
         {
             Func<Passenger, bool> getPassenger = pas => pas.Email == email;
-            bool isUptated = _passenger.Update(uptatedPassenger, getPassenger);
-            if (isUptated)
+            bool isUpdated = _passenger.Update(updatedPassenger, getPassenger);
+            if (isUpdated)
             {
-                return uptatedPassenger;
+                return updatedPassenger;
             }
             return new Passenger();
         }

@@ -11,5 +11,6 @@ namespace shuttleasy.LOGIC.Logics.Driver
     {
         public bool Add(CompanyWorker companyWorker);
         public CompanyWorker GetCompanyWorkerWithEmail(string email);
+        public CompanyWorker UpdateDriverWithEmail(CompanyWorker updatedCompanyWorker, string email);
     }
 }
