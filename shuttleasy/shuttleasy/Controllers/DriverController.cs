@@ -5,7 +5,7 @@ using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
 using shuttleasy.LOGIC.Logics;
-using shuttleasy.LOGIC.Logics.Driver;
+using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Services;
 
@@ -17,27 +17,30 @@ namespace shuttleasy.Controllers
     {
         private readonly IUserService _userService;
         private readonly IPassengerLogic _passengerLogic;
-        private readonly IDriverLogic _driverLogic;
-        public DriverController(IUserService userService , IPassengerLogic passengerLogic,IDriverLogic driverLogic)
+        private readonly ICompanyWorkerLogic _driverLogic;
+        public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public ActionResult<Passenger> Login(string email, string password)
+        public ActionResult<CompanyWorker> Login(string email, string password)
         {
             PasswordEncryption passwordEncryption = new PasswordEncryption();
             try
             {
-                bool isLogin = _userService.LoginDriver(email, password);
+                bool isLogin = _userService.LoginCompanyWorker(email, password);
                 if (isLogin)
                 {
-                    CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
-                    return Ok(companyWorker);
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                    if (companyWorker != null)
+                    {
+                        return Ok(companyWorker);
+                    }
+                    return BadRequest("The driver not found in list");
                 }
-                return BadRequest("Requirements not valid");
-
+                return BadRequest("Email and password not correct");
             }
             catch (Exception ex)
             {

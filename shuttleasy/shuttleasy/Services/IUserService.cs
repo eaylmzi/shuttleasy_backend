@@ -7,12 +7,14 @@ namespace shuttleasy.Services
 {
     public interface IUserService
     {
-        public bool LoginDriver(string email, string password);
+        public bool LoginCompanyWorker(string email, string password);
         public bool LoginPassenger(string email, string password);
-        public Passenger SignUp(PassengerRegisterDto passengerRegisterDto, string role);
-        public CompanyWorker SignUp(DriverRegisterDto driverRegisterDto, string role);
-        public ResetPassword sendOTP(string email);
+        public Passenger? SignUp(PassengerRegisterDto passengerRegisterDto, string role);
+        public Passenger CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role);
+        public CompanyWorker CreateDriver(DriverRegisterDto driverRegisterDto, string role);
+        public ResetPassword? SendOTP(string email);
         public EmailTokenDto? ValidateOTP(string email, string otp);
-        public object resetPassword(string email, string password);
+        public object? resetPassword(string email, string password);
+
     }
 }

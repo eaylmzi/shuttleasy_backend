@@ -10,6 +10,8 @@ namespace shuttleasy.LOGIC.Logics.PasswordReset
     public interface IPasswordResetLogic
     {
         public bool Add(ResetPassword resetPassword);
-        public ResetPassword GetResetPasswordWithEmail(string email);
+        public ResetPassword? GetResetPasswordWithEmail(string email);
+        public bool DeleteResetPasswordWithEmail(string email);
+
     }
 }

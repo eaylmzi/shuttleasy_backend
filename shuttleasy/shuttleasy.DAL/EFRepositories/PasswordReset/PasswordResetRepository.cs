@@ -1,4 +1,4 @@
-﻿using shuttleasy.DAL.EFRepositories.Driver;
+﻿using shuttleasy.DAL.EFRepositories.CompanyWorkers;
 using shuttleasy.DAL.Interfaces;
 using shuttleasy.DAL.Models;
 using System;

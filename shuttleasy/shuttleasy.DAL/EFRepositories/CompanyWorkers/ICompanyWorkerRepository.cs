@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace shuttleasy.DAL.EFRepositories.Driver
+namespace shuttleasy.DAL.EFRepositories.CompanyWorkers
 {
-    public interface IDriverRepository : IRepository<CompanyWorker>
+    public interface ICompanyWorkerRepository : IRepository<CompanyWorker>
     {
     }
 }

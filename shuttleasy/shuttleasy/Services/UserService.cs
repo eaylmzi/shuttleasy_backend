@@ -1,31 +1,33 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using shuttleasy.DAL.EFRepositories;
-using shuttleasy.DAL.EFRepositories.Driver;
+using shuttleasy.DAL.EFRepositories.CompanyWorkers;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
 using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
-using shuttleasy.LOGIC.Logics.Driver;
+using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.Mail;
 using shuttleasy.Models;
 using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
+using System;
 
 namespace shuttleasy.Services
 {
     public class UserService : IUserService
     {
         private readonly IPassengerLogic _passengerLogic;
-        private readonly IDriverLogic _driverLogic;
+        private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IPasswordResetLogic _passwordResetLogic;
         private readonly IPasswordResetRepository _passwordResetRepository;
-        private readonly IDriverRepository _driverRepository;
+        private readonly ICompanyWorkerRepository _driverRepository;
         private readonly IPasswordEncryption _passwordEncryption;
         private readonly IMapper _mapper;
         private readonly IJwtTokenManager _jwtTokenManager;
@@ -37,9 +39,9 @@ namespace shuttleasy.Services
 
 
         public UserService(IPassengerLogic passengerLogic, IPasswordEncryption passwordEncryption, IMapper mapper,
-            IJwtTokenManager jwtTokenManager, IConfiguration configuration, IDriverLogic driverLogic,
+            IJwtTokenManager jwtTokenManager, IConfiguration configuration, ICompanyWorkerLogic driverLogic,
             IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
-            IDriverRepository driverRepository,IPassengerRepository passengerRepository)
+            ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -55,7 +57,8 @@ namespace shuttleasy.Services
         }
         public bool LoginPassenger(string email, string password)
         {          
-            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
+            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
+                    ?? throw new ArgumentNullException();
 
             bool isMatched = _passwordEncryption.VerifyPasswordHash(passenger.PasswordHash,passenger.PasswordSalt, password);
             if (isMatched && passenger != null)
@@ -65,9 +68,10 @@ namespace shuttleasy.Services
             return false;
             //"1JCG6eSVTO"
         }
-        public bool LoginDriver(string email, string password)
+        public bool LoginCompanyWorker(string email, string password)
         {
-            CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+            CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email)
+                    ??throw new ArgumentNullException();
 
             bool isMatched = _passwordEncryption.VerifyPasswordHash(companyWorker.PasswordHash,companyWorker.PasswordSalt, password);
             if (isMatched && companyWorker != null)
@@ -75,174 +79,200 @@ namespace shuttleasy.Services
                 return true;
             }
             return false;
-            //"1JCG6eSVTO"
         }
-       /* public bool LoginAdmin(string email, string password) // Buraya bakılacak
-        {        
-            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
-
-            bool isMatched = _passwordEncryption.VerifyPasswordHash(passenger, password);
-            if (isMatched && passenger != null)
-            {
-                return true;
-            }
-            return false;
-            //"1JCG6eSVTO"
-        }*/
         public Passenger SignUp(PassengerRegisterDto passengerRegisterDto,string role)
         {
             Passenger newPassenger = new Passenger();
-            try
+            newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
+            newPassenger.QrString = Guid.NewGuid();
+            newPassenger.IsPayment = false;
+
+            string token = _jwtTokenManager.CreateToken(newPassenger, role, _configuration);
+            newPassenger.Token = token;
+            if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
             {
-                newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
-                newPassenger.QrString = Guid.NewGuid();
-                newPassenger.IsPayment = false;
-                if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
-                {
-                    _passwordEncryption.CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-
-                    newPassenger.PasswordHash = passwordHash;
-                    newPassenger.PasswordSalt = passwordSalt;
-                    newPassenger.Verified = true;
-
-                    string token = _jwtTokenManager.CreateToken(newPassenger, role, _configuration);
-                    newPassenger.Token = token;
-                }
-                else
-                {
-                    newPassenger.Verified = false;
-                }
-
-                bool result = _passengerLogic.Add(newPassenger);
-                return newPassenger;
+                _passwordEncryption.CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+                newPassenger.PasswordHash = passwordHash;
+                newPassenger.PasswordSalt = passwordSalt;
+                newPassenger.Verified = true;
             }
-            catch (Exception)
-            { //Kendi kendiliğine 401 403 atıyo ama döndürmek istersek nasıl olacak
-                return new Passenger(); //Bİr sıkıntı var 400 401 403 dönmek istediği zaman ne yapacam
+            else
+            {
+                newPassenger.Verified = false;
             }
 
+            _passengerLogic.Add(newPassenger);
+            return newPassenger;
 
         }
-        public CompanyWorker SignUp(DriverRegisterDto driverRegisterDto, string role)
+        public Passenger CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role)
+        {
+            Passenger newPassenger = new Passenger();
+            newPassenger = _mapper.Map<Passenger>(passengerRegisterPanelDto);
+            string randomPassword = GetRandomString(10);
+            _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            newPassenger.PasswordHash = passwordHash;
+            newPassenger.PasswordSalt = passwordSalt;
+
+            newPassenger.Verified = true;
+
+            string token = _jwtTokenManager.CreateToken(newPassenger, role, _configuration);
+            newPassenger.Token = token;
+
+            _passengerLogic.Add(newPassenger);
+            return newPassenger;
+
+        }
+        public CompanyWorker CreateDriver(DriverRegisterDto driverRegisterDto, string role)
         {
             CompanyWorker newCompanyWorker = new CompanyWorker();
-            try
-            {             
-                newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
-                string randomPassword = GetRandomString(10);
+            newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
+            string randomPassword = GetRandomString(10);
+            _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            newCompanyWorker.PasswordHash = passwordHash;
+            newCompanyWorker.PasswordSalt = passwordSalt;
 
-                _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
-                newCompanyWorker.PasswordHash = passwordHash;
-                newCompanyWorker.PasswordSalt = passwordSalt;
+            newCompanyWorker.Verified = true;
+            newCompanyWorker.WorkerType = role;
 
-                newCompanyWorker.Verified = true;
-                newCompanyWorker.WorkerType = role;
-               
-                string token = _jwtTokenManager.CreateToken(newCompanyWorker, role, _configuration);
-                newCompanyWorker.Token = token;
+            string token = _jwtTokenManager.CreateToken(newCompanyWorker, role, _configuration);
+            newCompanyWorker.Token = token;
 
-
-                bool result = _driverLogic.Add(newCompanyWorker);
-                return newCompanyWorker;
-            }
-            catch (Exception)
-            { //Kendi kendiliğine 401 403 atıyo ama döndürmek istersek nasıl olacak
-                return new CompanyWorker(); //Bİr sıkıntı var 400 401 403 dönmek istediği zaman ne yapacam
-            }
-
+            _driverLogic.Add(newCompanyWorker);
+            return newCompanyWorker;
 
         }
-
-
-
-
-
-        public ResetPassword sendOTP(string email)
+        private bool isAnyValidOTP(string email)
         {
-            string otp = GetRandomOTP(6);
-           // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
-            ResetPassword resetPassword = new ResetPassword();
-            resetPassword.Email = email;
-            resetPassword.Date = DateTime.Now;
-            resetPassword.ResetKey = otp;
-            _passwordResetLogic.Add(resetPassword);
-            return resetPassword;
-
-
-        }
-        public EmailTokenDto? ValidateOTP(string email,string otp)//gençler bir sonraki ekrana email bilgisini geçirmeniz gerekiyo
-        {
-            ResetPassword resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email);
-            Passenger passenger;
-            CompanyWorker companyWorker;
-            try
+            ResetPassword? resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email);
+            if (resetPassword != null)
             {
+                int time = getTimeDiffereance(resetPassword.Date);
+                if (time > 180)
+                {
+                    _passwordResetLogic.DeleteResetPasswordWithEmail(resetPassword.Email);
+                    return false;
+                }
 
-            
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+     
+        public ResetPassword? SendOTP(string email)
+        {
+            if (!isAnyValidOTP(email))
+            {
+                string otp = GetRandomOTP(6);
+                // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
+                ResetPassword resetPassword = new ResetPassword();
+                resetPassword.Email = email;
+                resetPassword.Date = DateTime.Now;
+                resetPassword.ResetKey = otp;
+                _passwordResetLogic.Add(resetPassword);
+                return resetPassword;
+
+            }
+            return null;
+        }
+        private int getTimeDiffereance(DateTime dateTime)
+        {
+            var remainingTime = DateTime.Now - dateTime;
+            int day = remainingTime.Days * 86400;
+            int hours = remainingTime.Hours * 3600;
+            int minutes = remainingTime.Minutes * 60;
+            int seconds = remainingTime.Seconds;
+            int time = day + hours + minutes + seconds;
+            return time;
+        }
+        public EmailTokenDto? ValidateOTP(string email,string otp)
+        {
+            ResetPassword resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email)
+                 ?? throw new ArgumentNullException();
+            Passenger? passenger;
+            CompanyWorker companyWorker;
+
             if (resetPassword != null)
             {
                 if (resetPassword.ResetKey.Equals(otp))
                 {
-                    var remainingTime = DateTime.Now - resetPassword.Date;
-                    int day = remainingTime.Days * 86400;
-                    int hours = remainingTime.Hours * 3600;
-                    int minutes = remainingTime.Minutes * 60;
-                    int seconds = remainingTime.Seconds;
 
-
-                    int time = day+hours+minutes+seconds;
-                    if( time < 180)
+                    int time = getTimeDiffereance(resetPassword.Date);
+                    if (time < 180)
                     {
                         EmailTokenDto emailTokenDto;
-                        if (_passengerLogic.GetPassengerWithEmail(email) != null)
+                        passenger = _passengerLogic.GetPassengerWithEmail(email);
+                        if (passenger!= null)//Geliştirilebilir bak buraya
                         {
-                            
-                            passenger = _passengerLogic.GetPassengerWithEmail(email);
                             emailTokenDto = new EmailTokenDto();
                             emailTokenDto.Email = email;
                             emailTokenDto.Token = passenger.Token;
                         }
                         else
                         {
-                            companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                            companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email)
+                                    ?? throw new ArgumentNullException();
                             emailTokenDto = new EmailTokenDto();
                             emailTokenDto.Email = email;
                             emailTokenDto.Token = companyWorker.Token;
                         }
-                        
-                        
+
+
                         return emailTokenDto;
                     }
                 }
             }
-            return null;
-            }
-            catch (Exception)
-            {
-                return null;
 
-            }
+            return null;
 
         }
-        public object resetPassword(string email,string password)
+        public object? resetPassword(string email,string password)
         {
-         
-            if(_passengerLogic.GetPassengerWithEmail(email) != null)
+            if (_passengerLogic.GetPassengerWithEmail(email) != null)
             {
-                Passenger passenger = _passengerLogic.GetPassengerWithEmail(email);
+                Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
+                        ?? throw new ArgumentNullException();
+                if (passenger.Verified == false)
+                {
+                    passenger.Verified = true;
+                }
                 _passwordEncryption.ResetPassengerPassword(password, passenger);
-                _passengerLogic.UpdatePassengerWithEmail(passenger,email);
-                return passenger;
-               
+
+                bool isUpdated = _passengerLogic.UpdatePassengerWithEmail(passenger, email);
+                if (isUpdated)
+                {
+                    return passenger;
+                }
+                else
+                {
+                    return null;
+                }
+                
             }
             else
             {
-                CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email)
+                        ?? throw new ArgumentNullException();
+                if (companyWorker.Verified == false)
+                {
+                    companyWorker.Verified = true;
+                }
                 _passwordEncryption.ResetDriverPassword(password, companyWorker);
-                _driverLogic.UpdateDriverWithEmail(companyWorker,email);
-                return companyWorker;
+                bool isUpdated = _driverLogic.UpdateDriverWithEmail(companyWorker, email);
+                if (isUpdated)
+                {
+                    return companyWorker;
+                }
+                else
+                {
+                    return null;
+                }
+               
             }
+
         }
       
 

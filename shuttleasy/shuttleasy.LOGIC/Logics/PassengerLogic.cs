@@ -31,20 +31,11 @@ namespace shuttleasy.LOGIC.Logics
             return passengerList;
         }
 
-        public Passenger GetPassengerWithEmail(string email) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
+        public Passenger? GetPassengerWithEmail(string email) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
             Func<Passenger, bool> getPassenger = pas => pas.Email == email;
-            try
-            {
-                Passenger passenger = _passenger.GetSingle(getPassenger) ?? throw new ArgumentNullException();
-                return passenger;
-            }
-            catch(Exception)
-            {
-                return new Passenger();
-            }
-            
-            
+            Passenger? passenger = _passenger.GetSingle(getPassenger);
+            return passenger;
         }
 
         public Passenger GetPassengerWithId(int id) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
@@ -54,15 +45,11 @@ namespace shuttleasy.LOGIC.Logics
             return passenger;
         }
 
-        public Passenger UpdatePassengerWithEmail(Passenger updatedPassenger,string email)
+        public bool UpdatePassengerWithEmail(Passenger updatedPassenger,string email)
         {
             Func<Passenger, bool> getPassenger = pas => pas.Email == email;
             bool isUpdated = _passenger.Update(updatedPassenger, getPassenger);
-            if (isUpdated)
-            {
-                return updatedPassenger;
-            }
-            return new Passenger();
+            return isUpdated;
         }
     }
 }

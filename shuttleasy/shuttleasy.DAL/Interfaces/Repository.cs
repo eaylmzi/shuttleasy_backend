@@ -44,9 +44,20 @@ namespace shuttleasy.DAL.Interfaces
 
         }
 
-        public bool Delete(T entity)
+        public bool Delete(Func<T, bool> metot)
         {
-            throw new NotImplementedException();
+            T? entity = query
+                     .Where(metot)
+                     .Select(m => m)
+                     .SingleOrDefault();
+            if(entity != null)
+            {
+                query.Remove(entity);
+                _context.SaveChanges();
+                return true;
+
+            }
+            return false;
         }
 
         public bool Add(T entity)

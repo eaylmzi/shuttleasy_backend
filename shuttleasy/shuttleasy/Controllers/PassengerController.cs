@@ -58,65 +58,15 @@ namespace shuttleasy.Controllers
             _userService = userService;
             _passwordEncryption = passwordEncryption;
         }
-
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public ActionResult<Passenger> GetPassenger(int id)
-        {
-            try
-            {
-                return _passengerLogic.GetPassengerWithId(id);
-            }
-            catch(ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch(InvalidOperationException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-        }
-        [HttpPost,Authorize(Roles = $"{Roles.Admin},{Roles.Driver}")]
-        public ActionResult<List<Passenger>> GetAllPassengers()
-        {
-            try
-            {
-                return _passengerLogic.GetAllPassengers();
-            }
-            catch(ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-        }
-
-        [HttpGet]
-        public ActionResult<string> GetPassengerToken()
-        {
-            var userName = _passengerService.getPassenger();
-            return Ok(userName);
-
-        }
-
-        [HttpPost]
-        public ActionResult<bool> ValidateToken(string jwt)
-        {
-            return _jwtTokenManager.validateToken(jwt,_configuration);
-        }
+        //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
         [HttpPost]
         public ActionResult<bool> SignUp(PassengerRegisterDto passengerRegisterDto)
         {           
             try
             {
-                Passenger newPassenger = _userService.SignUp(passengerRegisterDto,Roles.Passenger);
+                Passenger newPassenger = _userService.SignUp(passengerRegisterDto,Roles.Passenger)
+                        ?? throw new ArgumentNullException();
                 if(newPassenger != null)
                 {
                     return Ok(newPassenger);
@@ -134,16 +84,19 @@ namespace shuttleasy.Controllers
         [HttpPost]
         public ActionResult<Passenger> Login(string email,string password)
         {          
-            PasswordEncryption passwordEncryption = new PasswordEncryption();
             try
             {
                 bool isLogin = _userService.LoginPassenger(email, password);
                 if (isLogin)
                 {
-                    Passenger passenger = _passengerLogic.GetPassengerWithEmail(email) ?? throw new ArgumentNullException();
-                    return Ok(passenger);
+                    Passenger? passenger = _passengerLogic.GetPassengerWithEmail(email);
+                    if (passenger != null)
+                    {
+                        return Ok(passenger);
+                    }
+                    return BadRequest("The passenger not found in list");
                 }
-                return BadRequest("Requirements not valid");
+                return BadRequest("Email and password not correct");
 
             }         
             catch (Exception ex)
@@ -152,13 +105,26 @@ namespace shuttleasy.Controllers
             }
         }
 
+
+
+
+
+
         [HttpPost]
         public IActionResult SendOTPEmail(string email)
         {
             try
             {
-                ResetPassword res = _userService.sendOTP(email);
-                return Ok(res);
+                ResetPassword? res = _userService.SendOTP(email);
+                if(res != null)
+                {
+                    return Ok(res);
+                }
+                else
+                {
+                    return BadRequest("No attempt can be made before 180 seconds");
+                }
+                
             }
             catch(Exception ex) {
                 return BadRequest(ex.Message);
@@ -168,9 +134,14 @@ namespace shuttleasy.Controllers
         [HttpPost]
         public IActionResult ValidateOTP(string email, string otp)
         {
-            try { 
-            EmailTokenDto emailTokenDto = _userService.ValidateOTP(email,otp) ?? throw new ArgumentNullException();
-            return Ok(emailTokenDto);
+            try {
+                EmailTokenDto? emailTokenDto = _userService.ValidateOTP(email, otp);
+                if (emailTokenDto != null)
+                {
+                    return Ok(emailTokenDto);
+                }
+                return BadRequest("Not valid password");
+
             }
             catch (Exception ex)
             {
@@ -180,15 +151,21 @@ namespace shuttleasy.Controllers
         [HttpPost]
         public IActionResult ResetPassword(string email,string password)
         {
-            try { 
-            _userService.resetPassword(email, password);
-            return Ok();
+            try {
+                object? user = _userService.resetPassword(email, password);
+                if (user != null)
+                {
+                    return Ok(user);
+                }
+                return BadRequest("The password has not been updated");
+
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
 
     }
 
