@@ -84,7 +84,7 @@ namespace shuttleasy.Controllers
             
 
         }
-        [HttpPost,Authorize(Roles = $"{Roles.Passenger}")]
+        [HttpPost]
         public ActionResult<Passenger> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {          
             try
@@ -107,7 +107,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}W")]
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
         public ActionResult<Passenger> DeletePassenger([FromBody] EmailPasswordDto emailPasswordDto)
         {
             try
@@ -164,7 +164,7 @@ namespace shuttleasy.Controllers
 
 
 
-        [HttpPost,Authorize(Roles = $"{Roles.Passenger}")]
+        [HttpPost]
         public IActionResult SendOTPEmail([FromBody] string email)
         {
             try
@@ -185,7 +185,7 @@ namespace shuttleasy.Controllers
             }
                
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        [HttpPost]
         public IActionResult ValidateOTP([FromBody]EmailOtpDto emailOtpDto)
         {
             try {
@@ -202,7 +202,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        [HttpPost]
         public IActionResult ResetPassword(EmailPasswordDto emailPasswordDto)
         {
             try {

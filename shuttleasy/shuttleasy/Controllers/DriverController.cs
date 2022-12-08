@@ -29,7 +29,7 @@ namespace shuttleasy.Controllers
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        [HttpPost]
         public ActionResult<CompanyWorker> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {
             PasswordEncryption passwordEncryption = new PasswordEncryption();
@@ -58,6 +58,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
+                
                 CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(userProfileDto);
                 if (updatedDriver != null)
                 {
@@ -72,7 +73,7 @@ namespace shuttleasy.Controllers
 
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        [HttpPost]
         public IActionResult SendOTPEmail(string email)
         {
             try
@@ -94,7 +95,7 @@ namespace shuttleasy.Controllers
             }
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        [HttpPost]
         public IActionResult ValidateOTP([FromBody]EmailOtpDto emailOtpDto)
         {
             try
@@ -112,7 +113,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        [HttpPost]
         public IActionResult ResetPassword([FromBody]EmailPasswordDto emailPasswordDto)
         {
             try

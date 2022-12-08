@@ -147,6 +147,7 @@ namespace shuttleasy.Services
 
         public Passenger? UpdatePassengerProfile(UserProfileDto userProfileDto)
         {
+
             Passenger updatedPassenger = _mapper.Map<Passenger>(userProfileDto);  
             bool isUpdated = _passengerLogic.UpdatePassengerWithEmail(updatedPassenger,userProfileDto.Email);
             if (isUpdated)
@@ -159,6 +160,7 @@ namespace shuttleasy.Services
         }
         public CompanyWorker? UpdateDriverProfile(UserProfileDto userProfileDto)
         {
+
             CompanyWorker updatedDriver = _mapper.Map<CompanyWorker>(userProfileDto);
             bool isUpdated = _driverLogic.UpdateDriverWithEmail(updatedDriver, userProfileDto.Email);
             if (isUpdated)

@@ -19,6 +19,7 @@ namespace shuttleasy.Models.dto
             CreateMap<DriverRegisterDto, CompanyWorker>();
             CreateMap<PassengerRegisterPanelDto, Passenger>();
             CreateMap<UserProfileDto, Passenger>();
+            CreateMap<UserProfileDto, CompanyWorker>();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace shuttleasy.Controllers
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
         }
-        [HttpPost,Authorize(Roles = $"{Roles.Admin}")]
+        [HttpPost]
         public ActionResult<string> Login([FromBody]EmailPasswordDto emailPasswordDto)
         {
             try
