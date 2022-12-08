@@ -6,6 +6,7 @@ using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
+using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Services;
 
@@ -25,15 +26,15 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public ActionResult<CompanyWorker> Login(string email, string password)
+        public ActionResult<CompanyWorker> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {
             PasswordEncryption passwordEncryption = new PasswordEncryption();
             try
             {
-                bool isLogin = _userService.LoginCompanyWorker(email, password);
+                bool isLogin = _userService.LoginCompanyWorker(emailPasswordDto.Email, emailPasswordDto.Password);
                 if (isLogin)
                 {
-                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(emailPasswordDto.Email);
                     if (companyWorker != null)
                     {
                         return Ok(companyWorker);

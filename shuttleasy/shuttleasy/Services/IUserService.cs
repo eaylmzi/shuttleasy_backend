@@ -15,6 +15,7 @@ namespace shuttleasy.Services
         public ResetPassword? SendOTP(string email);
         public EmailTokenDto? ValidateOTP(string email, string otp);
         public object? resetPassword(string email, string password);
+        
 
     }
 }

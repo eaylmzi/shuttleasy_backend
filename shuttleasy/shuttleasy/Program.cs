@@ -49,6 +49,18 @@ builder.Services.AddSwaggerGen(options =>
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                                 .AllowAnyHeader()
+                                 .AllowAnyMethod();
+        });
+});
+
+
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -59,13 +71,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value ?? throw new ArgumentNullException())),
             ValidateIssuer = false,
-            ValidateAudience =false
+            ValidateAudience = false
         };
     });
 
 
 var hangfireConnectionString = "Server=.\\SQLSERVER;Database=DbCronJobHangfire;Trusted_Connection=true;";
-builder.Services.AddHangfire(x => {
+builder.Services.AddHangfire(x =>
+{
     x.UseSqlServerStorage(hangfireConnectionString);
     RecurringJob.AddOrUpdate<MailManager>(j => j.notifyPassengersPaymentDay(), "0 0 * * *");
 
@@ -87,6 +100,7 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 app.UseHangfireDashboard();
+app.UseCors();
 
 app.MapControllers();
 

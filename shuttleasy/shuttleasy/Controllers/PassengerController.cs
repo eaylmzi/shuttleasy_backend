@@ -24,6 +24,7 @@ using MailKit.Security;
 using shuttleasy.Mail;
 using shuttleasy.Services;
 using shuttleasy.Models.dto.Credentials.dto;
+using shuttleasy.Models.dto.Login.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -61,7 +62,7 @@ namespace shuttleasy.Controllers
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
         [HttpPost]
-        public ActionResult<bool> SignUp(PassengerRegisterDto passengerRegisterDto)
+        public ActionResult<bool> SignUp([FromBody] PassengerRegisterDto passengerRegisterDto)
         {           
             try
             {
@@ -82,14 +83,14 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost]
-        public ActionResult<Passenger> Login(string email,string password)
+        public ActionResult<Passenger> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {          
             try
             {
-                bool isLogin = _userService.LoginPassenger(email, password);
+                bool isLogin = _userService.LoginPassenger(emailPasswordDto.Email, emailPasswordDto.Password);
                 if (isLogin)
                 {
-                    Passenger? passenger = _passengerLogic.GetPassengerWithEmail(email);
+                    Passenger? passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email);
                     if (passenger != null)
                     {
                         return Ok(passenger);
@@ -104,6 +105,39 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost]
+        public ActionResult<Passenger> DeletePassenger([FromBody] string email, string password)
+        {
+            try
+            {
+                Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
+                    ?? throw new ArgumentNullException();
+                if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, password))
+                {   
+                    bool isDeleted = _passengerLogic.DeletePassenger(email);
+                    if (isDeleted)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest("The user not deleted");
+                    }
+                }
+                return BadRequest("The password not verified");
+
+                
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+
+
 
 
 

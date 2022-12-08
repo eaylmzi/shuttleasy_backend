@@ -6,6 +6,7 @@ using shuttleasy.Encryption;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.Models.dto.Driver.dto;
+using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Services;
 using System.Data;
@@ -26,14 +27,14 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public ActionResult<string> Login(string email, string password)
+        public ActionResult<string> Login([FromBody]EmailPasswordDto emailPasswordDto)
         {
             try
             {
-                bool isLogin = _userService.LoginCompanyWorker(email, password);
+                bool isLogin = _userService.LoginCompanyWorker(emailPasswordDto.Email, emailPasswordDto.Password);
                 if (isLogin)
                 {
-                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(emailPasswordDto.Email);
                     if (companyWorker != null)
                     {
                         return Ok(companyWorker.Token);
@@ -50,7 +51,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost]
-        public ActionResult<CompanyWorker> CreateDriver(DriverRegisterDto driverRegisterDto)
+        public ActionResult<CompanyWorker> CreateDriver([FromBody]DriverRegisterDto driverRegisterDto)
         {
             try
             {
@@ -69,7 +70,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost]
-        public ActionResult<CompanyWorker> CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto)
+        public ActionResult<CompanyWorker> CreatePassenger([FromBody] PassengerRegisterPanelDto passengerRegisterPanelDto)
         {
             try
             {
@@ -88,7 +89,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Passenger> GetPassenger(int id)
+        public ActionResult<Passenger> GetPassenger([FromBody] int id)
         {
             try
             {

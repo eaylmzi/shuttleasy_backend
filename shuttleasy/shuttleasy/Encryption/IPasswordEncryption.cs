@@ -8,5 +8,6 @@ namespace shuttleasy.Encryption
         public bool VerifyPasswordHash(byte[] passwordHash, byte[] passwordSalt, string password);
         public bool ResetPassengerPassword(string password, Passenger passenger);
         public bool ResetDriverPassword(string password, CompanyWorker companyWorker);
+        
     }
 }

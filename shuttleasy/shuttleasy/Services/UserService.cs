@@ -127,11 +127,11 @@ namespace shuttleasy.Services
         {
             CompanyWorker newCompanyWorker = new CompanyWorker();
             newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
-            string randomPassword = GetRandomString(10);
+            string randomPassword = "123456";
             _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
             newCompanyWorker.PasswordHash = passwordHash;
             newCompanyWorker.PasswordSalt = passwordSalt;
-
+            
             newCompanyWorker.Verified = true;
             newCompanyWorker.WorkerType = role;
 
@@ -142,26 +142,6 @@ namespace shuttleasy.Services
             return newCompanyWorker;
 
         }
-        private bool isAnyValidOTP(string email)
-        {
-            ResetPassword? resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email);
-            if (resetPassword != null)
-            {
-                int time = getTimeDiffereance(resetPassword.Date);
-                if (time > 180)
-                {
-                    _passwordResetLogic.DeleteResetPasswordWithEmail(resetPassword.Email);
-                    return false;
-                }
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-     
         public ResetPassword? SendOTP(string email)
         {
             if (!isAnyValidOTP(email))
@@ -177,16 +157,6 @@ namespace shuttleasy.Services
 
             }
             return null;
-        }
-        private int getTimeDiffereance(DateTime dateTime)
-        {
-            var remainingTime = DateTime.Now - dateTime;
-            int day = remainingTime.Days * 86400;
-            int hours = remainingTime.Hours * 3600;
-            int minutes = remainingTime.Minutes * 60;
-            int seconds = remainingTime.Seconds;
-            int time = day + hours + minutes + seconds;
-            return time;
         }
         public EmailTokenDto? ValidateOTP(string email,string otp)
         {
@@ -274,7 +244,42 @@ namespace shuttleasy.Services
             }
 
         }
-      
+
+
+
+
+
+
+
+        private bool isAnyValidOTP(string email)
+        {
+            ResetPassword? resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email);
+            if (resetPassword != null)
+            {
+                int time = getTimeDiffereance(resetPassword.Date);
+                if (time > 180)
+                {
+                    _passwordResetLogic.DeleteResetPasswordWithEmail(resetPassword.Email);
+                    return false;
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private int getTimeDiffereance(DateTime dateTime)
+        {
+            var remainingTime = DateTime.Now - dateTime;
+            int day = remainingTime.Days * 86400;
+            int hours = remainingTime.Hours * 3600;
+            int minutes = remainingTime.Minutes * 60;
+            int seconds = remainingTime.Seconds;
+            int time = day + hours + minutes + seconds;
+            return time;
+        }
 
 
 

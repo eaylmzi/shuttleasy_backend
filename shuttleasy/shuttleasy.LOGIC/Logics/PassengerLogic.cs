@@ -51,5 +51,11 @@ namespace shuttleasy.LOGIC.Logics
             bool isUpdated = _passenger.Update(updatedPassenger, getPassenger);
             return isUpdated;
         }
+        public bool DeletePassenger(string email)
+        {   
+            Func<Passenger, bool> getPassenger = pas => pas.Email == email;
+            bool isDeleted = _passenger.Delete(getPassenger);
+            return isDeleted;
+        }
     }
 }
