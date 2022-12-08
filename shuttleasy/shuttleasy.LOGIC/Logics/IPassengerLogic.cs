@@ -13,7 +13,7 @@ namespace shuttleasy.LOGIC.Logics
         public List<Passenger> GetAllPassengers();
         public Passenger? GetPassengerWithEmail(string email);
         public Passenger GetPassengerWithId(int id);
-        public bool UpdatePassengerWithEmail(Passenger uptatedPassenger, string email);
+        public bool UpdatePassengerWithEmail(Passenger updatedPassenger, string email);
         public bool DeletePassenger(string email);
     }
 }

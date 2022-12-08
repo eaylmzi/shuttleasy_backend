@@ -3,6 +3,7 @@ using shuttleasy.DAL.Models;
 using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
+using shuttleasy.Models.dto.User.dto;
 
 namespace shuttleasy.Services
 {
@@ -16,8 +17,8 @@ namespace shuttleasy.Services
         public ResetPassword? SendOTP(string email);
         public EmailTokenDto? ValidateOTP(string email, string otp);
         public object? resetPassword(string email, string password);
-        public Passenger UpdateProfile(Passenger passenger);
-        public CompanyWorker UpdateDriver(CompanyWorker companyWorker);
+        public Passenger? UpdatePassengerProfile(UserProfileDto userProfileDto);
+        public CompanyWorker? UpdateDriverProfile(UserProfileDto userProfileDto);
 
     }
 }

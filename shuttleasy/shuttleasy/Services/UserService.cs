@@ -17,6 +17,7 @@ using shuttleasy.Models;
 using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
+using shuttleasy.Models.dto.User.dto;
 using System;
 
 namespace shuttleasy.Services
@@ -144,13 +145,29 @@ namespace shuttleasy.Services
         }
 
 
-        public Passenger UpdateProfile(Passenger passenger)
+        public Passenger? UpdatePassengerProfile(UserProfileDto userProfileDto)
         {
-            return new Passenger();
+            Passenger updatedPassenger = _mapper.Map<Passenger>(userProfileDto);  
+            bool isUpdated = _passengerLogic.UpdatePassengerWithEmail(updatedPassenger,userProfileDto.Email);
+            if (isUpdated)
+            {
+                return updatedPassenger;
+            }
+
+
+            return null;
         }
-        public CompanyWorker UpdateDriver(CompanyWorker companyWorker)
+        public CompanyWorker? UpdateDriverProfile(UserProfileDto userProfileDto)
         {
-            return new CompanyWorker();
+            CompanyWorker updatedDriver = _mapper.Map<CompanyWorker>(userProfileDto);
+            bool isUpdated = _driverLogic.UpdateDriverWithEmail(updatedDriver, userProfileDto.Email);
+            if (isUpdated)
+            {
+                return updatedDriver;
+            }
+
+
+            return null;
         }
 
 

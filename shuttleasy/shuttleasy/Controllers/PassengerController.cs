@@ -25,6 +25,8 @@ using shuttleasy.Mail;
 using shuttleasy.Services;
 using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Login.dto;
+using shuttleasy.Models.dto.User.dto;
+using System.Data;
 
 namespace shuttleasy.Controllers
 {
@@ -61,7 +63,7 @@ namespace shuttleasy.Controllers
         }
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
-        [HttpPost]
+        [HttpPost,Authorize(Roles = $"{Roles.Passenger}")]
         public ActionResult<bool> SignUp([FromBody] PassengerRegisterDto passengerRegisterDto)
         {           
             try
@@ -82,7 +84,7 @@ namespace shuttleasy.Controllers
             
 
         }
-        [HttpPost]
+        [HttpPost,Authorize(Roles = $"{Roles.Passenger}")]
         public ActionResult<Passenger> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {          
             try
@@ -105,16 +107,16 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
-        public ActionResult<Passenger> DeletePassenger([FromBody] string email, string password)
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}W")]
+        public ActionResult<Passenger> DeletePassenger([FromBody] EmailPasswordDto emailPasswordDto)
         {
             try
             {
-                Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
+                Passenger passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email)
                     ?? throw new ArgumentNullException();
-                if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, password))
+                if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, emailPasswordDto.Password))
                 {   
-                    bool isDeleted = _passengerLogic.DeletePassenger(email);
+                    bool isDeleted = _passengerLogic.DeletePassenger(emailPasswordDto.Email);
                     if (isDeleted)
                     {
                         return Ok();
@@ -134,6 +136,25 @@ namespace shuttleasy.Controllers
             }
         }
 
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
+        public ActionResult<Passenger> UpdatePassenger(UserProfileDto userProfileDto)
+        {
+            try
+            {
+                Passenger? updatedPassenger = _userService.UpdatePassengerProfile(userProfileDto);
+                if (updatedPassenger != null)
+                {
+                    return Ok(updatedPassenger);
+                }
+                return BadRequest("User not updated");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
+        }
+        
 
 
 
@@ -143,9 +164,8 @@ namespace shuttleasy.Controllers
 
 
 
-
-        [HttpPost]
-        public IActionResult SendOTPEmail(string email)
+        [HttpPost,Authorize(Roles = $"{Roles.Passenger}")]
+        public IActionResult SendOTPEmail([FromBody] string email)
         {
             try
             {
@@ -165,11 +185,11 @@ namespace shuttleasy.Controllers
             }
                
         }
-        [HttpPost]
-        public IActionResult ValidateOTP(string email, string otp)
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public IActionResult ValidateOTP([FromBody]EmailOtpDto emailOtpDto)
         {
             try {
-                EmailTokenDto? emailTokenDto = _userService.ValidateOTP(email, otp);
+                EmailTokenDto? emailTokenDto = _userService.ValidateOTP(emailOtpDto.Email, emailOtpDto.Otp);
                 if (emailTokenDto != null)
                 {
                     return Ok(emailTokenDto);
@@ -182,11 +202,11 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
-        public IActionResult ResetPassword(string email,string password)
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public IActionResult ResetPassword(EmailPasswordDto emailPasswordDto)
         {
             try {
-                object? user = _userService.resetPassword(email, password);
+                object? user = _userService.resetPassword(emailPasswordDto.Email, emailPasswordDto.Password);
                 if (user != null)
                 {
                     return Ok(user);

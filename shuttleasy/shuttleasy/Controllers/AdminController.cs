@@ -26,7 +26,7 @@ namespace shuttleasy.Controllers
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
         }
-        [HttpPost]
+        [HttpPost,Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<string> Login([FromBody]EmailPasswordDto emailPasswordDto)
         {
             try
@@ -50,7 +50,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<CompanyWorker> CreateDriver([FromBody]DriverRegisterDto driverRegisterDto)
         {
             try
@@ -69,7 +69,7 @@ namespace shuttleasy.Controllers
 
 
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<CompanyWorker> CreatePassenger([FromBody] PassengerRegisterPanelDto passengerRegisterPanelDto)
         {
             try
@@ -88,7 +88,7 @@ namespace shuttleasy.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<Passenger> GetPassenger([FromBody] int id)
         {
             try
@@ -108,7 +108,7 @@ namespace shuttleasy.Controllers
                 return StatusCode(500);
             }
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<List<Passenger>> GetAllPassengers()
         {
             try

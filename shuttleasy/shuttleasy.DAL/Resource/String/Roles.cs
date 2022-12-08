@@ -8,9 +8,9 @@ namespace shuttleasy.DAL.Resource.String
 {
     public static class Roles
     {
-        public const string Passenger = "Passenger";
-        public const string Driver = "Driver";
-        public const string Admin = "Admin";
-        public const string SuperAdmin = "SuperAdmin";
+        public const string Passenger = "passenger";
+        public const string Driver = "driver";
+        public const string Admin = "admin";
+        public const string SuperAdmin = "superAdmin";
     }
 }

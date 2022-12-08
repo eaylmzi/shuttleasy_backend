@@ -7,6 +7,7 @@ using AutoMapper;
 using shuttleasy.DAL.Models;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
+using shuttleasy.Models.dto.User.dto;
 
 namespace shuttleasy.Models.dto
 {
@@ -17,6 +18,7 @@ namespace shuttleasy.Models.dto
             CreateMap<PassengerRegisterDto, Passenger>();
             CreateMap<DriverRegisterDto, CompanyWorker>();
             CreateMap<PassengerRegisterPanelDto, Passenger>();
+            CreateMap<UserProfileDto, Passenger>();
         }
     }
 }
