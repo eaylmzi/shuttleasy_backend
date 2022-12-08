@@ -127,7 +127,7 @@ namespace shuttleasy.Services
         {
             CompanyWorker newCompanyWorker = new CompanyWorker();
             newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
-            string randomPassword = "123456";
+            string randomPassword = GetRandomString(10);
             _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
             newCompanyWorker.PasswordHash = passwordHash;
             newCompanyWorker.PasswordSalt = passwordSalt;
@@ -142,6 +142,22 @@ namespace shuttleasy.Services
             return newCompanyWorker;
 
         }
+
+
+        public Passenger UpdateProfile(Passenger passenger)
+        {
+            return new Passenger();
+        }
+        public CompanyWorker UpdateDriver(CompanyWorker companyWorker)
+        {
+            return new CompanyWorker();
+        }
+
+
+
+
+
+
         public ResetPassword? SendOTP(string email)
         {
             if (!isAnyValidOTP(email))
