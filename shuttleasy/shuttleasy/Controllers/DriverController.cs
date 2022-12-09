@@ -59,16 +59,19 @@ namespace shuttleasy.Controllers
         public ActionResult<CompanyWorker> UpdateDriver(DriverProfileDto driverProfileDto)
         {
             try
-            {
-                string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-                CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithToken(token)
-                    ?? throw new AuthenticationException();
-                CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker,driverProfileDto);
-                if (updatedDriver != null)
+            {               
+                CompanyWorker? companyWorker = GetCompanyWorkerFromRequestToken();
+                if(companyWorker != null)
                 {
-                    return Ok(updatedDriver);
+                    CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker, driverProfileDto);
+                    if (updatedDriver != null)
+                    {
+                        return Ok(updatedDriver);
+                    }
+                    return BadRequest("Driver not updated");
                 }
-                return BadRequest("Driver not updated");
+                return BadRequest("Mistake about token");
+               
             }
             catch (Exception ex)
             {
@@ -135,5 +138,15 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+
+        private CompanyWorker? GetCompanyWorkerFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            CompanyWorker? companyWorkerFromToken = _driverLogic.GetCompanyWorkerWithToken(requestToken);
+            return companyWorkerFromToken;
+        }
     }
 }
+

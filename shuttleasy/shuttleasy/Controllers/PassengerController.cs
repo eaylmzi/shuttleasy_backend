@@ -149,19 +149,22 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
-        public ActionResult<Passenger> UpdatePassenger(UserProfileDto userProfileDto)
+        public ActionResult<Passenger> UpdatePassenger([FromBody] UserProfileDto userProfileDto)
         {
             try
             {
-                string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-                Passenger passenger = _passengerLogic.GetPassengerWithToken(token)
-                    ?? throw new AuthenticationException();
-                Passenger? updatedPassenger = _userService.UpdatePassengerProfile(passenger,userProfileDto);
-                if (updatedPassenger != null)
+                Passenger? passenger = GetPassengerFromRequestToken();
+                if(passenger != null)
                 {
-                    return Ok(updatedPassenger);
+                    Passenger? updatedPassenger = _userService.UpdatePassengerProfile(passenger, userProfileDto);
+                    if (updatedPassenger != null)
+                    {
+                        return Ok(updatedPassenger);
+                    }
+                    return BadRequest("User not updated");
                 }
-                return BadRequest("User not updated");
+                return BadRequest("Mistake about Token");
+                
             }
             catch(Exception ex)
             {
@@ -249,6 +252,12 @@ namespace shuttleasy.Controllers
             }
             return false;
 
+        }
+        private Passenger? GetPassengerFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            Passenger? passengerFromToken = _passengerLogic.GetPassengerWithToken(requestToken);
+            return passengerFromToken;
         }
 
 
