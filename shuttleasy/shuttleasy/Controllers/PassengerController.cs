@@ -27,6 +27,7 @@ using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.User.dto;
 using System.Data;
+using Microsoft.Net.Http.Headers;
 
 namespace shuttleasy.Controllers
 {
@@ -63,7 +64,7 @@ namespace shuttleasy.Controllers
         }
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
-        [HttpPost,Authorize(Roles = $"{Roles.Passenger}")]
+        [HttpPost]
         public ActionResult<bool> SignUp([FromBody] PassengerRegisterDto passengerRegisterDto)
         {           
             try
@@ -112,23 +113,34 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                Passenger passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email)
-                    ?? throw new ArgumentNullException();
-                if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, emailPasswordDto.Password))
-                {   
-                    bool isDeleted = _passengerLogic.DeletePassenger(emailPasswordDto.Email);
-                    if (isDeleted)
-                    {
-                        return Ok();
-                    }
-                    else
-                    {
-                        return BadRequest("The user not deleted");
-                    }
-                }
-                return BadRequest("The password not verified");
+                bool isSamePerson = IsSamePerson(emailPasswordDto.Email);
+              
+                if (isSamePerson)
+                {
+                    Passenger passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email)
+                        ?? throw new ArgumentNullException();
 
-                
+                    if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, emailPasswordDto.Password))
+                    {
+                        bool isDeleted = _passengerLogic.DeletePassenger(emailPasswordDto.Email);
+                        if (isDeleted)
+                        {
+                            return Ok();
+                        }
+                        else
+                        {
+                            return BadRequest("The user not deleted");
+                        }
+                    }
+                    return BadRequest("The password not verified");
+                }
+                return BadRequest("The user and the person who sent the request are not the same"); //Neyi dönceğimi daha bilmiyom status code olarak
+
+
+            }
+            catch(AuthenticationException ex)
+            {
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
@@ -141,7 +153,10 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                Passenger? updatedPassenger = _userService.UpdatePassengerProfile(userProfileDto);
+                string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+                Passenger passenger = _passengerLogic.GetPassengerWithToken(token)
+                    ?? throw new AuthenticationException();
+                Passenger? updatedPassenger = _userService.UpdatePassengerProfile(passenger,userProfileDto);
                 if (updatedPassenger != null)
                 {
                     return Ok(updatedPassenger);
@@ -218,6 +233,22 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        private bool IsSamePerson(string email)
+        {
+            string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            Passenger passengerFromToken = _passengerLogic.GetPassengerWithToken(token)
+                ?? throw new AuthenticationException();
+            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
+                ?? throw new ArgumentNullException();
+
+            if (passengerFromToken.Id == passenger.Id)
+            {
+                return true;
+            }
+            return false;
+
         }
 
 

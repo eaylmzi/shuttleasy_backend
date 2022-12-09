@@ -27,6 +27,8 @@ namespace shuttleasy.LOGIC.Logics.PasswordReset
             ResetPassword? resetPassword = _passwordResetRepository.GetSingle(getResetPassword);
             return resetPassword;
         }
+     
+
         public bool DeleteResetPasswordWithEmail(string email) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
             Func<ResetPassword, bool> deleteResetPassword = deleteResetPassword => deleteResetPassword.Email == email;

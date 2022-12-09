@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Utilities;
 using shuttleasy.DAL.EFRepositories;
 using shuttleasy.DAL.EFRepositories.CompanyWorkers;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
@@ -158,11 +160,20 @@ namespace shuttleasy.Services
 
             return null;
         }
-        public CompanyWorker? UpdateDriverProfile(UserProfileDto userProfileDto)
+
+
+        public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto)
         {
 
-            CompanyWorker updatedDriver = _mapper.Map<CompanyWorker>(userProfileDto);
-            bool isUpdated = _driverLogic.UpdateDriverWithEmail(updatedDriver, userProfileDto.Email);
+             CompanyWorker updatedDriver = companyWorker;
+
+             updatedDriver.ProfilePic = setProfilePhoto(driverProfileDto.ProfilePic);
+             updatedDriver.Name = driverProfileDto.Name;
+             updatedDriver.Surname = driverProfileDto.Surname;
+             updatedDriver.Email = driverProfileDto.Email;
+             updatedDriver.PhoneNumber = setPhoneNumber(driverProfileDto.PhoneNumber);
+
+            bool isUpdated = _driverLogic.UpdateDriverWithEmail(updatedDriver, companyWorker.Email);
             if (isUpdated)
             {
                 return updatedDriver;
@@ -171,7 +182,53 @@ namespace shuttleasy.Services
 
             return null;
         }
+        public Passenger? UpdatePassengerProfile(Passenger passenger, UserProfileDto userprofileDto)
+        {
 
+            Passenger updatedPassenger = passenger;
+
+            updatedPassenger.ProfilePic = setProfilePhoto(userprofileDto.ProfilePic);
+            updatedPassenger.Name = userprofileDto.Name;
+            updatedPassenger.Surname = userprofileDto.Surname;
+            updatedPassenger.Email = userprofileDto.Email;
+            updatedPassenger.PhoneNumber = setPhoneNumber(userprofileDto.PhoneNumber);
+            updatedPassenger.City= userprofileDto.City;
+            updatedPassenger.PassengerAddress = setAddress(userprofileDto.PassengerAddress); 
+
+            bool isUpdated = _passengerLogic.UpdatePassengerWithEmail(updatedPassenger, passenger.Email);
+            if (isUpdated)
+            {
+                return updatedPassenger;
+            }
+
+
+            return null;
+        }
+        private byte[]? setProfilePhoto(byte[]? profilePhoto)
+        {
+            if (profilePhoto.IsNullOrEmpty())
+            {
+                return null;
+            }
+            return profilePhoto;
+
+        }
+        private string? setPhoneNumber(string? phoneNumber)
+        {
+            if (phoneNumber.IsNullOrEmpty())
+            {
+                return null;
+            }
+            return phoneNumber;
+        }
+        private string? setAddress(string? address)
+        {
+            if (address.IsNullOrEmpty())
+            {
+                return null;
+            }
+            return address;
+        }
 
 
 

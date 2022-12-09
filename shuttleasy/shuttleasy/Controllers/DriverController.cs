@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
@@ -13,6 +14,7 @@ using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Models.dto.User.dto;
 using shuttleasy.Services;
 using System.Data;
+using System.Security.Authentication;
 
 namespace shuttleasy.Controllers
 {
@@ -54,17 +56,19 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<CompanyWorker> UpdateDriver(UserProfileDto userProfileDto)
+        public ActionResult<CompanyWorker> UpdateDriver(DriverProfileDto driverProfileDto)
         {
             try
             {
-                
-                CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(userProfileDto);
+                string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+                CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithToken(token)
+                    ?? throw new AuthenticationException();
+                CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker,driverProfileDto);
                 if (updatedDriver != null)
                 {
                     return Ok(updatedDriver);
                 }
-                return BadRequest("User not updated");
+                return BadRequest("Driver not updated");
             }
             catch (Exception ex)
             {
