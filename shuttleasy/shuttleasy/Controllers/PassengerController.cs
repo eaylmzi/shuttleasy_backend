@@ -177,67 +177,6 @@ namespace shuttleasy.Controllers
 
 
 
-
-
-
-
-
-        [HttpPost]
-        public IActionResult SendOTPEmail([FromBody] string email)
-        {
-            try
-            {
-                ResetPassword? res = _userService.SendOTP(email);
-                if(res != null)
-                {
-                    return Ok(res);
-                }
-                else
-                {
-                    return BadRequest("No attempt can be made before 180 seconds");
-                }
-                
-            }
-            catch(Exception ex) {
-                return BadRequest(ex.Message);
-            }
-               
-        }
-        [HttpPost]
-        public IActionResult ValidateOTP([FromBody]EmailOtpDto emailOtpDto)
-        {
-            try {
-                EmailTokenDto? emailTokenDto = _userService.ValidateOTP(emailOtpDto.Email, emailOtpDto.Otp);
-                if (emailTokenDto != null)
-                {
-                    return Ok(emailTokenDto);
-                }
-                return BadRequest("Not valid password");
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpPost]
-        public IActionResult ResetPassword(EmailPasswordDto emailPasswordDto)
-        {
-            try {
-                object? user = _userService.resetPassword(emailPasswordDto.Email, emailPasswordDto.Password);
-                if (user != null)
-                {
-                    return Ok(user);
-                }
-                return BadRequest("The password has not been updated");
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         private bool IsSamePerson(string email)
         {
             string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
