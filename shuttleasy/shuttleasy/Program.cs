@@ -6,11 +6,13 @@ using Microsoft.OpenApi.Models;
 using shuttleasy.Controllers;
 using shuttleasy.DAL.EFRepositories;
 using shuttleasy.DAL.EFRepositories.CompanyWorkers;
+using shuttleasy.DAL.EFRepositories.Destinations;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.Encryption;
 using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
+using shuttleasy.LOGIC.Logics.Destinations;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.Mail;
 using shuttleasy.Services;
@@ -26,6 +28,10 @@ builder.Services.AddScoped<ICompanyWorkerLogic, CompanyWorkerLogic>();
 
 builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 builder.Services.AddScoped<IPasswordResetLogic, PasswordResetLogic>();
+
+builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
+builder.Services.AddScoped<IDestinationLogic, DestinationLogic>();
+
 
 builder.Services.AddScoped<IPassengerService, PassengerService>();
 builder.Services.AddScoped<IMailManager, MailManager>();
