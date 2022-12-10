@@ -11,6 +11,5 @@ namespace shuttleasy.DAL.Models
         public int CompanyId { get; set; }
         public string LicensePlate { get; set; } = null!;
         public bool? State { get; set; }
-        public int DestinationId { get; set; }
     }
 }

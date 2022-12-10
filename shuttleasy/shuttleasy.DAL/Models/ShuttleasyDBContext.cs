@@ -386,7 +386,7 @@ namespace shuttleasy.DAL.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("company_id");
 
-                entity.Property(e => e.DestinationId).HasColumnName("destination_id");
+                
 
                 entity.Property(e => e.LicensePlate)
                     .HasMaxLength(7)
@@ -431,6 +431,8 @@ namespace shuttleasy.DAL.Models
                 entity.Property(e => e.StartingLongtitude)
                     .HasMaxLength(11)
                     .HasColumnName("starting_longtitude");
+
+                entity.Property(e => e.DestinationId).HasColumnName("destination_id");
 
             });
 
