@@ -9,6 +9,7 @@ using shuttleasy.DAL.EFRepositories.CompanyWorkers;
 using shuttleasy.DAL.EFRepositories.Destinations;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.ShuttleBuses;
+using shuttleasy.DAL.EFRepositories.ShuttleSessions;
 using shuttleasy.Encryption;
 using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
@@ -16,6 +17,7 @@ using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics.Destinations;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.LOGIC.Logics.ShuttleBuses;
+using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.Mail;
 using shuttleasy.Services;
 using Swashbuckle.AspNetCore.Filters;
@@ -36,6 +38,9 @@ builder.Services.AddScoped<IDestinationLogic, DestinationLogic>();
 
 builder.Services.AddScoped<IShuttleBusRepository, ShuttleBusRepository>();
 builder.Services.AddScoped<IShuttleBusLogic, ShuttleBusLogic>();
+
+builder.Services.AddScoped<IShuttleSessionRepository, ShuttleSessionRepository>();
+builder.Services.AddScoped<IShuttleSessionLogic, ShuttleSessionLogic>();
 
 
 
