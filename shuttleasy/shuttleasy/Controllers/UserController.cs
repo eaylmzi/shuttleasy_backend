@@ -22,7 +22,7 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public IActionResult SendOTPEmail(string email)
+        public IActionResult SendOTPEmail([FromBody] string email)
         {
             try
             {
