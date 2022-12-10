@@ -8,6 +8,7 @@ using shuttleasy.DAL.Models;
 using shuttleasy.Models.dto.Destinations.dto;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
+using shuttleasy.Models.dto.ShuttleBuses.dto;
 using shuttleasy.Models.dto.User.dto;
 
 namespace shuttleasy.Models.dto
@@ -22,6 +23,7 @@ namespace shuttleasy.Models.dto
             CreateMap<UserProfileDto, Passenger>();
             CreateMap<DriverProfileDto, CompanyWorker>();
             CreateMap<DestinationDto, Destination>();
+            CreateMap<ShuttleBusDto, ShuttleBus>();
         }
     }
 }

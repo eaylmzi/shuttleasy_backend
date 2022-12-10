@@ -29,7 +29,7 @@ namespace shuttleasy.DAL.Models
         public virtual DbSet<ResetPassword> ResetPasswords { get; set; } = null!;
         public virtual DbSet<SessionHistory> SessionHistories { get; set; } = null!;
         public virtual DbSet<SessionPassenger> SessionPassengers { get; set; } = null!;
-        public virtual DbSet<ShuttleBu> ShuttleBus { get; set; } = null!;
+        public virtual DbSet<ShuttleBus> ShuttleBus { get; set; } = null!;
         public virtual DbSet<ShuttleSession> ShuttleSessions { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -369,7 +369,7 @@ namespace shuttleasy.DAL.Models
 
             });
 
-            modelBuilder.Entity<ShuttleBu>(entity =>
+            modelBuilder.Entity<ShuttleBus>(entity =>
             {
                 entity.ToTable("shuttle_bus");
 
