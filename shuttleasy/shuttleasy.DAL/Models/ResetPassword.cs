@@ -9,6 +9,5 @@ namespace shuttleasy.DAL.Models
         public string Email { get; set; } = null!;
         public string ResetKey { get; set; } = null!;
         public DateTime Date { get; set; }
-
     }
 }

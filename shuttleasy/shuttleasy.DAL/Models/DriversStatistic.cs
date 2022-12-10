@@ -11,8 +11,5 @@ namespace shuttleasy.DAL.Models
         public int RateCount { get; set; }
         public double WorkingHours { get; set; }
         public int SessionId { get; set; }
-
-        public virtual CompanyWorker Driver { get; set; } = null!;
-        public virtual ShuttleSession Session { get; set; } = null!;
     }
 }

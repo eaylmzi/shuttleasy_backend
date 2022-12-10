@@ -11,6 +11,5 @@ namespace shuttleasy.DAL.Models
         public int SessionId { get; set; }
         public DateTime Date { get; set; }
         public string? Comment { get; set; }
-
     }
 }

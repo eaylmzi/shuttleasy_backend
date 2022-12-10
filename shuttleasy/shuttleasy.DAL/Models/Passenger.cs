@@ -1,13 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace shuttleasy.DAL.Models
 {
     public partial class Passenger
     {
-
-
         public int Id { get; set; }
         public byte[]? ProfilePic { get; set; }
         public string Name { get; set; } = null!;
@@ -21,7 +18,6 @@ namespace shuttleasy.DAL.Models
         public Guid QrString { get; set; }
         public bool IsPayment { get; set; }
         public bool Verified { get; set; }
-        public string Token { get; set; } = null!;
-
+        public string? Token { get; set; }
     }
 }

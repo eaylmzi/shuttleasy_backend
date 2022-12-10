@@ -16,8 +16,10 @@ namespace shuttleasy.DAL.Models
         {
         }
 
+        public virtual DbSet<City> Cities { get; set; } = null!;
         public virtual DbSet<Company> Companies { get; set; } = null!;
         public virtual DbSet<CompanyWorker> CompanyWorkers { get; set; } = null!;
+        public virtual DbSet<Destination> Destinations { get; set; } = null!;
         public virtual DbSet<DriversStatistic> DriversStatistics { get; set; } = null!;
         public virtual DbSet<NotificationPassenger> NotificationPassengers { get; set; } = null!;
         public virtual DbSet<NotificationWorker> NotificationWorkers { get; set; } = null!;
@@ -34,12 +36,27 @@ namespace shuttleasy.DAL.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=.\\SQLSERVER;Database=Shuttleasy DB;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=.\\SQLSERVER;Database=Shuttleasy DB;Trusted_Connection=true;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<City>(entity =>
+            {
+                entity.HasKey(e => e.CityNumber);
+
+                entity.ToTable("city");
+
+                entity.Property(e => e.CityNumber)
+                    .ValueGeneratedNever()
+                    .HasColumnName("city_number");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(14)
+                    .HasColumnName("name");
+            });
+
             modelBuilder.Entity<Company>(entity =>
             {
                 entity.ToTable("company");
@@ -105,6 +122,25 @@ namespace shuttleasy.DAL.Models
 
             });
 
+            modelBuilder.Entity<Destination>(entity =>
+            {
+                entity.ToTable("destination");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.BeginningDestination)
+                    .HasMaxLength(50)
+                    .HasColumnName("beginning_destination");
+
+                entity.Property(e => e.CityNumber).HasColumnName("city_number");
+
+                entity.Property(e => e.LastDestination)
+                    .HasMaxLength(50)
+                    .HasColumnName("last_destination");
+
+
+            });
+
             modelBuilder.Entity<DriversStatistic>(entity =>
             {
                 entity.ToTable("drivers_statistics");
@@ -120,9 +156,6 @@ namespace shuttleasy.DAL.Models
                 entity.Property(e => e.SessionId).HasColumnName("session_id");
 
                 entity.Property(e => e.WorkingHours).HasColumnName("working_hours");
-
-
-
 
             });
 
@@ -146,7 +179,6 @@ namespace shuttleasy.DAL.Models
 
                 entity.Property(e => e.NotificationType).HasColumnName("notification_type");
 
-
             });
 
             modelBuilder.Entity<NotificationWorker>(entity =>
@@ -168,7 +200,6 @@ namespace shuttleasy.DAL.Models
                     .HasColumnName("email");
 
                 entity.Property(e => e.NotificationType).HasColumnName("notification_type");
-
 
             });
 
@@ -241,7 +272,6 @@ namespace shuttleasy.DAL.Models
 
                 entity.Property(e => e.ShuttleSessionId).HasColumnName("shuttle_session_id");
 
-
             });
 
             modelBuilder.Entity<PassengerRating>(entity =>
@@ -262,8 +292,6 @@ namespace shuttleasy.DAL.Models
 
                 entity.Property(e => e.SessionId).HasColumnName("session_id");
 
-               
-
             });
 
             modelBuilder.Entity<ResetPassword>(entity =>
@@ -283,11 +311,7 @@ namespace shuttleasy.DAL.Models
                 entity.Property(e => e.ResetKey)
                     .HasMaxLength(6)
                     .HasColumnName("reset_key");
-
-
             });
-
-
 
             modelBuilder.Entity<SessionHistory>(entity =>
             {
@@ -343,8 +367,6 @@ namespace shuttleasy.DAL.Models
                 entity.Property(e => e.SessionId).HasColumnName("session_id");
 
 
-
-
             });
 
             modelBuilder.Entity<ShuttleBu>(entity =>
@@ -363,6 +385,8 @@ namespace shuttleasy.DAL.Models
                 entity.Property(e => e.Capacity).HasColumnName("capacity");
 
                 entity.Property(e => e.CompanyId).HasColumnName("company_id");
+
+                entity.Property(e => e.DestinationId).HasColumnName("destination_id");
 
                 entity.Property(e => e.LicensePlate)
                     .HasMaxLength(7)
@@ -407,7 +431,6 @@ namespace shuttleasy.DAL.Models
                 entity.Property(e => e.StartingLongtitude)
                     .HasMaxLength(11)
                     .HasColumnName("starting_longtitude");
-
 
             });
 

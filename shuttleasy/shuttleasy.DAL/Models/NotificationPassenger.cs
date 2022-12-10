@@ -10,6 +10,5 @@ namespace shuttleasy.DAL.Models
         public DateTime Date { get; set; }
         public string? NotificationType { get; set; }
         public string? Content { get; set; }
-
     }
 }

@@ -5,7 +5,6 @@ namespace shuttleasy.DAL.Models
 {
     public partial class CompanyWorker
     {
-
         public int Id { get; set; }
         public byte[]? ProfilePic { get; set; }
         public string Name { get; set; } = null!;
@@ -18,6 +17,5 @@ namespace shuttleasy.DAL.Models
         public string WorkerType { get; set; } = null!;
         public byte[] PasswordHash { get; set; } = null!;
         public byte[] PasswordSalt { get; set; } = null!;
-
     }
 }

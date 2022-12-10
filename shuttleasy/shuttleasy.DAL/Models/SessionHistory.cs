@@ -11,6 +11,5 @@ namespace shuttleasy.DAL.Models
         public DateTime Date { get; set; }
         public double? Rate { get; set; }
         public int? RateCount { get; set; }
-
     }
 }

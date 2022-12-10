@@ -15,6 +15,5 @@ namespace shuttleasy.DAL.Models
         public string EndingPoint { get; set; } = null!;
         public DateTime SessionDate { get; set; }
         public bool IsActive { get; set; }
-
     }
 }
