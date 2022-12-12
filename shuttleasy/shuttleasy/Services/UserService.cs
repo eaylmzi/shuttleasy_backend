@@ -306,7 +306,8 @@ namespace shuttleasy.Services
                 bool isUpdated = _passengerLogic.UpdatePassengerWithEmail(passenger, email);
                 if (isUpdated)
                 {
-                    return passenger;
+                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
+                    return passengerInfoDto;
                 }
                 else
                 {
@@ -326,7 +327,8 @@ namespace shuttleasy.Services
                 bool isUpdated = _driverLogic.UpdateDriverWithEmail(companyWorker, email);
                 if (isUpdated)
                 {
-                    return companyWorker;
+                    DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(companyWorker);
+                    return driverInfoDto;
                 }
                 else
                 {

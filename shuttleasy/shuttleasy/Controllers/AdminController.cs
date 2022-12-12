@@ -75,7 +75,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<CompanyWorker> CreatePassenger([FromBody] PassengerRegisterPanelDto passengerRegisterPanelDto)
+        public ActionResult<PassengerInfoDto> CreatePassenger([FromBody] PassengerRegisterPanelDto passengerRegisterPanelDto)
         {
             try
             {

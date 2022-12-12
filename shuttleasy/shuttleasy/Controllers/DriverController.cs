@@ -55,6 +55,7 @@ namespace shuttleasy.Controllers
                 }
                 return BadRequest("Email and password not correct");
             }
+
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
