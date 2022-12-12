@@ -19,7 +19,7 @@ namespace shuttleasy.Models.dto
         public AutoMapperProfile()
         {          
             CreateMap<PassengerRegisterDto, Passenger>();
-            CreateMap<DriverRegisterDto, CompanyWorker>();
+            CreateMap<CompanyWorkerRegisterDto, CompanyWorker>();
             CreateMap<PassengerRegisterPanelDto, Passenger>();
             CreateMap<UserProfileDto, Passenger>();
             CreateMap<DriverProfileDto, CompanyWorker>();
@@ -27,7 +27,7 @@ namespace shuttleasy.Models.dto
             CreateMap<ShuttleBusDto, ShuttleBus>();
             CreateMap<ShuttleSessionDto, ShuttleSession>();
 
-            CreateMap<CompanyWorker, DriverInfoDto>();
+            CreateMap<CompanyWorker, CompanyWorkerInfoDto>();
             CreateMap<Passenger, PassengerInfoDto>();
         }
     }

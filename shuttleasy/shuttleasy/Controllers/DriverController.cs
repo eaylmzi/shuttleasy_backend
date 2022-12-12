@@ -48,7 +48,7 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(emailPasswordDto.Email);
                     if (companyWorker != null)
                     {
-                        DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(companyWorker);
+                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
                         return Ok(driverInfoDto);
                     }
                     return BadRequest("The driver not found in list");
@@ -73,7 +73,7 @@ namespace shuttleasy.Controllers
                     CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker, driverProfileDto);
                     if (updatedDriver != null)
                     {
-                        DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(updatedDriver);
+                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(updatedDriver);
                         return Ok(driverInfoDto);
                     }
                     return BadRequest("Driver not updated");

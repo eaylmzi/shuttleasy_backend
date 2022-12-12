@@ -1,6 +1,6 @@
 ﻿namespace shuttleasy.Models.dto.Driver.dto
 {
-    public class DriverInfoDto
+    public class CompanyWorkerInfoDto
     {
         public int Id { get; set; }
         public byte[]? ProfilePic { get; set; }

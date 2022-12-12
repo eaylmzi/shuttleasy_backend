@@ -54,15 +54,15 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
-        public ActionResult<CompanyWorker> CreateDriver([FromBody]DriverRegisterDto driverRegisterDto)
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<CompanyWorker> CreateDriver([FromBody]CompanyWorkerRegisterDto driverRegisterDto)
         {
             try
             {
-                CompanyWorker newCompanyWorker = _userService.CreateDriver(driverRegisterDto, Roles.Driver);
+                CompanyWorker newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
                 if (newCompanyWorker != null)
                 {
-                    DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(newCompanyWorker);
+                    CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
                     return Ok(driverInfoDto);
                 }
                 return BadRequest("Not Added");

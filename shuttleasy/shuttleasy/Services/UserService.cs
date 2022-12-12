@@ -126,7 +126,7 @@ namespace shuttleasy.Services
             return newPassenger;
 
         }
-        public CompanyWorker CreateDriver(DriverRegisterDto driverRegisterDto, string role)
+        public CompanyWorker CreateCompanyWorker(CompanyWorkerRegisterDto driverRegisterDto, string role)
         {
             CompanyWorker newCompanyWorker = new CompanyWorker();
             newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
@@ -327,7 +327,7 @@ namespace shuttleasy.Services
                 bool isUpdated = _driverLogic.UpdateDriverWithEmail(companyWorker, email);
                 if (isUpdated)
                 {
-                    DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(companyWorker);
+                    CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
                     return driverInfoDto;
                 }
                 else
