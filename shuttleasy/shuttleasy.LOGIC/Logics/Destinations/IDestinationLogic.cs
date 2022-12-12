@@ -11,5 +11,6 @@ namespace shuttleasy.LOGIC.Logics.Destinations
     {
         public bool Add(Destination destination);
         public bool DeleteDestination(int destinationNumber);
+        public Destination? FindDestinationWithBeginningDestination(string beginningDestination);
     }
 }

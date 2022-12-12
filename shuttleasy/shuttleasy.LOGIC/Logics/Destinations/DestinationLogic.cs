@@ -30,5 +30,13 @@ namespace shuttleasy.LOGIC.Logics.Destinations
             bool isDeleted = _destinationRepository.Delete(getDestinationNumber);
             return isDeleted;
         }
+
+        public Destination? FindDestinationWithBeginningDestination(string beginningDestination)
+        {
+            Func<Destination, bool> getDestinationNumber = getDestinationNumber => getDestinationNumber.BeginningDestination == beginningDestination;
+            Destination? destination = _destinationRepository.GetSingle(getDestinationNumber);
+            return destination;
+          
+        }
     }
 }

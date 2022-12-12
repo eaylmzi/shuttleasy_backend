@@ -71,6 +71,6 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+     
     }
 }

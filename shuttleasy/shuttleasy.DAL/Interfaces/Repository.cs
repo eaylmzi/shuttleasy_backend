@@ -24,6 +24,16 @@ namespace shuttleasy.DAL.Interfaces
             var entity = query.ToList();
             return entity;
         }
+        public List<T>? Get(Func<T, bool> metot)
+        {          
+            var list = query
+                      .Where(metot)
+                      .Select(m => m)
+                      .ToList();
+           
+            return list;
+        }
+        
 
         public bool Update(T updatedEntity, Func<T, bool> metot)
         {          

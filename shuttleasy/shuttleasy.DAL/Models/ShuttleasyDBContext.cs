@@ -407,17 +407,9 @@ namespace shuttleasy.DAL.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("company_id");
 
-                entity.Property(e => e.EndingPoint)
-                    .HasMaxLength(15)
-                    .HasColumnName("ending_point");
-
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 
                 entity.Property(e => e.PassengerCount).HasColumnName("passenger_count");
-
-                entity.Property(e => e.SessionDate)
-                    .HasColumnType("date")
-                    .HasColumnName("session_date");
 
                 entity.Property(e => e.StartTime)
                     .IsRowVersion()

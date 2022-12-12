@@ -1,4 +1,5 @@
-﻿using System;
+﻿using shuttleasy.DAL.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,8 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
 {
     public interface IShuttleSessionLogic
     {
+        public bool CreateShuttleSession(ShuttleSession shuttleSession);
+        public bool DeleteShuttleSession(int shuttleSessionNumber);
+        public List<ShuttleSession>? FindSessionWithSpecificLocation(int destinationNumber);
     }
 }
