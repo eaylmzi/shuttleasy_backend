@@ -65,7 +65,7 @@ namespace shuttleasy.Controllers
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
         [HttpPost]
-        public ActionResult<bool> SignUp([FromBody] PassengerRegisterDto passengerRegisterDto)
+        public ActionResult<PassengerInfoDto> SignUp([FromBody] PassengerRegisterDto passengerRegisterDto)
         {           
             try
             {
