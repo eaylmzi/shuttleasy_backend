@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
@@ -20,11 +21,14 @@ namespace shuttleasy.Controllers
         private readonly IUserService _userService;
         private readonly IPassengerLogic _passengerLogic;
         private readonly ICompanyWorkerLogic _driverLogic;
-        public AdminController(IUserService userService, IPassengerLogic passengerLogic ,ICompanyWorkerLogic driverLogic)
+        private readonly IMapper _mapper;
+        public AdminController(IUserService userService, IPassengerLogic passengerLogic ,ICompanyWorkerLogic driverLogic,
+            IMapper mapper)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
+            _mapper = mapper;
         }
         [HttpPost]
         public ActionResult<string> Login([FromBody]EmailPasswordDto emailPasswordDto)
@@ -50,7 +54,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        [HttpPost]
         public ActionResult<CompanyWorker> CreateDriver([FromBody]DriverRegisterDto driverRegisterDto)
         {
             try
@@ -58,7 +62,8 @@ namespace shuttleasy.Controllers
                 CompanyWorker newCompanyWorker = _userService.CreateDriver(driverRegisterDto, Roles.Driver);
                 if (newCompanyWorker != null)
                 {
-                    return Ok(newCompanyWorker);
+                    DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(newCompanyWorker);
+                    return Ok(driverInfoDto);
                 }
                 return BadRequest("Not Added");
             }
@@ -78,7 +83,8 @@ namespace shuttleasy.Controllers
                          ?? throw new ArgumentNullException();
                 if (newPassenger != null)
                 {
-                    return Ok(newPassenger);
+                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
+                    return Ok(passengerInfoDto);
                 }
                 return BadRequest("Not Added");
             }

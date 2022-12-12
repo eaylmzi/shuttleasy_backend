@@ -73,7 +73,8 @@ namespace shuttleasy.Controllers
                         ?? throw new ArgumentNullException();
                 if(newPassenger != null)
                 {
-                    return Ok(newPassenger);
+                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
+                    return Ok(passengerInfoDto);
                 }
                 return BadRequest("Not Added");
             
@@ -96,7 +97,8 @@ namespace shuttleasy.Controllers
                     Passenger? passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email);
                     if (passenger != null)
                     {
-                        return Ok(passenger);
+                        PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
+                        return Ok(passengerInfoDto);
                     }
                     return BadRequest("The passenger not found in list");
                 }
@@ -109,7 +111,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
-        public ActionResult<Passenger> DeletePassenger([FromBody] EmailPasswordDto emailPasswordDto)
+        public ActionResult<bool> DeletePassenger([FromBody] EmailPasswordDto emailPasswordDto)
         {
             try
             {
@@ -125,7 +127,7 @@ namespace shuttleasy.Controllers
                         bool isDeleted = _passengerLogic.DeletePassenger(emailPasswordDto.Email);
                         if (isDeleted)
                         {
-                            return Ok();
+                            return Ok(isDeleted);
                         }
                         else
                         {
@@ -159,7 +161,8 @@ namespace shuttleasy.Controllers
                     Passenger? updatedPassenger = _userService.UpdatePassengerProfile(passenger, userProfileDto);
                     if (updatedPassenger != null)
                     {
-                        return Ok(updatedPassenger);
+                        PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(updatedPassenger);
+                        return Ok(passengerInfoDto);
                     }
                     return BadRequest("User not updated");
                 }

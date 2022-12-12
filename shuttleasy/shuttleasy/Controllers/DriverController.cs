@@ -1,5 +1,6 @@
 ﻿
 
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -9,6 +10,7 @@ using shuttleasy.Encryption;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.Models.dto.Credentials.dto;
+using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Models.dto.User.dto;
@@ -25,11 +27,14 @@ namespace shuttleasy.Controllers
         private readonly IUserService _userService;
         private readonly IPassengerLogic _passengerLogic;
         private readonly ICompanyWorkerLogic _driverLogic;
-        public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic)
+        private readonly IMapper _mapper;
+        public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic,
+            IMapper mapper)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
+            _mapper = mapper;
         }
         [HttpPost]
         public ActionResult<CompanyWorker> Login([FromBody] EmailPasswordDto emailPasswordDto)
@@ -43,7 +48,8 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(emailPasswordDto.Email);
                     if (companyWorker != null)
                     {
-                        return Ok(companyWorker);
+                        DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(companyWorker);
+                        return Ok(driverInfoDto);
                     }
                     return BadRequest("The driver not found in list");
                 }
@@ -66,7 +72,8 @@ namespace shuttleasy.Controllers
                     CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker, driverProfileDto);
                     if (updatedDriver != null)
                     {
-                        return Ok(updatedDriver);
+                        DriverInfoDto driverInfoDto = _mapper.Map<DriverInfoDto>(updatedDriver);
+                        return Ok(driverInfoDto);
                     }
                     return BadRequest("Driver not updated");
                 }
