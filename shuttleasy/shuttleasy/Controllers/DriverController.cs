@@ -37,7 +37,7 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
         }
         [HttpPost]
-        public ActionResult<CompanyWorker> Login([FromBody] EmailPasswordDto emailPasswordDto)
+        public ActionResult<CompanyWorkerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {
             PasswordEncryption passwordEncryption = new PasswordEncryption();
             try
@@ -63,7 +63,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<CompanyWorker> UpdateDriver(DriverProfileDto driverProfileDto)
+        public ActionResult<CompanyWorkerInfoDto> UpdateDriver(DriverProfileDto driverProfileDto)
         {
             try
             {               

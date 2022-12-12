@@ -33,7 +33,7 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<ShuttleBus> AddShuttleBus([FromBody] ShuttleBusDto shuttleBusDto)
+        public ActionResult<bool> AddShuttleBus([FromBody] ShuttleBusDto shuttleBusDto)
         {
             try
             {
@@ -41,9 +41,9 @@ namespace shuttleasy.Controllers
                 bool isAdded = _shuttleBusLogic.Add(shuttleBus);
                 if (isAdded)
                 {
-                    return Ok(shuttleBus);
+                    return Ok(isAdded);
                 }
-                return BadRequest("Shuttle bus not added");
+                return BadRequest(isAdded);
             }
             catch (Exception ex)
             {
@@ -54,7 +54,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<ShuttleBus> DeleteShuttleBus([FromBody] int shuttleBusNumber)
+        public ActionResult<bool> DeleteShuttleBus([FromBody] int shuttleBusNumber)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace shuttleasy.Controllers
                 {
                     return Ok(isAdded);
                 }
-                return BadRequest("Shuttle bus not deleted");
+                return BadRequest(isAdded);
             }
             catch (Exception ex)
             {

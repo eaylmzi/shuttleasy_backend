@@ -13,7 +13,7 @@ namespace shuttleasy.DAL.Models
         public string Email { get; set; } = null!;
         public byte[] PasswordHash { get; set; } = null!;
         public byte[] PasswordSalt { get; set; } = null!;
-        public string City { get; set; } = null!;
+        public string? City { get; set; } 
         public string? PassengerAddress { get; set; }
         public Guid QrString { get; set; }
         public bool IsPayment { get; set; }

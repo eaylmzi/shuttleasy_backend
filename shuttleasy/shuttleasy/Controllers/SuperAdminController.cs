@@ -29,7 +29,7 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
         }
         [HttpPost]
-        public ActionResult<string> Login([FromBody] EmailPasswordDto emailPasswordDto)
+        public ActionResult<CompanyWorkerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {
             try
             {
@@ -39,7 +39,8 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(emailPasswordDto.Email);
                     if (companyWorker != null)
                     {
-                        return Ok(companyWorker.Token);
+                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
+                        return Ok(driverInfoDto);
                     }
                     return BadRequest("The Superadmin not found in list");
 
@@ -53,7 +54,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.SuperAdmin}")]
-        public ActionResult<CompanyWorker> CreateAdmin([FromBody] CompanyWorkerRegisterDto adminRegisterDto)
+        public ActionResult<CompanyWorkerInfoDto> CreateAdmin([FromBody] CompanyWorkerRegisterDto adminRegisterDto)
         {
             try
             {

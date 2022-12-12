@@ -34,7 +34,7 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
         }
         [HttpPost,Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<CompanyWorker> AddDestination([FromBody] DestinationDto destinationDto)
+        public ActionResult<bool> AddDestination([FromBody] DestinationDto destinationDto)
         {
             try
             {
@@ -42,9 +42,9 @@ namespace shuttleasy.Controllers
                 bool isAdded = _destinationLogic.Add(destination);
                 if (isAdded)
                 {
-                    return Ok(destination);
+                    return Ok(isAdded);
                 }
-                return BadRequest("Destination not added");
+                return BadRequest(isAdded);
             }
             catch(Exception ex)
             {
@@ -55,7 +55,7 @@ namespace shuttleasy.Controllers
            
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<CompanyWorker> DeleteDestination([FromBody] int destinationNumber)
+        public ActionResult<bool> DeleteDestination([FromBody] int destinationNumber)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace shuttleasy.Controllers
                 {
                     return Ok(isAdded);
                 }
-                return BadRequest("Destination not deleted");
+                return BadRequest(isAdded);
             }
             catch (Exception ex)
             {

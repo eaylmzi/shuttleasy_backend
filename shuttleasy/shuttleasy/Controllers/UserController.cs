@@ -22,7 +22,7 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public IActionResult SendOTPEmail([FromBody] string email)
+        public ActionResult<ResetPassword> SendOTPEmail([FromBody] string email)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost]
-        public IActionResult ValidateOTP([FromBody] EmailOtpDto emailOtpDto)
+        public ActionResult<EmailTokenDto> ValidateOTP([FromBody] EmailOtpDto emailOtpDto)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost]
-        public IActionResult ResetPassword([FromBody] EmailPasswordDto emailPasswordDto)
+        public ActionResult<object> ResetPassword([FromBody] EmailPasswordDto emailPasswordDto)
         {
             try
             {

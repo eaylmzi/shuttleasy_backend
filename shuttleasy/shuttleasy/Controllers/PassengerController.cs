@@ -87,7 +87,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost]
-        public ActionResult<Passenger> Login([FromBody] EmailPasswordDto emailPasswordDto)
+        public ActionResult<PassengerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {          
             try
             {
@@ -151,7 +151,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
-        public ActionResult<Passenger> UpdatePassenger([FromBody] UserProfileDto userProfileDto)
+        public ActionResult<PassengerInfoDto> UpdatePassenger([FromBody] UserProfileDto userProfileDto)
         {
             try
             {
