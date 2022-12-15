@@ -42,7 +42,7 @@ namespace shuttleasy.Controllers
             _destinationLogic = destinationLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<ShuttleSession> CreateShuttleSession([FromBody] ShuttleSessionDto shuttleSessionDto)
+        public ActionResult<bool> CreateShuttleSession([FromBody] ShuttleSessionDto shuttleSessionDto)
         {
             try
             {
@@ -57,9 +57,9 @@ namespace shuttleasy.Controllers
                 bool isAdded = _shuttleSessionLogic.CreateShuttleSession(shuttleSession);
                 if (isAdded)
                 {
-                    return Ok(shuttleSession);
+                    return Ok(isAdded);
                 }
-                return BadRequest("Shuttle bus not added");
+                return BadRequest(isAdded);
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<ShuttleSession> DeleteShuttleSession([FromBody] int shuttleSessionNumber)
+        public ActionResult<bool> DeleteShuttleSession([FromBody] int shuttleSessionNumber)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace shuttleasy.Controllers
                 {
                     return Ok(isAdded);
                 }
-                return BadRequest("Shuttle Session not deleted");
+                return BadRequest(isAdded);
             }
             catch (Exception ex)
             {
