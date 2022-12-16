@@ -36,7 +36,7 @@ namespace shuttleasy.DAL.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=.\\SQLSERVER;Database=Shuttleasy DB;Trusted_Connection=true;");
+               // optionsBuilder.UseSqlServer("Data Source=shuttleasydbserver1.database.windows.net;Initial Catalog=ShuttleasyDB;User ID=emreyilmaz;Password=Easypeasy1");
             }
         }
 

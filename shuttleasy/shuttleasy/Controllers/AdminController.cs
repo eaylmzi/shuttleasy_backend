@@ -11,6 +11,7 @@ using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Services;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace shuttleasy.Controllers
 {
@@ -115,7 +116,7 @@ namespace shuttleasy.Controllers
                 return StatusCode(500);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        [HttpPost]
         public ActionResult<List<Passenger>> GetAllPassengers()
         {
             try
@@ -131,6 +132,46 @@ namespace shuttleasy.Controllers
             {
                 return StatusCode(500);
             }
+        }
+        [HttpPost]
+        public IActionResult Test1()
+        {
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+                builder.DataSource = "shuttleasydbserver1.database.windows.net";
+                builder.UserID = "emreyilmaz";
+                builder.Password = "Easypeasy1";
+                builder.InitialCatalog = "ShuttleasyDB";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+      
+
+                    connection.Open();
+
+                    string sql = "SELECT name  FROM company_worker";
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                return Ok(reader.GetString(0));
+                            }
+                        }
+                    }
+                    
+                }
+                return Ok();
+            }
+            catch (SqlException e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
     }

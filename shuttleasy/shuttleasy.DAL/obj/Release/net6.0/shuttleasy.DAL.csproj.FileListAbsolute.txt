@@ -1,0 +1,14 @@
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\bin\Release\net6.0\shuttleasy.DAL.deps.json
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\bin\Release\net6.0\shuttleasy.DAL.runtimeconfig.json
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\bin\Release\net6.0\shuttleasy.DAL.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\bin\Release\net6.0\shuttleasy.DAL.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.csproj.AssemblyReference.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.AssemblyInfoInputs.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.AssemblyInfo.cs
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.csproj.CoreCompileInputs.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\refint\shuttleasy.DAL.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\shuttleasy.DAL.genruntimeconfig.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy.DAL\obj\Release\net6.0\ref\shuttleasy.DAL.dll

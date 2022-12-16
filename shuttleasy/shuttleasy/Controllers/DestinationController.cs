@@ -33,7 +33,7 @@ namespace shuttleasy.Controllers
             _destinationLogic = destinationLogic;
             _mapper = mapper;
         }
-        [HttpPost,Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
+        [HttpPost]
         public ActionResult<bool> AddDestination([FromBody] DestinationDto destinationDto)
         {
             try
@@ -54,7 +54,7 @@ namespace shuttleasy.Controllers
 
            
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
+        [HttpPost]
         public ActionResult<bool> DeleteDestination([FromBody] int destinationNumber)
         {
             try
