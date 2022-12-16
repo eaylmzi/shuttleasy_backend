@@ -72,17 +72,20 @@ namespace shuttleasy.DAL.Interfaces
 
         public bool Add(T entity)
         {
-            if (entity != null)
+          using(var context = new ShuttleasyDBContext())
             {
-                query.Add(entity);
-                _context.SaveChangesAsync();
-                return true;
+                if (entity != null)
+                {
+                    context.Set<T>().Add(entity);
+                    context.SaveChanges();
+                    return true;
 
+                }
+                else
+                {
+                    return false;
+                };
             }
-            else
-            {
-                return false;
-            };
         }
 
         public T? GetSingle(Func<T, bool> metot)

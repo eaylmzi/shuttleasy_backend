@@ -19,6 +19,7 @@ namespace shuttleasy.Services
         public object? resetPassword(string email, string password);
         public Passenger? UpdatePassengerProfile(Passenger passenger, UserProfileDto userProfileDto);
         public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto);
+        public Passenger reCreateToken(Passenger passenger, string role, IConfiguration _configuration);
 
     }
 }

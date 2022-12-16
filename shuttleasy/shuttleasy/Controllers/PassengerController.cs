@@ -69,12 +69,12 @@ namespace shuttleasy.Controllers
         {           
             try
             {
-                Passenger newPassenger = _userService.SignUp(passengerRegisterDto,Roles.Passenger)
-                        ?? throw new ArgumentNullException();
+                Passenger? newPassenger = _userService.SignUp(passengerRegisterDto,Roles.Passenger);
                 if(newPassenger != null)
                 {
                     PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
-                    return Ok(passengerInfoDto);
+                    return Ok(newPassenger);
+
                 }
                 return BadRequest("Not Added");
             

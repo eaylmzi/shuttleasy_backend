@@ -21,6 +21,7 @@ using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Models.dto.User.dto;
 using System;
+using System.Data;
 
 namespace shuttleasy.Services
 {
@@ -83,14 +84,12 @@ namespace shuttleasy.Services
             }
             return false;
         }
-        public Passenger SignUp(PassengerRegisterDto passengerRegisterDto,string role)
+        public Passenger? SignUp(PassengerRegisterDto passengerRegisterDto,string role)
         {
             Passenger newPassenger = new Passenger();
             newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
             newPassenger.QrString = Guid.NewGuid();
 
-            string token = _jwtTokenManager.CreateToken(newPassenger, role, _configuration);
-            newPassenger.Token = token;
             if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
             {
                 _passwordEncryption.CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -104,9 +103,27 @@ namespace shuttleasy.Services
             }
 
             _passengerLogic.Add(newPassenger);
-            return newPassenger;
+
+            Passenger? passengerFromDB = _passengerLogic.GetPassengerWithEmail(newPassenger.Email);
+            if(passengerFromDB != null)
+            {
+                string token = _jwtTokenManager.CreateToken(passengerFromDB, role, _configuration);
+                passengerFromDB.Token = token;
+                _passengerLogic.UpdatePassengerWithEmail(passengerFromDB, passengerFromDB.Email);
+                return passengerFromDB;
+            }
+
+            return null;
+            
 
         }
+        public Passenger reCreateToken(Passenger passenger,string role, IConfiguration _configuration)
+        {
+            string token = _jwtTokenManager.CreateToken(passenger, role, _configuration);
+            passenger.Token = token;
+            return passenger;
+        }
+
         public Passenger CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role)
         {
             Passenger newPassenger = new Passenger();
