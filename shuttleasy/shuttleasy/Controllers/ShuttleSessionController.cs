@@ -15,6 +15,8 @@ using shuttleasy.LOGIC.Logics.Destinations;
 using shuttleasy.Models.dto.ShuttleSessions.dto;
 using System.Text;
 using shuttleasy.Models.dto.Driver.dto;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace shuttleasy.Controllers
 {
@@ -47,20 +49,24 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                
-                ShuttleSession shuttleSession = _mapper.Map<ShuttleSession>(shuttleSessionDto);
-                //string timeStamp = DateTime.Now.ToString("dddd, dd MMMM yyyy");
-                //{11.12.2022 16:14:12}
-                // byte[] timeStampBytes = Encoding.ASCII.GetBytes(timeStamp); //STRİNG TO TİMESTAMP YAPÇAN
-                // shuttleSession.StartTime = DateTime.Now;
-                //Shuttlesessionda timestamp ve dateyi sor
-                DateTime d = DateTime.Now;
-                bool isAdded = _shuttleSessionLogic.CreateShuttleSession(shuttleSession);
-                if (isAdded)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    return Ok(isAdded);
+                    ShuttleSession shuttleSession = _mapper.Map<ShuttleSession>(shuttleSessionDto);
+                    //string timeStamp = DateTime.Now.ToString("dddd, dd MMMM yyyy");
+                    //{11.12.2022 16:14:12}
+                    // byte[] timeStampBytes = Encoding.ASCII.GetBytes(timeStamp); //STRİNG TO TİMESTAMP YAPÇAN
+                    // shuttleSession.StartTime = DateTime.Now;
+                    //Shuttlesessionda timestamp ve dateyi sor
+                    bool isAdded = _shuttleSessionLogic.CreateShuttleSession(shuttleSession);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
                 }
-                return BadRequest(isAdded);
+                return BadRequest("The user that send request not found");
+                
             }
             catch (Exception ex)
             {
@@ -76,12 +82,18 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                bool isAdded = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
-                if (isAdded)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    return Ok(isAdded);
+                    bool isAdded = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
                 }
-                return BadRequest(isAdded);
+                return BadRequest("The user that send request not found");
+                
             }
             catch (Exception ex)
             {
@@ -90,16 +102,22 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<ShuttleSession> GetShuttleSession([FromBody] IdDto cpmpanyWorkerId)
+        public ActionResult<ShuttleSession> GetShuttleSession([FromBody] IdDto companyWorkerId)
         {
             try
             {
-                ShuttleSession? shuttleSession = _shuttleSessionLogic.GetShuttleSessionWithCompanyId(cpmpanyWorkerId.Id);
-                if (shuttleSession != null)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    return Ok(shuttleSession);
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.GetShuttleSessionWithCompanyId(companyWorkerId.Id);
+                    if (shuttleSession != null)
+                    {
+                        return Ok(shuttleSession);
+                    }
+                    return BadRequest("Shuttle session not found");
                 }
-                return BadRequest("Shuttle session not found");
+                return BadRequest("The user that send request not found");
+
 
             }
             catch (Exception ex)
@@ -114,29 +132,48 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                Destination? destination = _destinationLogic
-                        .FindDestinationWithBeginningDestination(searchDestinationDto.BeginningDestination);
-                if(destination != null)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    if (destination.LastDestination.Equals(searchDestinationDto.LastDestination))
+                    Destination? destination = _destinationLogic
+                      .FindDestinationWithBeginningDestination(searchDestinationDto.BeginningDestination);
+                    if (destination != null)
                     {
-                        List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionWithSpecificLocation(destination.Id);
-                        if(shuttleSessions != null)
+                        if (destination.LastDestination.Equals(searchDestinationDto.LastDestination))
                         {
-                            return Ok(shuttleSessions);
+                            List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionWithSpecificLocation(destination.Id);
+                            if (shuttleSessions != null)
+                            {
+                                return Ok(shuttleSessions);
+                            }
+                            return BadRequest("The bus not found with that destination");
                         }
-                        return BadRequest("The bus not found with that destination");
+                        return BadRequest("There is no destination");
                     }
-                    return BadRequest("There is no destination");
-                }
 
-                return BadRequest("The destination not in the list");
+                    return BadRequest("The destination not in the list");
+
+                }
+                return BadRequest("The user that send request not found");
+              
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
+
+
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
+
 
         private static string GetTimestamp(DateTime value)
         {

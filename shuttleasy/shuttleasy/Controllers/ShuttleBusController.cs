@@ -12,6 +12,8 @@ using shuttleasy.LOGIC.Logics.ShuttleBuses;
 using shuttleasy.Models.dto.ShuttleBuses.dto;
 using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Driver.dto;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace shuttleasy.Controllers
 {
@@ -39,13 +41,20 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                ShuttleBus shuttleBus = _mapper.Map<ShuttleBus>(shuttleBusDto);
-                bool isAdded = _shuttleBusLogic.Add(shuttleBus);
-                if (isAdded)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    return Ok(isAdded);
+                    ShuttleBus shuttleBus = _mapper.Map<ShuttleBus>(shuttleBusDto);
+                    bool isAdded = _shuttleBusLogic.Add(shuttleBus);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
+
                 }
-                return BadRequest(isAdded);
+                return BadRequest("The user that send request not found");
+              
             }
             catch (Exception ex)
             {
@@ -60,12 +69,19 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                bool isAdded = _shuttleBusLogic.DeleteShuttleBus(idDto.Id);
-                if (isAdded)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    return Ok(isAdded);
+                    bool isAdded = _shuttleBusLogic.DeleteShuttleBus(idDto.Id);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
+
                 }
-                return BadRequest(isAdded);
+                return BadRequest("The user that send request not found");
+               
             }
             catch (Exception ex)
             {
@@ -73,6 +89,13 @@ namespace shuttleasy.Controllers
             }
         }
 
-       
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
     }
 }

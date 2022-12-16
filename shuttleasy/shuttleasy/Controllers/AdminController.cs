@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
@@ -13,6 +14,7 @@ using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Services;
 using System.Data;
 using System.Data.SqlClient;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace shuttleasy.Controllers
 {
@@ -62,13 +64,19 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                CompanyWorker newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
-                if (newCompanyWorker != null)
+                if(_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
                 {
-                    CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
-                    return Ok(driverInfoDto);
+                    CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
+                    if (newCompanyWorker != null)
+                    {
+                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
+                        return Ok(driverInfoDto);
+                    }
+                    return BadRequest("Not Added");
+
                 }
-                return BadRequest("Not Added");
+                return BadRequest("The driver that send request not found");
+               
             }
             catch (Exception ex)
             { 
@@ -82,14 +90,19 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                Passenger newPassenger = _userService.CreatePassenger(passengerRegisterPanelDto, Roles.Passenger)
-                         ?? throw new ArgumentNullException();
-                if (newPassenger != null)
+                if (_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
                 {
-                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
-                    return Ok(passengerInfoDto);
+                    Passenger newPassenger = _userService.CreatePassenger(passengerRegisterPanelDto, Roles.Passenger)
+                        ?? throw new ArgumentNullException();
+                    if (newPassenger != null)
+                    {
+                        PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
+                        return Ok(passengerInfoDto);
+                    }
+                    return BadRequest("Not Added");
                 }
-                return BadRequest("Not Added");
+                return BadRequest("The driver that send request not found");
+               
             }
             catch (Exception ex)
             {
@@ -102,7 +115,13 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                return _passengerLogic.GetPassengerWithId(idDto.Id);
+                int a = GetUserIdFromRequestToken();
+                if (_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
+                {
+                    return _passengerLogic.GetPassengerWithId(idDto.Id);
+                }
+                return BadRequest("The user that send request not found");
+               
             }
             catch (ArgumentNullException ex)
             {
@@ -122,7 +141,12 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                return _passengerLogic.GetAllPassengers();
+                if (_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
+                {
+                    return _passengerLogic.GetAllPassengers();
+                }
+                return BadRequest("The admin that send request not found");
+                
             }
             catch (ArgumentNullException ex)
             {
@@ -173,6 +197,23 @@ namespace shuttleasy.Controllers
                 return BadRequest(e.Message);
             }
 
+        }
+
+
+
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
+        private CompanyWorker? GetAdminFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            CompanyWorker? adminFromToken = _driverLogic.GetCompanyWorkerWithToken(requestToken);
+            return adminFromToken;
         }
 
     }

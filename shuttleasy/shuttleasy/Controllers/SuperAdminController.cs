@@ -53,12 +53,12 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.SuperAdmin}")]
+        [HttpPost]
         public ActionResult<CompanyWorkerInfoDto> CreateAdmin([FromBody] CompanyWorkerRegisterDto adminRegisterDto)
         {
             try
             {
-                CompanyWorker newCompanyWorker = _userService.CreateCompanyWorker(adminRegisterDto, Roles.Admin);
+                CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(adminRegisterDto, Roles.Admin);
                 if (newCompanyWorker != null)
                 {
                     CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);

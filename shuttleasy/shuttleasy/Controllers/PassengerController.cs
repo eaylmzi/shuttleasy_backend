@@ -115,28 +115,34 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                bool isSamePerson = IsSamePerson(emailPasswordDto.Email);
-              
-                if (isSamePerson)
-                {
-                    Passenger passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email)
-                        ?? throw new ArgumentNullException();
+                Passenger? passengerFromRequestToken = GetUserFromRequestToken();
+                Passenger? passengerFromEmail = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email);
 
-                    if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, emailPasswordDto.Password))
+                if(passengerFromEmail != null && passengerFromRequestToken != null)
+                {
+                    if (passengerFromRequestToken.Id == passengerFromEmail.Id)
                     {
-                        bool isDeleted = _passengerLogic.DeletePassenger(emailPasswordDto.Email);
-                        if (isDeleted)
+                        Passenger passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email)
+                            ?? throw new ArgumentNullException();
+
+                        if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, emailPasswordDto.Password))
                         {
-                            return Ok(isDeleted);
+                            bool isDeleted = _passengerLogic.DeletePassenger(emailPasswordDto.Email);
+                            if (isDeleted)
+                            {
+                                return Ok(isDeleted);
+                            }
+                            else
+                            {
+                                return BadRequest("The user not deleted");
+                            }
                         }
-                        else
-                        {
-                            return BadRequest("The user not deleted");
-                        }
+                        return BadRequest("The password not verified");
                     }
-                    return BadRequest("The password not verified");
+                    return BadRequest("The user and the person who sent the request are not the same");
                 }
-                return BadRequest("The user and the person who sent the request are not the same"); //Neyi dönceğimi daha bilmiyom status code olarak
+                return BadRequest("The user is null");
+
 
 
             }
@@ -155,10 +161,10 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                Passenger? passenger = GetPassengerFromRequestToken();
-                if(passenger != null)
+                Passenger? passengerFromRequestToken = GetUserFromRequestToken();
+                if (passengerFromRequestToken != null)
                 {
-                    Passenger? updatedPassenger = _userService.UpdatePassengerProfile(passenger, userProfileDto);
+                    Passenger? updatedPassenger = _userService.UpdatePassengerProfile(passengerFromRequestToken, userProfileDto);
                     if (updatedPassenger != null)
                     {
                         PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(updatedPassenger);
@@ -175,7 +181,7 @@ namespace shuttleasy.Controllers
             }
             
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin},{Roles.Driver}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin},{Roles.Driver}")]
         public ActionResult<PassengerInfoDto> GetPassenger([FromBody] IdDto idDto)
         {
             try
@@ -195,29 +201,39 @@ namespace shuttleasy.Controllers
             }
 
         }
-        [HttpPost]
-        public ActionResult<string> La([FromBody] IdDto idDto)
-        {
-            try
-            {
-                Passenger passenger = _passengerLogic.GetPassengerWithId(idDto.Id);
-                var jwt = new JwtSecurityTokenHandler().ReadJwtToken(passenger.Token);
-                string user = jwt.Claims.First(c => c.Type == "user").Value;
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+ 
 
+
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;         
+        }     
+        private Passenger? GetUserFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            Passenger? passengerFromToken = _passengerLogic.GetPassengerWithToken(requestToken);
+            return passengerFromToken;
         }
 
 
 
+        
 
 
 
-        private bool IsSamePerson(string email)
+
+
+
+
+
+
+
+
+        /*private bool IsSamePerson(string email)
         {
             string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
             Passenger passengerFromToken = _passengerLogic.GetPassengerWithToken(token)
@@ -231,13 +247,7 @@ namespace shuttleasy.Controllers
             }
             return false;
 
-        }
-        private Passenger? GetPassengerFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            Passenger? passengerFromToken = _passengerLogic.GetPassengerWithToken(requestToken);
-            return passengerFromToken;
-        }
+        }*/
 
 
     }

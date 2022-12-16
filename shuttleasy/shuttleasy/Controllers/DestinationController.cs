@@ -12,6 +12,8 @@ using AutoMapper;
 using shuttleasy.DAL.Resource.String;
 using Microsoft.AspNetCore.Authorization;
 using shuttleasy.Models.dto.Credentials.dto;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace shuttleasy.Controllers
 {
@@ -39,13 +41,20 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                Destination destination = _mapper.Map<Destination>(destinationDto);
-                bool isAdded = _destinationLogic.Add(destination);
-                if (isAdded)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    return Ok(isAdded);
+                    Destination destination = _mapper.Map<Destination>(destinationDto);
+                    bool isAdded = _destinationLogic.Add(destination);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
+
                 }
-                return BadRequest(isAdded);
+                return BadRequest("The user that send request not found");
+               
             }
             catch(Exception ex)
             {
@@ -60,18 +69,34 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                bool isAdded = _destinationLogic.DeleteDestination(idDto.Id);
-                if (isAdded)
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
                 {
-                    return Ok(isAdded);
+                    bool isAdded = _destinationLogic.DeleteDestination(idDto.Id);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
+
+
                 }
-                return BadRequest(isAdded);
+                return BadRequest("The user that send request not found");
+              
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-     
+
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
     }
 }

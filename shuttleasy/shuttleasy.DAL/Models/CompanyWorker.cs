@@ -13,7 +13,7 @@ namespace shuttleasy.DAL.Models
         public int CompanyId { get; set; }
         public string Email { get; set; } = null!;
         public bool Verified { get; set; }
-        public string Token { get; set; } = null!;
+        public string? Token { get; set; }
         public string WorkerType { get; set; } = null!;
         public byte[] PasswordHash { get; set; } = null!;
         public byte[] PasswordSalt { get; set; } = null!;

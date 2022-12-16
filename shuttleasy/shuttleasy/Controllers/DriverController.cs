@@ -16,6 +16,7 @@ using shuttleasy.Models.dto.Passengers.dto;
 using shuttleasy.Models.dto.User.dto;
 using shuttleasy.Services;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Authentication;
 
 namespace shuttleasy.Controllers
@@ -62,15 +63,16 @@ namespace shuttleasy.Controllers
             }
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
         public ActionResult<CompanyWorkerInfoDto> UpdateDriver(DriverProfileDto driverProfileDto)
         {
             try
             {               
-                CompanyWorker? companyWorker = GetCompanyWorkerFromRequestToken();
-                if(companyWorker != null)
+                CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
+                if(companyWorkerFromRequestToken != null)
                 {
-                    CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker, driverProfileDto);
+
+                    CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorkerFromRequestToken, driverProfileDto);
                     if (updatedDriver != null)
                     {
                         CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(updatedDriver);
@@ -87,19 +89,53 @@ namespace shuttleasy.Controllers
             }
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin},{Roles.Driver}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<CompanyWorkerInfoDto> UpdateDriver(DriverProfileDto driverProfileDto,IdDto idDto)
+        {
+            try
+            {
+                CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
+                if (companyWorkerFromRequestToken != null)
+                {
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(idDto.Id);
+                    if(companyWorker != null)
+                    {
+                        CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker, driverProfileDto);
+                        if (updatedDriver != null)
+                        {
+                            CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(updatedDriver);
+                            return Ok(driverInfoDto);
+                        }
+                        return BadRequest("Driver not updated");
+                    }
+                    return BadRequest("Driver not found");
+                }
+                return BadRequest("Mistake about token");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin},{Roles.SuperAdmin}")]
         public ActionResult<CompanyWorkerInfoDto> GetDriver([FromBody] IdDto idDto)
         {
             try
             {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(idDto.Id);
-                if (companyWorker != null)
+                CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
+                if (companyWorkerFromRequestToken != null)
                 {
-                    CompanyWorkerInfoDto companyWorkerInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
-                    return Ok(companyWorkerInfoDto);
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(idDto.Id);
+                    if (companyWorker != null)
+                    {
+                        CompanyWorkerInfoDto companyWorkerInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
+                        return Ok(companyWorkerInfoDto);
+                    }
+                    return BadRequest("Company worker not found");
                 }
-                return BadRequest("Company worker not found");
-
+                return BadRequest("The user that send request not found");
             }
             catch (Exception ex)
             {
@@ -111,6 +147,14 @@ namespace shuttleasy.Controllers
 
 
 
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
 
         private CompanyWorker? GetCompanyWorkerFromRequestToken()
         {

@@ -117,14 +117,7 @@ namespace shuttleasy.Services
             
 
         }
-        public Passenger reCreateToken(Passenger passenger,string role, IConfiguration _configuration)
-        {
-            string token = _jwtTokenManager.CreateToken(passenger, role, _configuration);
-            passenger.Token = token;
-            return passenger;
-        }
-
-        public Passenger CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role)
+        public Passenger? CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role)
         {
             Passenger newPassenger = new Passenger();
             newPassenger = _mapper.Map<Passenger>(passengerRegisterPanelDto);
@@ -135,14 +128,19 @@ namespace shuttleasy.Services
 
             newPassenger.Verified = true;
 
-            string token = _jwtTokenManager.CreateToken(newPassenger, role, _configuration);
-            newPassenger.Token = token;
-
             _passengerLogic.Add(newPassenger);
-            return newPassenger;
+            Passenger? passengerFromDB = _passengerLogic.GetPassengerWithEmail(newPassenger.Email);
+            if (passengerFromDB != null)
+            {
+                string token = _jwtTokenManager.CreateToken(passengerFromDB, role, _configuration);
+                passengerFromDB.Token = token;
+                _passengerLogic.UpdatePassengerWithEmail(passengerFromDB, passengerFromDB.Email);
+                return passengerFromDB;
+            }
+            return null;
 
         }
-        public CompanyWorker CreateCompanyWorker(CompanyWorkerRegisterDto driverRegisterDto, string role)
+        public CompanyWorker? CreateCompanyWorker(CompanyWorkerRegisterDto driverRegisterDto, string role)
         {
             CompanyWorker newCompanyWorker = new CompanyWorker();
             newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
@@ -154,28 +152,20 @@ namespace shuttleasy.Services
             newCompanyWorker.Verified = true;
             newCompanyWorker.WorkerType = role;
 
-            string token = _jwtTokenManager.CreateToken(newCompanyWorker, role, _configuration);
-            newCompanyWorker.Token = token;
 
             _driverLogic.Add(newCompanyWorker);
-            return newCompanyWorker;
-
-        }
-
-
-        public Passenger? UpdatePassengerProfile(UserProfileDto userProfileDto)
-        {
-
-            Passenger updatedPassenger = _mapper.Map<Passenger>(userProfileDto);  
-            bool isUpdated = _passengerLogic.UpdatePassengerWithEmail(updatedPassenger,userProfileDto.Email);
-            if (isUpdated)
+            CompanyWorker? companyWorkerFromDB = _driverLogic.GetCompanyWorkerWithEmail(newCompanyWorker.Email);
+            if (companyWorkerFromDB != null)
             {
-                return updatedPassenger;
+                string token = _jwtTokenManager.CreateToken(companyWorkerFromDB, role, _configuration);
+                companyWorkerFromDB.Token = token;
+                _driverLogic.UpdateDriverWithEmail(companyWorkerFromDB, companyWorkerFromDB.Email);
+                return companyWorkerFromDB;
             }
-
-
             return null;
+
         }
+
 
 
         public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto)
@@ -354,12 +344,6 @@ namespace shuttleasy.Services
             }
 
         }
-
-
-
-
-
-
 
         private bool isAnyValidOTP(string email)
         {

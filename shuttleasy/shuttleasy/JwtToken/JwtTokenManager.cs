@@ -17,7 +17,7 @@ namespace shuttleasy.JwtToken
             {
                 new Claim(ClaimTypes.Role,role),
                 new Claim(ClaimTypes.Name,passenger.Name),
-                new Claim(ClaimTypes.NameIdentifier,passenger.Id.ToString())
+                new Claim("id",passenger.Id.ToString())
 
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
@@ -40,7 +40,7 @@ namespace shuttleasy.JwtToken
             {
                 new Claim(ClaimTypes.Role,role),
                 new Claim(ClaimTypes.Name,worker.Name),
-                new Claim(ClaimTypes.NameIdentifier,worker.Id.ToString())
+                new Claim("id",worker.Id.ToString())
 
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
