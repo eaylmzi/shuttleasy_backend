@@ -175,7 +175,28 @@ namespace shuttleasy.Controllers
             }
             
         }
-        
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin},{Roles.Driver}")]
+        public ActionResult<PassengerInfoDto> GetPassenger([FromBody] IdDto idDto)
+        {
+            try
+            {
+                Passenger? passenger = _passengerLogic.GetPassengerWithId(idDto.Id);
+                if (passenger != null)
+                {
+                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
+                    return Ok(passengerInfoDto);
+                }
+                return BadRequest("Passenger not found");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
 
 
 

@@ -228,8 +228,6 @@ namespace shuttleasy.DAL
                     .HasMaxLength(30)
                     .HasColumnName("email");
 
-                entity.Property(e => e.IsPayment).HasColumnName("is_payment");
-
                 entity.Property(e => e.Name)
                     .HasMaxLength(20)
                     .HasColumnName("name");
@@ -421,13 +419,7 @@ namespace shuttleasy.DAL
                     .IsConcurrencyToken()
                     .HasColumnName("start_time");
 
-                entity.Property(e => e.StartingLatitude)
-                    .HasMaxLength(11)
-                    .HasColumnName("starting_latitude");
-
-                entity.Property(e => e.StartingLongtitude)
-                    .HasMaxLength(11)
-                    .HasColumnName("starting_longtitude");
+                entity.Property(e => e.DriverId).HasColumnName("driver_id");
 
                 entity.Property(e => e.DestinationId).HasColumnName("destination_id");
 

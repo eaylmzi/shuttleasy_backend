@@ -10,6 +10,8 @@ using shuttleasy.Models.dto.Destinations.dto;
 using shuttleasy.Services;
 using shuttleasy.LOGIC.Logics.ShuttleBuses;
 using shuttleasy.Models.dto.ShuttleBuses.dto;
+using shuttleasy.Models.dto.Credentials.dto;
+using shuttleasy.Models.dto.Driver.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -54,11 +56,11 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public ActionResult<bool> DeleteShuttleBus([FromBody] int shuttleBusNumber)
+        public ActionResult<bool> DeleteShuttleBus([FromBody] IdDto idDto)
         {
             try
             {
-                bool isAdded = _shuttleBusLogic.DeleteShuttleBus(shuttleBusNumber);
+                bool isAdded = _shuttleBusLogic.DeleteShuttleBus(idDto.Id);
                 if (isAdded)
                 {
                     return Ok(isAdded);
@@ -70,5 +72,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+       
     }
 }

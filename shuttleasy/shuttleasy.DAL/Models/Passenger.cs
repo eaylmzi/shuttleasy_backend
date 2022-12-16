@@ -16,7 +16,6 @@ namespace shuttleasy.DAL.Models
         public string? City { get; set; } 
         public string? PassengerAddress { get; set; }
         public Guid QrString { get; set; }
-        public bool IsPayment { get; set; }
         public bool Verified { get; set; }
         public string? Token { get; set; }
     }

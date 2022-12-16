@@ -22,11 +22,11 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public ActionResult<ResetPassword> SendOTPEmail([FromBody] string email)
+        public ActionResult<ResetPassword> SendOTPEmail([FromBody] EmailDto emailDto)
         {
             try
             {
-                ResetPassword? res = _userService.SendOTP(email);
+                ResetPassword? res = _userService.SendOTP(emailDto.Email);
                 if (res != null)
                 {
                     return Ok(res);

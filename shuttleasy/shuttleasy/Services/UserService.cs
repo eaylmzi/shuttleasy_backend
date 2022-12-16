@@ -88,7 +88,6 @@ namespace shuttleasy.Services
             Passenger newPassenger = new Passenger();
             newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
             newPassenger.QrString = Guid.NewGuid();
-            newPassenger.IsPayment = false;
 
             string token = _jwtTokenManager.CreateToken(newPassenger, role, _configuration);
             newPassenger.Token = token;

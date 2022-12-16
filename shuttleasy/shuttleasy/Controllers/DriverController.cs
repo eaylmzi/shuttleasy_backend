@@ -87,7 +87,27 @@ namespace shuttleasy.Controllers
             }
 
         }
-        
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin},{Roles.Driver}")]
+        public ActionResult<CompanyWorkerInfoDto> GetDriver([FromBody] IdDto idDto)
+        {
+            try
+            {
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(idDto.Id);
+                if (companyWorker != null)
+                {
+                    CompanyWorkerInfoDto companyWorkerInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
+                    return Ok(companyWorkerInfoDto);
+                }
+                return BadRequest("Company worker not found");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
 
 
 

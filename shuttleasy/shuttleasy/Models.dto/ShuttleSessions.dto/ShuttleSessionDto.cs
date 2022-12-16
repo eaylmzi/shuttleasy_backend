@@ -6,8 +6,7 @@
         public int BusId { get; set; }
         public int PassengerCount { get; set; }
         public DateTime StartTime { get; set; }
-        public string StartingLongtitude { get; set; } = null!;
-        public string StartingLatitude { get; set; } = null!;
+        public int DriverId { get; set; }
         public bool IsActive { get; set; }
         public int DestinationId { get; set; }
     }

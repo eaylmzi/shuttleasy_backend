@@ -11,6 +11,7 @@ using shuttleasy.Models.dto.Passengers.dto;
 using AutoMapper;
 using shuttleasy.DAL.Resource.String;
 using Microsoft.AspNetCore.Authorization;
+using shuttleasy.Models.dto.Credentials.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -55,11 +56,11 @@ namespace shuttleasy.Controllers
            
         }
         [HttpPost]
-        public ActionResult<bool> DeleteDestination([FromBody] int destinationNumber)
+        public ActionResult<bool> DeleteDestination([FromBody] IdDto idDto)
         {
             try
             {
-                bool isAdded = _destinationLogic.DeleteDestination(destinationNumber);
+                bool isAdded = _destinationLogic.DeleteDestination(idDto.Id);
                 if (isAdded)
                 {
                     return Ok(isAdded);

@@ -14,6 +14,7 @@ using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.LOGIC.Logics.Destinations;
 using shuttleasy.Models.dto.ShuttleSessions.dto;
 using System.Text;
+using shuttleasy.Models.dto.Driver.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -71,11 +72,11 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<bool> DeleteShuttleSession([FromBody] int shuttleSessionNumber)
+        public ActionResult<bool> DeleteShuttleSession([FromBody] IdDto idDto)
         {
             try
             {
-                bool isAdded = _shuttleSessionLogic.DeleteShuttleSession(shuttleSessionNumber);
+                bool isAdded = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
                 if (isAdded)
                 {
                     return Ok(isAdded);
@@ -86,6 +87,26 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<ShuttleSession> GetShuttleSession([FromBody] IdDto cpmpanyWorkerId)
+        {
+            try
+            {
+                ShuttleSession? shuttleSession = _shuttleSessionLogic.GetShuttleSessionWithCompanyId(cpmpanyWorkerId.Id);
+                if (shuttleSession != null)
+                {
+                    return Ok(shuttleSession);
+                }
+                return BadRequest("Shuttle session not found");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpPost]

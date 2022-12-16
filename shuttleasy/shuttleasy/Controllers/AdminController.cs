@@ -6,6 +6,7 @@ using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
+using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.Passengers.dto;
@@ -97,11 +98,11 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<Passenger> GetPassenger([FromBody] int id)
+        public ActionResult<Passenger> GetPassenger([FromBody] IdDto idDto)
         {
             try
             {
-                return _passengerLogic.GetPassengerWithId(id);
+                return _passengerLogic.GetPassengerWithId(idDto.Id);
             }
             catch (ArgumentNullException ex)
             {

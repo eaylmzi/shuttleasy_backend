@@ -11,6 +11,7 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
     {
         public bool CreateShuttleSession(ShuttleSession shuttleSession);
         public bool DeleteShuttleSession(int shuttleSessionNumber);
+        public ShuttleSession GetShuttleSessionWithCompanyId(int id);
         public List<ShuttleSession>? FindSessionWithSpecificLocation(int destinationNumber);
     }
 }

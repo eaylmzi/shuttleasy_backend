@@ -11,7 +11,6 @@
         public string City { get; set; } = null!;
         public string? PassengerAddress { get; set; }
         public Guid QrString { get; set; }
-        public bool IsPayment { get; set; }
         public string? Token { get; set; }
     }
 }
