@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Hangfire.Server;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using shuttleasy.DAL.Models;
@@ -15,7 +16,8 @@ namespace shuttleasy.JwtToken
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role,role),
-                new Claim(ClaimTypes.Name,passenger.Name)
+                new Claim(ClaimTypes.Name,passenger.Name),
+                new Claim(ClaimTypes.NameIdentifier,passenger.Id.ToString())
 
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
@@ -37,7 +39,8 @@ namespace shuttleasy.JwtToken
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role,role),
-                new Claim(ClaimTypes.Name,worker.Name)
+                new Claim(ClaimTypes.Name,worker.Name),
+                new Claim(ClaimTypes.NameIdentifier,worker.Id.ToString())
 
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
@@ -70,8 +73,8 @@ namespace shuttleasy.JwtToken
                     ValidateAudience = false,
                     ValidateIssuer = false
                 } ,out SecurityToken validatedToken);
-                // var jwtToken = (JwtSecurityToken)validatedToken;
-                // var claims = jwtToken.Claims.ToList();
+                 //var jwtToken = (JwtSecurityToken)validatedToken;
+                 //var claims = jwtToken.Claims.ToList();
                 return true;
             }
             catch(Exception)

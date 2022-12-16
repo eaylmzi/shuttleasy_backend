@@ -195,6 +195,22 @@ namespace shuttleasy.Controllers
             }
 
         }
+        [HttpPost]
+        public ActionResult<string> La([FromBody] IdDto idDto)
+        {
+            try
+            {
+                Passenger passenger = _passengerLogic.GetPassengerWithId(idDto.Id);
+                var jwt = new JwtSecurityTokenHandler().ReadJwtToken(passenger.Token);
+                string user = jwt.Claims.First(c => c.Type == "user").Value;
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
 
 
 
