@@ -25,7 +25,7 @@ namespace shuttleasy.LOGIC.Logics
             bool isAdded = _passenger.Add(passenger);
             return isAdded;
         }
-        public List<Passenger>? GetAllPassengers()// yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
+        public List<Passenger>? GetAllPassengers()
         {
             var passengerList = _passenger.Get();
             return passengerList;

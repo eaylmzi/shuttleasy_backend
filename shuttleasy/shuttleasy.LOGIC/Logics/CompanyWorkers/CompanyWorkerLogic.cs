@@ -44,11 +44,18 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
 
         }
 
-        public bool UpdateDriverWithEmail(CompanyWorker updatedCompanyWorker, string email)
+        public bool UpdateCompanyWorkerWithEmail(CompanyWorker updatedCompanyWorker, string email)
         {
             Func<CompanyWorker, bool> getDriver = pas => pas.Email == email;
             bool isUpdated = _companyWorkerRepository.Update(updatedCompanyWorker, getDriver);
             return isUpdated;        
+        }
+
+        public List<CompanyWorker>? GetAllDriverWithCompanyId(int companyId)
+        {
+            Func<CompanyWorker, bool> getDriver = getDriver => getDriver.CompanyId == companyId;
+            List<CompanyWorker>? getDriverList = _companyWorkerRepository.Get(getDriver);
+            return getDriverList;
         }
     }
 }

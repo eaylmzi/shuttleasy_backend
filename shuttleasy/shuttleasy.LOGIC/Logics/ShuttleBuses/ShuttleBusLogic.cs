@@ -24,6 +24,12 @@ namespace shuttleasy.LOGIC.Logics.ShuttleBuses
             bool isAdded = _shuttleBusRepository.Add(shuttleBus);
             return isAdded;
         }
+        public List<ShuttleBus>? GetAllShuttleBusesWithCompanyId(int companyId)
+        {
+            Func<ShuttleBus, bool> getShuttleBuses = getShuttleBuses => getShuttleBuses.CompanyId == companyId;
+            List<ShuttleBus>? getShuttleBusesList = _shuttleBusRepository.Get(getShuttleBuses);
+            return getShuttleBusesList;
+        }
         public bool DeleteShuttleBus(int shuttleBusNumber) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
             Func<ShuttleBus, bool> getShuttleBus = getShuttleBus => getShuttleBus.Id == shuttleBusNumber;

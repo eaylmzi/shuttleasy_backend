@@ -30,6 +30,11 @@ namespace shuttleasy.LOGIC.Logics.Destinations
             bool isDeleted = _destinationRepository.Delete(getDestinationNumber);
             return isDeleted;
         }
+        public List<Destination>? GetAllDestinations()
+        {
+            var destinationList = _destinationRepository.Get();
+            return destinationList;
+        }
 
         public Destination? FindDestinationWithBeginningDestination(string beginningDestination)
         {

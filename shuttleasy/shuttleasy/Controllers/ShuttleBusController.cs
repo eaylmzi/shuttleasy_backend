@@ -98,6 +98,36 @@ namespace shuttleasy.Controllers
             }
         }
 
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<List<ShuttleSession>> GetAllBuses()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                    if (companyWorker != null)
+                    {
+                        var list = _shuttleBusLogic.GetAllShuttleBusesWithCompanyId(companyWorker.CompanyId);
+                        return Ok(list);
+                    }
+                    return BadRequest("The user that send request not found");
+
+                }
+                return BadRequest("Mistake about token");
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+
         private int GetUserIdFromRequestToken()
         {
             string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");

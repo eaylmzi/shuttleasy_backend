@@ -159,7 +159,7 @@ namespace shuttleasy.Services
             {
                 string token = _jwtTokenManager.CreateToken(companyWorkerFromDB, role, _configuration);
                 companyWorkerFromDB.Token = token;
-                _driverLogic.UpdateDriverWithEmail(companyWorkerFromDB, companyWorkerFromDB.Email);
+                _driverLogic.UpdateCompanyWorkerWithEmail(companyWorkerFromDB, companyWorkerFromDB.Email);
                 return companyWorkerFromDB;
             }
             return null;
@@ -179,7 +179,7 @@ namespace shuttleasy.Services
              updatedDriver.Email = driverProfileDto.Email;
              updatedDriver.PhoneNumber = setPhoneNumber(driverProfileDto.PhoneNumber);
 
-            bool isUpdated = _driverLogic.UpdateDriverWithEmail(updatedDriver, companyWorker.Email);
+            bool isUpdated = _driverLogic.UpdateCompanyWorkerWithEmail(updatedDriver, companyWorker.Email);
             if (isUpdated)
             {
                 return updatedDriver;
@@ -330,7 +330,7 @@ namespace shuttleasy.Services
                     companyWorker.Verified = true;
                 }
                 _passwordEncryption.ResetDriverPassword(password, companyWorker);
-                bool isUpdated = _driverLogic.UpdateDriverWithEmail(companyWorker, email);
+                bool isUpdated = _driverLogic.UpdateCompanyWorkerWithEmail(companyWorker, email);
                 if (isUpdated)
                 {
                     CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);

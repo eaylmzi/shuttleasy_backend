@@ -10,6 +10,7 @@ namespace shuttleasy.LOGIC.Logics.ShuttleBuses
     public interface IShuttleBusLogic
     {
         public bool Add(ShuttleBus shuttleBus);
+        public List<ShuttleBus>? GetAllShuttleBusesWithCompanyId(int companyId);
         public bool DeleteShuttleBus(int shuttleBusNumber);
     }
 }

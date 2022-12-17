@@ -89,6 +89,29 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<List<Destination>> GetAllDestinations()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
+                {
+                    var list = _destinationLogic.GetAllDestinations();
+                    if (list != null)
+                    {
+                        return list;
+                    }
+                    return BadRequest("There is no destination in list");
+                }
+                return BadRequest("Mistake about token");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         private int GetUserIdFromRequestToken()
         {

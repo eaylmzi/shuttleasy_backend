@@ -13,6 +13,7 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
         public CompanyWorker? GetCompanyWorkerWithId(int id);
         public CompanyWorker? GetCompanyWorkerWithEmail(string email);
         public CompanyWorker? GetCompanyWorkerWithToken(string token);
-        public bool UpdateDriverWithEmail(CompanyWorker updatedCompanyWorker, string email);
+        public bool UpdateCompanyWorkerWithEmail(CompanyWorker updatedCompanyWorker, string email);
+        public List<CompanyWorker>? GetAllDriverWithCompanyId(int companyId);
     }
 }
