@@ -18,7 +18,9 @@ namespace shuttleasy.Services
         public EmailTokenDto? ValidateOTP(string email, string otp);
         public object? resetPassword(string email, string password);
         public Passenger? UpdatePassengerProfile(Passenger passenger, UserProfileDto userProfileDto);
+
         public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto);
+        public bool CheckEmail(string email);
 
     }
 }

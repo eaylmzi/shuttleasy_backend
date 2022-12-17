@@ -66,13 +66,20 @@ namespace shuttleasy.Controllers
             {
                 if(_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
                 {
-                    CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
-                    if (newCompanyWorker != null)
+                    bool isCreated = _userService.CheckEmail(driverRegisterDto.Email);
+                    if (!isCreated)
                     {
-                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
-                        return Ok(driverInfoDto);
+                        CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
+                        if (newCompanyWorker != null)
+                        {
+                            CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
+                            return Ok(driverInfoDto);
+                        }
+                        return BadRequest("Not Added");
+
                     }
-                    return BadRequest("Not Added");
+                    return BadRequest("Registered with this email");
+                   
 
                 }
                 return BadRequest("The driver that send request not found");
@@ -92,14 +99,20 @@ namespace shuttleasy.Controllers
             {
                 if (_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
                 {
-                    Passenger newPassenger = _userService.CreatePassenger(passengerRegisterPanelDto, Roles.Passenger)
-                        ?? throw new ArgumentNullException();
-                    if (newPassenger != null)
+                    bool isCreated = _userService.CheckEmail(passengerRegisterPanelDto.Email);
+                    if (!isCreated)
                     {
-                        PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
-                        return Ok(passengerInfoDto);
+                        Passenger? newPassenger = _userService.CreatePassenger(passengerRegisterPanelDto, Roles.Passenger);
+                        if (newPassenger != null)
+                        {
+                            PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
+                            return Ok(passengerInfoDto);
+                        }
+                        return BadRequest("Not Added");
+
                     }
-                    return BadRequest("Not Added");
+                    return BadRequest("Registered with this email");
+                    
                 }
                 return BadRequest("The driver that send request not found");
                

@@ -90,14 +90,14 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<CompanyWorkerInfoDto> UpdateDriver(DriverProfileDto driverProfileDto,IdDto idDto)
+        public ActionResult<CompanyWorkerInfoDto> UpdateDriverFromAdmin(DriverProfileDto driverProfileDto,int id)
         {
             try
             {
                 CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
                 if (companyWorkerFromRequestToken != null)
                 {
-                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(idDto.Id);
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(id);
                     if(companyWorker != null)
                     {
                         CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorker, driverProfileDto);

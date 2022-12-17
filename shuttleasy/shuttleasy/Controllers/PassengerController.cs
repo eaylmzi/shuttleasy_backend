@@ -69,23 +69,29 @@ namespace shuttleasy.Controllers
         {           
             try
             {
-                Passenger? newPassenger = _userService.SignUp(passengerRegisterDto,Roles.Passenger);
-                if(newPassenger != null)
+                bool isCreated = _userService.CheckEmail(passengerRegisterDto.Email);
+                if (!isCreated)
                 {
-                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
-                    return Ok(newPassenger);
+                    Passenger? newPassenger = _userService.SignUp(passengerRegisterDto, Roles.Passenger);
+                    if (newPassenger != null)
+                    {
+                        PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
+                        return Ok(newPassenger);
+
+                    }
+                    return BadRequest("Not Added");
 
                 }
-                return BadRequest("Not Added");
+                return BadRequest("Registered with this email");
             
                
             }  
-            catch (Exception ex) { //Kendi kendiliğine 401 403 atıyo ama döndürmek istersek nasıl olacak
-                return BadRequest(ex.Message) ; //Bİr sıkıntı var 400 401 403 dönmek istediği zaman ne yapacam
+            catch (Exception ex) { 
+                return BadRequest(ex.Message) ; 
             }
-            
-
+         
         }
+       
         [HttpPost]
         public ActionResult<PassengerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
         {          

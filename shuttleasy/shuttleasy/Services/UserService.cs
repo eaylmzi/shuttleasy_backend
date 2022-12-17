@@ -345,6 +345,7 @@ namespace shuttleasy.Services
 
         }
 
+      
         private bool isAnyValidOTP(string email)
         {
             ResetPassword? resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email);
@@ -373,6 +374,30 @@ namespace shuttleasy.Services
             int seconds = remainingTime.Seconds;
             int time = day + hours + minutes + seconds;
             return time;
+        }
+
+
+        public bool CheckEmail(string email)
+        {
+            Passenger? passenger = _passengerLogic.GetPassengerWithEmail(email);
+            if (passenger != null)
+            {
+                return true;
+            }
+            else
+            {
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                if(companyWorker != null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
+            }
+
         }
 
 
