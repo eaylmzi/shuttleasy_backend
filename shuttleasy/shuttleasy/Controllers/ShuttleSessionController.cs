@@ -162,7 +162,27 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<List<ShuttleSession>> GetAllSessions()
+        {
+            try
+            {
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                if (companyWorker != null)
+                {
+                   var list = _shuttleSessionLogic.GetAllSessionsWithCompanyId(companyWorker.CompanyId);
+                   return Ok(list);
+                }
+                return BadRequest("The user that send request not found");
 
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
         private int GetUserIdFromRequestToken()
