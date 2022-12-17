@@ -12,67 +12,80 @@ namespace shuttleasy.DAL.Interfaces
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        ShuttleasyDBContext _context = new ShuttleasyDBContext();
-
-        private DbSet<T> query { get; set; }
-        public Repository() {
-            query = _context.Set<T>();
-        }
-
         public List<T>? Get()
         {
-            var entity = query.ToList();
-            return entity;
+            using (var context = new ShuttleasyDBContext())
+            {
+                var entity = context.Set<T>().ToList();
+                return entity;
+            }
+            
         }
         public List<T>? Get(Func<T, bool> metot)
-        {          
-            var list = query
+        {
+            using (var context = new ShuttleasyDBContext())
+            {
+                var list = context.Set<T>()
                       .Where(metot)
                       .Select(m => m)
                       .ToList();
-           
-            return list;
+
+                return list;
+
+
+            }
+            
         }
         
 
         public bool Update(T updatedEntity, Func<T, bool> metot)
-        {          
-           
-            T? entity = query
+        {
+            using (var context = new ShuttleasyDBContext())
+            {
+                T? entity = context.Set<T>()
                       .Where(metot)
                       .Select(m => m)
                       .SingleOrDefault();
 
-            if (entity != null)
-            {
-                entity = updatedEntity;
-                _context.SaveChangesAsync();
-                return true;
-            }
-              
+                if (entity != null)
+                {
+                    entity = updatedEntity;
+                    context.SaveChangesAsync();
+                    return true;
+                }
+
                 return false;
+
+
+            }
+            
 
         }
 
         public bool Delete(Func<T, bool> metot)
         {
-            T? entity = query
+            using (var context = new ShuttleasyDBContext())
+            {
+                T? entity = context.Set<T>()
                      .Where(metot)
                      .Select(m => m)
                      .SingleOrDefault();
-            if(entity != null)
-            {
-                query.Remove(entity);
-                _context.SaveChanges();
-                return true;
+                if (entity != null)
+                {
+                    context.Set<T>().Remove(entity);
+                    context.SaveChanges();
+                    return true;
+
+                }
+                return false;
 
             }
-            return false;
+            
         }
 
         public bool Add(T entity)
         {
-          using(var context = new ShuttleasyDBContext())
+            using(var context = new ShuttleasyDBContext())
             {
                 if (entity != null)
                 {
@@ -90,13 +103,19 @@ namespace shuttleasy.DAL.Interfaces
 
         public T? GetSingle(Func<T, bool> metot)
         {
-            T? entity = query
-                      .Where(metot)
-                      .Select(m => m)
-                      .SingleOrDefault();
-            
+            using (var context = new ShuttleasyDBContext())
+            {
+                T? entity = context.Set<T>()
+                                 .Where(metot)
+                                 .Select(m => m)
+                                 .SingleOrDefault();
 
-            return entity;
+
+                return entity;
+
+
+            }
+            
         }
     }
 }
