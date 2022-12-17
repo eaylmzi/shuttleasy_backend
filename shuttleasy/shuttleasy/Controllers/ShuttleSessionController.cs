@@ -49,24 +49,30 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                if (companyWorker != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    ShuttleSession shuttleSession = _mapper.Map<ShuttleSession>(shuttleSessionDto);
-                    //string timeStamp = DateTime.Now.ToString("dddd, dd MMMM yyyy");
-                    //{11.12.2022 16:14:12}
-                    // byte[] timeStampBytes = Encoding.ASCII.GetBytes(timeStamp); //STRİNG TO TİMESTAMP YAPÇAN
-                    // shuttleSession.StartTime = DateTime.Now;
-                    //Shuttlesessionda timestamp ve dateyi sor
-                    bool isAdded = _shuttleSessionLogic.CreateShuttleSession(shuttleSession);
-                    if (isAdded)
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                    if (companyWorker != null)
                     {
-                        return Ok(isAdded);
+                        ShuttleSession shuttleSession = _mapper.Map<ShuttleSession>(shuttleSessionDto);
+                        //string timeStamp = DateTime.Now.ToString("dddd, dd MMMM yyyy");
+                        //{11.12.2022 16:14:12}
+                        // byte[] timeStampBytes = Encoding.ASCII.GetBytes(timeStamp); //STRİNG TO TİMESTAMP YAPÇAN
+                        // shuttleSession.StartTime = DateTime.Now;
+                        //Shuttlesessionda timestamp ve dateyi sor
+                        bool isAdded = _shuttleSessionLogic.CreateShuttleSession(shuttleSession);
+                        if (isAdded)
+                        {
+                            return Ok(isAdded);
+                        }
+                        return BadRequest(isAdded);
                     }
-                    return BadRequest(isAdded);
+                    return BadRequest("The user that send request not found");
+
                 }
-                return BadRequest("The user that send request not found");
-                
+                return BadRequest("Mistake about token");
+                                             
             }
             catch (Exception ex)
             {
@@ -82,80 +88,25 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                if (companyWorker != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    bool isAdded = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
-                    if (isAdded)
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                    if (companyWorker != null)
                     {
-                        return Ok(isAdded);
-                    }
-                    return BadRequest(isAdded);
-                }
-                return BadRequest("The user that send request not found");
-                
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<ShuttleSession> GetShuttleSession([FromBody] IdDto companyWorkerId)
-        {
-            try
-            {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                if (companyWorker != null)
-                {
-                    ShuttleSession? shuttleSession = _shuttleSessionLogic.GetShuttleSessionWithCompanyId(companyWorkerId.Id);
-                    if (shuttleSession != null)
-                    {
-                        return Ok(shuttleSession);
-                    }
-                    return BadRequest("Shuttle session not found");
-                }
-                return BadRequest("The user that send request not found");
-
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-        }
-
-        [HttpPost]
-        public ActionResult<List<ShuttleSession>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
-        {
-            try
-            {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                if (companyWorker != null)
-                {
-                    Destination? destination = _destinationLogic
-                      .FindDestinationWithBeginningDestination(searchDestinationDto.BeginningDestination);
-                    if (destination != null)
-                    {
-                        if (destination.LastDestination.Equals(searchDestinationDto.LastDestination))
+                        bool isAdded = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
+                        if (isAdded)
                         {
-                            List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionWithSpecificLocation(destination.Id);
-                            if (shuttleSessions != null)
-                            {
-                                return Ok(shuttleSessions);
-                            }
-                            return BadRequest("The bus not found with that destination");
+                            return Ok(isAdded);
                         }
-                        return BadRequest("There is no destination");
+                        return BadRequest(isAdded);
                     }
-
-                    return BadRequest("The destination not in the list");
-
+                    return BadRequest("The user that send request not found");
                 }
-                return BadRequest("The user that send request not found");
+                return BadRequest("Mistake about token");
+
               
+                
             }
             catch (Exception ex)
             {
@@ -167,14 +118,19 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                if (companyWorker != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                   var list = _shuttleSessionLogic.GetAllSessionsWithCompanyId(companyWorker.CompanyId);
-                   return Ok(list);
-                }
-                return BadRequest("The user that send request not found");
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                    if (companyWorker != null)
+                    {
+                        var list = _shuttleSessionLogic.GetAllSessionsWithCompanyId(companyWorker.CompanyId);
+                        return Ok(list);
+                    }
+                    return BadRequest("The user that send request not found");
 
+                }
+                return BadRequest("Mistake about token");
 
 
             }
@@ -184,6 +140,51 @@ namespace shuttleasy.Controllers
             }
         }
 
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<List<ShuttleSession>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                    if (companyWorker != null)
+                    {
+                        Destination? destination = _destinationLogic
+                          .FindDestinationWithBeginningDestination(searchDestinationDto.BeginningDestination);
+                        if (destination != null)
+                        {
+                            if (destination.LastDestination.Equals(searchDestinationDto.LastDestination))
+                            {
+                                List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionWithSpecificLocation(destination.Id);
+                                if (shuttleSessions != null)
+                                {
+                                    return Ok(shuttleSessions);
+                                }
+                                return BadRequest("The bus not found with that destination");
+                            }
+                            return BadRequest("There is no destination");
+                        }
+
+                        return BadRequest("The destination not in the list");
+
+                    }
+                    return BadRequest("The user that send request not found");
+
+                }
+                return BadRequest("Mistake about token");
+                
+                
+              
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+
 
         private int GetUserIdFromRequestToken()
         {
@@ -192,6 +193,27 @@ namespace shuttleasy.Controllers
             string user = jwt.Claims.First(c => c.Type == "id").Value;
             int userId = int.Parse(user);
             return userId;
+        }
+        private string GetUserRoleFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
+            return userEmail;
+        }
+
+        private string GetUserTokenFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            return requestToken;
+        }
+        private UserVerifyingDto GetUserInformation()
+        {
+            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
+            userVerifyingDto.Id = GetUserIdFromRequestToken();
+            userVerifyingDto.Token = GetUserTokenFromRequestToken();
+            userVerifyingDto.Role = GetUserRoleFromRequestToken();
+            return userVerifyingDto;
         }
 
 

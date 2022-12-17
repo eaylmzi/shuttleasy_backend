@@ -5,6 +5,8 @@ using shuttleasy.LOGIC.Logics;
 using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Services;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace shuttleasy.Controllers
 {
@@ -78,6 +80,36 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
+        private string GetUserRoleFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
+            return userEmail;
+        }
+
+        private string GetUserTokenFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            return requestToken;
+        }
+        private UserVerifyingDto GetUserInformation()
+        {
+            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
+            userVerifyingDto.Id = GetUserIdFromRequestToken();
+            userVerifyingDto.Token = GetUserTokenFromRequestToken();
+            userVerifyingDto.Role = GetUserRoleFromRequestToken();
+            return userVerifyingDto;
         }
     }
 }

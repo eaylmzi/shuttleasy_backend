@@ -67,18 +67,23 @@ namespace shuttleasy.Controllers
         public ActionResult<CompanyWorkerInfoDto> UpdateDriver(DriverProfileDto driverProfileDto)
         {
             try
-            {               
-                CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
-                if(companyWorkerFromRequestToken != null)
+            {
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-
-                    CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorkerFromRequestToken, driverProfileDto);
-                    if (updatedDriver != null)
+                    CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
+                    if(companyWorkerFromRequestToken != null)
                     {
-                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(updatedDriver);
-                        return Ok(driverInfoDto);
+                        CompanyWorker? updatedDriver = _userService.UpdateDriverProfile(companyWorkerFromRequestToken, driverProfileDto);
+                        if (updatedDriver != null)
+                        {
+                            CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(updatedDriver);
+                            return Ok(driverInfoDto);
+                        }
+                        return BadRequest("Driver not updated");
                     }
-                    return BadRequest("Driver not updated");
+                    return BadRequest("Driver not found");
+                    
                 }
                 return BadRequest("Mistake about token");
                
@@ -94,8 +99,9 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
-                if (companyWorkerFromRequestToken != null)
+
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(id);
                     if(companyWorker != null)
@@ -119,13 +125,13 @@ namespace shuttleasy.Controllers
             }
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Admin},{Roles.SuperAdmin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<CompanyWorkerInfoDto> GetDriver([FromBody] IdDto idDto)
         {
             try
             {
-                CompanyWorker? companyWorkerFromRequestToken = GetCompanyWorkerFromRequestToken();
-                if (companyWorkerFromRequestToken != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(idDto.Id);
                     if (companyWorker != null)
@@ -154,6 +160,27 @@ namespace shuttleasy.Controllers
             string user = jwt.Claims.First(c => c.Type == "id").Value;
             int userId = int.Parse(user);
             return userId;
+        }
+        private string GetUserRoleFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
+            return userEmail;
+        }
+
+        private string GetUserTokenFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            return requestToken;
+        }
+        private UserVerifyingDto GetUserInformation()
+        {
+            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
+            userVerifyingDto.Id = GetUserIdFromRequestToken();
+            userVerifyingDto.Token = GetUserTokenFromRequestToken();
+            userVerifyingDto.Role = GetUserRoleFromRequestToken();
+            return userVerifyingDto;
         }
 
         private CompanyWorker? GetCompanyWorkerFromRequestToken()

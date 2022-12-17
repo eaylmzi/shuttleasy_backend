@@ -9,16 +9,14 @@ using System.Security.Claims;
 namespace shuttleasy.JwtToken
 {
     public class JwtTokenManager : IJwtTokenManager
-    {//Localde ya da serverde saklanıyormuş tokenler biz databasede saklıyoruz ?
-     //bence tek seferlik 9 aylık token oluşturmak yanlış
+    {
         public string CreateToken(Passenger passenger,string role, IConfiguration _configuration)
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role,role),
-                new Claim("email",passenger.Email),
-                new Claim("id",passenger.Id.ToString())
-
+                new Claim("id",passenger.Id.ToString()),
+                 new Claim("role",role)
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
               _configuration.GetSection("AppSettings:Token").Value ?? throw new ArgumentNullException()));
@@ -39,8 +37,8 @@ namespace shuttleasy.JwtToken
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Role,role),
-                new Claim("email",worker.Email),
-                new Claim("id",worker.Id.ToString())
+                new Claim("id",worker.Id.ToString()),
+                new Claim("role",role)
 
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

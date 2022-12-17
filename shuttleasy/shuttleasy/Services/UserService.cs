@@ -400,6 +400,44 @@ namespace shuttleasy.Services
 
         }
 
+        public bool VerifyUser(UserVerifyingDto userInformation)
+        {
+            if (Roles.Passenger.Equals(userInformation.Role))
+            {
+                Passenger? passenger = _passengerLogic.GetPassengerWithId(userInformation.Id);
+                if (passenger != null)
+                {
+                    if(passenger.Token != null)
+                    {
+                        if (passenger.Token.Equals(userInformation.Token))
+                        {
+                            return true;
+                        }
+
+                    }
+                    
+                }
+                return false;
+            }
+            else if (Roles.Driver.Equals(userInformation.Role) || Roles.Admin.Equals(userInformation.Role) || Roles.SuperAdmin.Equals(userInformation.Role))
+            {
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(userInformation.Id);
+                if (companyWorker != null)
+                {
+                    if (companyWorker.Token != null)
+                    {
+                        if (companyWorker.Token.Equals(userInformation.Token))
+                        {
+                            return true;
+                        }
+
+                    }
+
+                }
+                return false;
+            }
+            return false;
+        }
 
 
 

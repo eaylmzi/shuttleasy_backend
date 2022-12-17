@@ -21,6 +21,7 @@ namespace shuttleasy.Services
 
         public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto);
         public bool CheckEmail(string email);
+        public bool VerifyUser(UserVerifyingDto userInformation);
 
     }
 }

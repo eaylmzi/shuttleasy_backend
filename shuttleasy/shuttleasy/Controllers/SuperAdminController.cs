@@ -9,6 +9,9 @@ using shuttleasy.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using shuttleasy.Models.dto.Login.dto;
+using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
+using shuttleasy.Models.dto.Credentials.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -53,18 +56,27 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.SuperAdmin}")]
         public ActionResult<CompanyWorkerInfoDto> CreateAdmin([FromBody] CompanyWorkerRegisterDto adminRegisterDto)
         {
             try
             {
-                CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(adminRegisterDto, Roles.Admin);
-                if (newCompanyWorker != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
-                    return Ok(driverInfoDto);
+                    CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(adminRegisterDto, Roles.Admin);
+                    if (newCompanyWorker != null)
+                    {
+                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
+                        return Ok(driverInfoDto);
+                    }
+                    return BadRequest("Not Added");
                 }
-                return BadRequest("Not Added");
+                return BadRequest("Mistake about token");
+                    
+
+                
+                
             }
             catch (Exception ex)
             {
@@ -72,6 +84,36 @@ namespace shuttleasy.Controllers
             }
 
 
+        }
+
+        private int GetUserIdFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
+        private string GetUserRoleFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
+            return userEmail;
+        }
+
+        private string GetUserTokenFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            return requestToken;
+        }
+        private UserVerifyingDto GetUserInformation()
+        {
+            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
+            userVerifyingDto.Id = GetUserIdFromRequestToken();
+            userVerifyingDto.Token = GetUserTokenFromRequestToken();
+            userVerifyingDto.Role = GetUserRoleFromRequestToken();
+            return userVerifyingDto;
         }
     }
 }

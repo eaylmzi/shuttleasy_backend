@@ -36,25 +36,30 @@ namespace shuttleasy.Controllers
             _shuttleBusLogic = shuttleBusLogic;
             _mapper = mapper;
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> AddShuttleBus([FromBody] ShuttleBusDto shuttleBusDto)
         {
             try
             {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                if (companyWorker != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    ShuttleBus shuttleBus = _mapper.Map<ShuttleBus>(shuttleBusDto);
-                    bool isAdded = _shuttleBusLogic.Add(shuttleBus);
-                    if (isAdded)
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                    if (companyWorker != null)
                     {
-                        return Ok(isAdded);
-                    }
-                    return BadRequest(isAdded);
+                        ShuttleBus shuttleBus = _mapper.Map<ShuttleBus>(shuttleBusDto);
+                        bool isAdded = _shuttleBusLogic.Add(shuttleBus);
+                        if (isAdded)
+                        {
+                            return Ok(isAdded);
+                        }
+                        return BadRequest(isAdded);
 
+                    }
+                    return BadRequest("The user that send request not found");
                 }
-                return BadRequest("The user that send request not found");
-              
+                return BadRequest("Mistake about token");
+                          
             }
             catch (Exception ex)
             {
@@ -64,24 +69,28 @@ namespace shuttleasy.Controllers
 
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> DeleteShuttleBus([FromBody] IdDto idDto)
         {
             try
             {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                if (companyWorker != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    bool isAdded = _shuttleBusLogic.DeleteShuttleBus(idDto.Id);
-                    if (isAdded)
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
+                    if (companyWorker != null)
                     {
-                        return Ok(isAdded);
-                    }
-                    return BadRequest(isAdded);
+                        bool isAdded = _shuttleBusLogic.DeleteShuttleBus(idDto.Id);
+                        if (isAdded)
+                        {
+                            return Ok(isAdded);
+                        }
+                        return BadRequest(isAdded);
 
+                    }
+                    return BadRequest("The user that send request not found");
                 }
-                return BadRequest("The user that send request not found");
-               
+                return BadRequest("Mistake about token");             
             }
             catch (Exception ex)
             {
@@ -96,6 +105,27 @@ namespace shuttleasy.Controllers
             string user = jwt.Claims.First(c => c.Type == "id").Value;
             int userId = int.Parse(user);
             return userId;
+        }
+        private string GetUserRoleFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
+            return userEmail;
+        }
+
+        private string GetUserTokenFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            return requestToken;
+        }
+        private UserVerifyingDto GetUserInformation()
+        {
+            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
+            userVerifyingDto.Id = GetUserIdFromRequestToken();
+            userVerifyingDto.Token = GetUserTokenFromRequestToken();
+            userVerifyingDto.Role = GetUserRoleFromRequestToken();
+            return userVerifyingDto;
         }
     }
 }

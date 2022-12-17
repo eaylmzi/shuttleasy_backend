@@ -64,7 +64,8 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                if(_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
                     bool isCreated = _userService.CheckEmail(driverRegisterDto.Email);
                     if (!isCreated)
@@ -97,7 +98,8 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                if (_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
                     bool isCreated = _userService.CheckEmail(passengerRegisterPanelDto.Email);
                     if (!isCreated)
@@ -128,10 +130,15 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                int a = GetUserIdFromRequestToken();
-                if (_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    return _passengerLogic.GetPassengerWithId(idDto.Id);
+                    Passenger? passenger = _passengerLogic.GetPassengerWithId(idDto.Id);
+                    if(passenger != null)
+                    {
+                        return Ok(passenger);
+                    }
+                    return BadRequest("The passenger not found");
                 }
                 return BadRequest("The user that send request not found");
                
@@ -149,14 +156,20 @@ namespace shuttleasy.Controllers
                 return StatusCode(500);
             }
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<List<Passenger>> GetAllPassengers()
         {
             try
             {
-                if (_driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken()) != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    return _passengerLogic.GetAllPassengers();
+                    var list = _passengerLogic.GetAllPassengers();
+                    if(list != null)
+                    {
+                        return list;
+                    }
+                    return BadRequest("There is no passenger in list");
                 }
                 return BadRequest("The admin that send request not found");
                 
@@ -211,6 +224,19 @@ namespace shuttleasy.Controllers
             }
 
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public IActionResult Test2()
+        {
+            try
+            {
+                return Ok(GetUserRoleFromRequestToken());
+            }
+            catch (SqlException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
 
 
 
@@ -221,6 +247,27 @@ namespace shuttleasy.Controllers
             string user = jwt.Claims.First(c => c.Type == "id").Value;
             int userId = int.Parse(user);
             return userId;
+        }
+        private string GetUserRoleFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
+            return userEmail;
+        }
+       
+        private string GetUserTokenFromRequestToken()
+        {
+            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            return requestToken;
+        }
+        private UserVerifyingDto GetUserInformation()
+        {
+            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
+            userVerifyingDto.Id = GetUserIdFromRequestToken();
+            userVerifyingDto.Token = GetUserTokenFromRequestToken();
+            userVerifyingDto.Role = GetUserRoleFromRequestToken();
+            return userVerifyingDto;
         }
         private CompanyWorker? GetAdminFromRequestToken()
         {
