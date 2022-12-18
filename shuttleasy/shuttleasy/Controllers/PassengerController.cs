@@ -227,6 +227,34 @@ namespace shuttleasy.Controllers
 
         }
 
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<List<Passenger>> GetAllPassengers()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
+                {
+                    var list = _passengerLogic.GetAllPassengers();
+                    if (list != null)
+                    {
+                        return list;
+                    }
+                    return BadRequest("There is no passenger in list");
+                }
+                return BadRequest("The admin that send request not found");
+
+            }
+            catch (ArgumentNullException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+        }
 
 
         private int GetUserIdFromRequestToken()

@@ -151,7 +151,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<List<ShuttleSession>> GetAllDriver()
+        public ActionResult<List<CompanyWorker>> GetAllDriver()
         {
             try
             {

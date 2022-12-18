@@ -22,17 +22,13 @@ namespace shuttleasy.Controllers
     public class DestinationController : Controller
     {
         private readonly IUserService _userService;
-        private readonly IPassengerLogic _passengerLogic;
-        private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IDestinationLogic _destinationLogic;
         private readonly IMapper _mapper;
 
-        public DestinationController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
+        public DestinationController(IUserService userService,
                     IDestinationLogic destinationLogic, IMapper mapper)
         {
             _userService = userService;
-            _passengerLogic = passengerLogic;
-            _driverLogic = driverLogic;
             _destinationLogic = destinationLogic;
             _mapper = mapper;
         }
@@ -53,7 +49,7 @@ namespace shuttleasy.Controllers
                     return BadRequest(isAdded);
 
                 }
-                return BadRequest("The user that send request not found");
+                return Unauthorized("The user that send request not found");
                
             }
             catch(Exception ex)
@@ -112,6 +108,18 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
 
         private int GetUserIdFromRequestToken()
         {

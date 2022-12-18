@@ -99,7 +99,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<List<ShuttleSession>> GetAllBuses()
+        public ActionResult<List<ShuttleBus>> GetAllBuses()
         {
             try
             {

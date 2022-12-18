@@ -156,87 +156,7 @@ namespace shuttleasy.Controllers
                 return StatusCode(500);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<List<Passenger>> GetAllPassengers()
-        {
-            try
-            {
-                UserVerifyingDto userInformation = GetUserInformation();
-                if (_userService.VerifyUser(userInformation))
-                {
-                    var list = _passengerLogic.GetAllPassengers();
-                    if(list != null)
-                    {
-                        return list;
-                    }
-                    return BadRequest("There is no passenger in list");
-                }
-                return BadRequest("The admin that send request not found");
-                
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-        }
-        [HttpPost]
-        public IActionResult Test1()
-        {
-            try
-            {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-                builder.DataSource = "shuttleasydbserver1.database.windows.net";
-                builder.UserID = "emreyilmaz";
-                builder.Password = "Easypeasy1";
-                builder.InitialCatalog = "ShuttleasyDB";
-
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
-                {
-      
-
-                    connection.Open();
-
-                    string sql = "SELECT name  FROM company_worker";
-
-                    using (SqlCommand command = new SqlCommand(sql, connection))
-                    {
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                return Ok(reader.GetString(0));
-                            }
-                        }
-                    }
-                    
-                }
-                return Ok();
-            }
-            catch (SqlException e)
-            {
-                return BadRequest(e.Message);
-            }
-
-        }
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public IActionResult Test2()
-        {
-            try
-            {
-                return Ok(GetUserRoleFromRequestToken());
-            }
-            catch (SqlException e)
-            {
-                return BadRequest(e.Message);
-            }
-
-        }
+        
 
 
 
@@ -276,5 +196,63 @@ namespace shuttleasy.Controllers
             return adminFromToken;
         }
 
+
+
+        /*
+
+        [HttpPost]
+        public IActionResult Test1()
+        {
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+                builder.DataSource = "shuttleasydbserver1.database.windows.net";
+                builder.UserID = "emreyilmaz";
+                builder.Password = "Easypeasy1";
+                builder.InitialCatalog = "ShuttleasyDB";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+
+
+                    connection.Open();
+
+                    string sql = "SELECT name  FROM company_worker";
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                return Ok(reader.GetString(0));
+                            }
+                        }
+                    }
+
+                }
+                return Ok();
+            }
+            catch (SqlException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public IActionResult Test2()
+        {
+            try
+            {
+                return Ok(GetUserRoleFromRequestToken());
+            }
+            catch (SqlException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+        */
     }
 }

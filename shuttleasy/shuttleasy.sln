@@ -5,9 +5,11 @@ VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shuttleasy", "shuttleasy\shuttleasy.csproj", "{D3862160-E86C-4F76-A672-FA922689B8A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shuttleasy.DAL", "shuttleasy.DAL\shuttleasy.DAL.csproj", "{50D45B50-18CC-42CA-9867-E66217D7F6A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shuttleasy.DAL", "shuttleasy.DAL\shuttleasy.DAL.csproj", "{50D45B50-18CC-42CA-9867-E66217D7F6A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shuttleasy.LOGIC", "shuttleasy.LOGIC\shuttleasy.LOGIC.csproj", "{14A3FEAD-F03C-4824-BAEC-4404AF6DC6C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shuttleasy.LOGIC", "shuttleasy.LOGIC\shuttleasy.LOGIC.csproj", "{14A3FEAD-F03C-4824-BAEC-4404AF6DC6C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shuttleasy.unittest", "shuttleasy.unittest\shuttleasy.unittest.csproj", "{6301378D-D39A-408A-A69B-53724B658C71}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{14A3FEAD-F03C-4824-BAEC-4404AF6DC6C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14A3FEAD-F03C-4824-BAEC-4404AF6DC6C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14A3FEAD-F03C-4824-BAEC-4404AF6DC6C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6301378D-D39A-408A-A69B-53724B658C71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6301378D-D39A-408A-A69B-53724B658C71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6301378D-D39A-408A-A69B-53724B658C71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6301378D-D39A-408A-A69B-53724B658C71}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
