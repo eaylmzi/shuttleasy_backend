@@ -415,8 +415,7 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.PassengerCount).HasColumnName("passenger_count");
 
                 entity.Property(e => e.StartTime)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+
                     .HasColumnName("start_time");
 
                 entity.Property(e => e.DriverId).HasColumnName("driver_id");

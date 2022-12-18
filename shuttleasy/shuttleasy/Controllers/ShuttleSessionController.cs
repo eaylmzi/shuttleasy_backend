@@ -61,8 +61,6 @@ namespace shuttleasy.Controllers
                         // byte[] timeStampBytes = Encoding.ASCII.GetBytes(timeStamp); //STRİNG TO TİMESTAMP YAPÇAN
                         // shuttleSession.StartTime = DateTime.Now;
                         //Shuttlesessionda timestamp ve dateyi sor
-                        
-                        shuttleSession.StartTime = DateTime.Now;
                         bool isAdded = _shuttleSessionLogic.CreateShuttleSession(shuttleSession);
                         if (isAdded)
                         {
