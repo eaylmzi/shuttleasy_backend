@@ -24,18 +24,18 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
         }
         [HttpPost]
-        public ActionResult<ResetPassword> SendOTPEmail([FromBody] EmailDto emailDto)
+        public ActionResult<DateTime> SendOTPEmail([FromBody] EmailDto emailDto)
         {
             try
             {
-                ResetPassword? res = _userService.SendOTP(emailDto.Email);
-                if (res != null)
+                DateTime? expiredDate = _userService.SendOTP(emailDto.Email);
+                if (expiredDate != null)
                 {
-                    return Ok(res);
+                    return Ok(expiredDate);
                 }
                 else
                 {
-                    return BadRequest("No attempt can be made before 180 seconds");
+                    return BadRequest("No attempt can be made before 180 seconds or email not in the list");
                 }
 
             }

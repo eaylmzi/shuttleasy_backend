@@ -69,7 +69,7 @@ namespace shuttleasy.Controllers
         {           
             try
             {
-                bool isCreated = _userService.CheckEmail(passengerRegisterDto.Email);
+                bool isCreated = _userService.CheckEmailandPhoneNumber(passengerRegisterDto.Email,passengerRegisterDto.PhoneNumber);
                 if (!isCreated)
                 {
                     Passenger? newPassenger = _userService.SignUp(passengerRegisterDto, Roles.Passenger);
@@ -82,7 +82,7 @@ namespace shuttleasy.Controllers
                     return BadRequest("Not Added");
 
                 }
-                return BadRequest("Registered with this email");
+                return BadRequest("Registered with this email or phone");
             
                
             }  
@@ -153,14 +153,10 @@ namespace shuttleasy.Controllers
                     return BadRequest("The user is null");
 
                 }
-                return BadRequest("Mistake about token");   
+                return Unauthorized("Mistake about token");
 
 
 
-            }
-            catch(AuthenticationException ex)
-            {
-                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
@@ -187,12 +183,12 @@ namespace shuttleasy.Controllers
                         }
                         return BadRequest("User not updated");
                     }
-                    return BadRequest("Mistake about Token");
+                    return BadRequest("Passenger not found from token");
 
                 }
 
-                return BadRequest("Mistake about token");
-                    
+                return Unauthorized("Mistake about token");
+
 
 
             }
@@ -202,6 +198,7 @@ namespace shuttleasy.Controllers
             }
             
         }
+        
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<PassengerInfoDto> GetPassenger([FromBody] IdDto idDto)
         {
@@ -218,7 +215,7 @@ namespace shuttleasy.Controllers
                     }
                     return BadRequest("Passenger not found");
                 }
-                return BadRequest("Mistake about token");                            
+                return Unauthorized("Mistake about token");
             }
             catch (Exception ex)
             {
@@ -242,17 +239,12 @@ namespace shuttleasy.Controllers
                     }
                     return BadRequest("There is no passenger in list");
                 }
-                return BadRequest("The admin that send request not found");
+                return Unauthorized("Mistake about token");
 
             }
-            catch (ArgumentNullException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-            }
-
-            catch (Exception)
-            {
-                return StatusCode(500);
             }
         }
 

@@ -12,6 +12,7 @@ using shuttleasy.Models.dto.Login.dto;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using shuttleasy.Models.dto.Credentials.dto;
+using shuttleasy.Models.dto.Passengers.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -64,19 +65,24 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = GetUserInformation();
                 if (_userService.VerifyUser(userInformation))
                 {
-                    CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(adminRegisterDto, Roles.Admin);
-                    if (newCompanyWorker != null)
+                    bool isCreated = _userService.CheckEmailandPhoneNumber(adminRegisterDto.Email, adminRegisterDto.PhoneNumber);
+                    if (!isCreated)
                     {
-                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
-                        return Ok(driverInfoDto);
+                        CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(adminRegisterDto, Roles.Admin);
+                        if (newCompanyWorker != null)
+                        {
+                            CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
+                            return Ok(driverInfoDto);
+                        }
+                        return BadRequest("Not Added");
                     }
-                    return BadRequest("Not Added");
+                    return BadRequest("Registered with this email or phone");
                 }
-                return BadRequest("Mistake about token");
-                    
+                return Unauthorized("Mistake about token");
 
-                
-                
+
+
+
             }
             catch (Exception ex)
             {

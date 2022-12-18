@@ -67,7 +67,7 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = GetUserInformation();
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isCreated = _userService.CheckEmail(driverRegisterDto.Email);
+                    bool isCreated = _userService.CheckEmailandPhoneNumber(driverRegisterDto.Email,driverRegisterDto.PhoneNumber);
                     if (!isCreated)
                     {
                         CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
@@ -79,11 +79,11 @@ namespace shuttleasy.Controllers
                         return BadRequest("Not Added");
 
                     }
-                    return BadRequest("Registered with this email");
+                    return BadRequest("Registered with this email or phone");
                    
 
                 }
-                return BadRequest("The driver that send request not found");
+                return Unauthorized("Mistake about token");
                
             }
             catch (Exception ex)
@@ -101,7 +101,7 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = GetUserInformation();
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isCreated = _userService.CheckEmail(passengerRegisterPanelDto.Email);
+                    bool isCreated = _userService.CheckEmailandPhoneNumber(passengerRegisterPanelDto.Email,passengerRegisterPanelDto.PhoneNumber);
                     if (!isCreated)
                     {
                         Passenger? newPassenger = _userService.CreatePassenger(passengerRegisterPanelDto, Roles.Passenger);
@@ -113,10 +113,10 @@ namespace shuttleasy.Controllers
                         return BadRequest("Not Added");
 
                     }
-                    return BadRequest("Registered with this email");
+                    return BadRequest("Registered with this email or phone");
                     
                 }
-                return BadRequest("The driver that send request not found");
+                return Unauthorized("Mistake about token");
                
             }
             catch (Exception ex)
@@ -125,37 +125,7 @@ namespace shuttleasy.Controllers
             }
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<Passenger> GetPassenger([FromBody] IdDto idDto)
-        {
-            try
-            {
-                UserVerifyingDto userInformation = GetUserInformation();
-                if (_userService.VerifyUser(userInformation))
-                {
-                    Passenger? passenger = _passengerLogic.GetPassengerWithId(idDto.Id);
-                    if(passenger != null)
-                    {
-                        return Ok(passenger);
-                    }
-                    return BadRequest("The passenger not found");
-                }
-                return BadRequest("The user that send request not found");
-               
-            }
-            catch (ArgumentNullException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-        }
+        
         
 
 

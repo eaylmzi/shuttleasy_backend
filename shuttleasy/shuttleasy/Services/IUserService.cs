@@ -14,12 +14,13 @@ namespace shuttleasy.Services
         public Passenger? SignUp(PassengerRegisterDto passengerRegisterDto, string role);
         public Passenger? CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role);
         public CompanyWorker? CreateCompanyWorker(CompanyWorkerRegisterDto driverRegisterDto, string role);
-        public ResetPassword? SendOTP(string email);
+        public DateTime? SendOTP(string email);
         public EmailTokenDto? ValidateOTP(string email, string otp);
         public object? resetPassword(string email, string password);
         public Passenger? UpdatePassengerProfile(Passenger passenger, UserProfileDto userProfileDto);
 
         public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto);
+        public bool CheckEmailandPhoneNumber(string email,string phoneNumber);
         public bool CheckEmail(string email);
         public bool VerifyUser(UserVerifyingDto userInformation);
 

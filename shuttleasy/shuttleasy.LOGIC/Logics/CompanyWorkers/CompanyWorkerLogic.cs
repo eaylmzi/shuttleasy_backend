@@ -30,15 +30,22 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
             return companyWorker;
 
         }
-        public CompanyWorker GetCompanyWorkerWithId(int id) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
+        public CompanyWorker GetCompanyWorkerWithId(int id)
         {
             Func<CompanyWorker, bool> getDriver = getDriver => getDriver.Id == id;
             CompanyWorker companyWorker = _companyWorkerRepository.GetSingle(getDriver) ?? throw new ArgumentNullException();
             return companyWorker;
         }
-        public CompanyWorker? GetCompanyWorkerWithToken(string token) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
+        public CompanyWorker? GetCompanyWorkerWithToken(string token)
         {
             Func<CompanyWorker, bool> getCompanyWorker = getCompanyWorker => getCompanyWorker.Token == token;
+            CompanyWorker? companyWorker = _companyWorkerRepository.GetSingle(getCompanyWorker);
+            return companyWorker;
+
+        }
+        public CompanyWorker? GetCompanyWorkerWithPhoneNumber(string phone) 
+        {
+            Func<CompanyWorker, bool> getCompanyWorker = getCompanyWorker => getCompanyWorker.PhoneNumber == phone;
             CompanyWorker? companyWorker = _companyWorkerRepository.GetSingle(getCompanyWorker);
             return companyWorker;
 

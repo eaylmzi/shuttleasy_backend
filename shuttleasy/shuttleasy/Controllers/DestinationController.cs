@@ -49,7 +49,7 @@ namespace shuttleasy.Controllers
                     return BadRequest(isAdded);
 
                 }
-                return Unauthorized("The user that send request not found");
+                return Unauthorized("Mistake about token");
                
             }
             catch(Exception ex)
@@ -77,7 +77,7 @@ namespace shuttleasy.Controllers
 
 
                 }
-                return BadRequest("The user that send request not found");
+                return Unauthorized("Mistake about token");
               
             }
             catch (Exception ex)
@@ -100,7 +100,7 @@ namespace shuttleasy.Controllers
                     }
                     return BadRequest("There is no destination in list");
                 }
-                return BadRequest("Mistake about token");
+                return Unauthorized("Mistake about token");
 
             }
             catch (Exception ex)

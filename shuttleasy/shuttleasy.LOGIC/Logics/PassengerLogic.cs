@@ -51,9 +51,16 @@ namespace shuttleasy.LOGIC.Logics
             bool isUpdated = _passenger.Update(updatedPassenger, getPassenger);
             return isUpdated;
         }
-        public Passenger? GetPassengerWithToken(string token) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
+        public Passenger? GetPassengerWithToken(string token) 
         {
             Func<Passenger, bool> getPassenger = getPassenger => getPassenger.Token == token;
+            Passenger? passenger = _passenger.GetSingle(getPassenger);
+            return passenger;
+
+        }
+        public Passenger? GetPassengerWithPhoneNumber(string phone)
+        {
+            Func<Passenger, bool> getPassenger = getPassenger => getPassenger.PhoneNumber == phone;
             Passenger? passenger = _passenger.GetSingle(getPassenger);
             return passenger;
 

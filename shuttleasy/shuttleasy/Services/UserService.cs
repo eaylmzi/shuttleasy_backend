@@ -236,32 +236,82 @@ namespace shuttleasy.Services
             return address;
         }
 
-
-
-
-
-        public ResetPassword? SendOTP(string email)
+        public bool CheckEmail(string email)
         {
-            if (!isAnyValidOTP(email))
+            Passenger? passenger = _passengerLogic.GetPassengerWithEmail(email);
+            if (passenger != null)
             {
-                string otp = GetRandomOTP(6);
-                // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
-                ResetPassword resetPassword = new ResetPassword();
-                resetPassword.Email = email;
-                resetPassword.Date = DateTime.Now;
-                resetPassword.ResetKey = otp;
-                _passwordResetLogic.Add(resetPassword);
-                return resetPassword;
+                return true;
+            }
+            else
+            {
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                if (companyWorker != null)
+                {
+                    return true;
+                }
+                else
+                {
+
+                    return false;
+                }
 
             }
-            return null;
+
+        }
+
+
+
+        public DateTime? SendOTP(string email)
+        {
+            Passenger? passenger = _passengerLogic.GetPassengerWithEmail(email);
+            if (passenger != null)
+            {
+                if (!isAnyValidOTP(email))
+                {
+                    string otp = GetRandomOTP(6);
+                    // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
+                    ResetPassword resetPassword = new ResetPassword();
+                    resetPassword.Email = email;
+                    resetPassword.Date = DateTime.Now;
+                    resetPassword.ResetKey = otp;
+                    DateTime expireDate = DateTime.Now.AddSeconds(180);
+                    _passwordResetLogic.Add(resetPassword);
+                    return expireDate;
+
+                }
+                return null;
+
+            }
+            else
+            {
+                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                if (companyWorker != null)
+                {
+                    if (!isAnyValidOTP(email))
+                    {
+                        string otp = GetRandomOTP(6);
+                        // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
+                        ResetPassword resetPassword = new ResetPassword();
+                        resetPassword.Email = email;
+                        resetPassword.Date = DateTime.Now;
+                        resetPassword.ResetKey = otp;
+                        DateTime expireDate = DateTime.Now.AddSeconds(180);
+                        _passwordResetLogic.Add(resetPassword);
+                        return expireDate;
+
+                    }
+                }
+                return null;
+            }
+            
         }
         public EmailTokenDto? ValidateOTP(string email,string otp)
         {
             ResetPassword resetPassword = _passwordResetLogic.GetResetPasswordWithEmail(email)
                  ?? throw new ArgumentNullException();
             Passenger? passenger;
-            CompanyWorker companyWorker;
+            CompanyWorker? companyWorker;
 
             if (resetPassword != null)
             {
@@ -273,23 +323,33 @@ namespace shuttleasy.Services
                     {
                         EmailTokenDto emailTokenDto;
                         passenger = _passengerLogic.GetPassengerWithEmail(email);
-                        if (passenger!= null)//Geliştirilebilir bak buraya
+                        if (passenger!= null)
                         {
-                            emailTokenDto = new EmailTokenDto();
-                            emailTokenDto.Email = email;
-                            emailTokenDto.Token = passenger.Token;
+                            if(passenger.Token != null)
+                            {
+                                emailTokenDto = new EmailTokenDto();
+                                emailTokenDto.Email = email;
+                                emailTokenDto.Token = passenger.Token;
+                                return emailTokenDto;
+
+                            }
+                            
                         }
                         else
                         {
-                            companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email)
-                                    ?? throw new ArgumentNullException();
-                            emailTokenDto = new EmailTokenDto();
-                            emailTokenDto.Email = email;
-                            emailTokenDto.Token = companyWorker.Token;
+                            companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+                            if(companyWorker!= null)
+                            {
+                                if(companyWorker.Token != null)
+                                {
+                                    emailTokenDto = new EmailTokenDto();
+                                    emailTokenDto.Email = email;
+                                    emailTokenDto.Token = companyWorker.Token;
+                                    return emailTokenDto;
+
+                                }
+                            }                          
                         }
-
-
-                        return emailTokenDto;
                     }
                 }
             }
@@ -377,17 +437,19 @@ namespace shuttleasy.Services
         }
 
 
-        public bool CheckEmail(string email)
+        public bool CheckEmailandPhoneNumber(string email,string phoneNumber)
         {
-            Passenger? passenger = _passengerLogic.GetPassengerWithEmail(email);
-            if (passenger != null)
+            Passenger? forPassengerEmail = _passengerLogic.GetPassengerWithEmail(email);
+            Passenger? forPassengerPhone = _passengerLogic.GetPassengerWithPhoneNumber(phoneNumber);
+            if (forPassengerEmail != null || forPassengerPhone != null)
             {
                 return true;
             }
             else
             {
-                CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
-                if(companyWorker != null)
+                CompanyWorker? forCompanyWorkerEmail = _driverLogic.GetCompanyWorkerWithEmail(email);
+                CompanyWorker? forCompanyWorkerPhone = _driverLogic.GetCompanyWorkerWithPhoneNumber(phoneNumber);
+                if (forCompanyWorkerEmail != null || forCompanyWorkerPhone != null)
                 {
                     return true;
                 }

@@ -16,5 +16,6 @@ namespace shuttleasy.LOGIC.Logics
         public bool UpdatePassengerWithEmail(Passenger updatedPassenger, string email);
         public Passenger? GetPassengerWithToken(string token);
         public bool DeletePassenger(string email);
+        public Passenger? GetPassengerWithPhoneNumber(string phone);
     }
 }
