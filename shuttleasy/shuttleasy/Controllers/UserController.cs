@@ -7,6 +7,8 @@ using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Services;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
+using shuttleasy.DAL.Resource.String;
 
 namespace shuttleasy.Controllers
 {
@@ -29,9 +31,11 @@ namespace shuttleasy.Controllers
             try
             {
                 DateTime? expiredDate = _userService.SendOTP(emailDto.Email);
+                TimeDto timeDto = new TimeDto();
+                timeDto.dateTime = expiredDate;
                 if (expiredDate != null)
                 {
-                    return Ok(expiredDate);
+                    return Ok(timeDto);
                 }
                 else
                 {
@@ -63,17 +67,22 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin},{Roles.Driver},{Roles.Passenger}")]
         public ActionResult<object> ResetPassword([FromBody] EmailPasswordDto emailPasswordDto)
         {
             try
             {
-                object? user = _userService.resetPassword(emailPasswordDto.Email, emailPasswordDto.Password);
-                if (user != null)
+                UserVerifyingDto userInformation = GetUserInformation();
+                if (_userService.VerifyUser(userInformation))
                 {
-                    return Ok(user);
+                    object? user = _userService.resetPassword(emailPasswordDto.Email, emailPasswordDto.Password);
+                    if (user != null)
+                    {
+                        return Ok(user);
+                    }
+                    return BadRequest("The password has not been updated");
                 }
-                return BadRequest("The password has not been updated");
+                return BadRequest("Mistake about token");
 
             }
             catch (Exception ex)
