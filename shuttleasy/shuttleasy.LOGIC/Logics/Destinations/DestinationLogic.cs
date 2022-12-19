@@ -36,10 +36,10 @@ namespace shuttleasy.LOGIC.Logics.Destinations
             return destinationList;
         }
 
-        public Destination? FindDestinationWithBeginningDestination(string beginningDestination)
+        public List<Destination>? FindDestinationWithBeginningDestination(string lastDestination)
         {
-            Func<Destination, bool> getDestinationNumber = getDestinationNumber => getDestinationNumber.BeginningDestination == beginningDestination;
-            Destination? destination = _destinationRepository.GetSingle(getDestinationNumber);
+            Func<Destination, bool> getDestinationNumber = getDestinationNumber => getDestinationNumber.LastDestination == lastDestination;
+            List<Destination>? destination = _destinationRepository.Get(getDestinationNumber);
             return destination;
           
         }

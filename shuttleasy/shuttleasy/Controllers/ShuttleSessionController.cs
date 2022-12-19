@@ -156,18 +156,19 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
                     if (companyWorker != null)
                     {
-                        Destination? destination = _destinationLogic
-                          .FindDestinationWithBeginningDestination(searchDestinationDto.BeginningDestination);
+                        List<Destination>? destination = _destinationLogic
+                          .FindDestinationWithBeginningDestination(searchDestinationDto.LastDestination);
                         if (destination != null)
                         {
-                            if (destination.LastDestination.Equals(searchDestinationDto.LastDestination))
+                            List<ShuttleSessionSearchDto>? shuttleSessionDtoList = new List<ShuttleSessionSearchDto>();
+                            foreach (Destination destinationItem in destination)
                             {
-                                List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionsWithSpecificLocation(destination.Id);
+                                List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionsWithSpecificLocation(destinationItem.Id);
                                 ShuttleSessionSearchDto shuttleSessionSearchDto = new ShuttleSessionSearchDto();
-                                List<ShuttleSessionSearchDto>? shuttleSessionDtoList = new List<ShuttleSessionSearchDto>();
+                                
                                 if (shuttleSessions != null)
                                 {
-                                    foreach(var item in shuttleSessions)
+                                    foreach (var item in shuttleSessions)
                                     {
                                         shuttleSessionSearchDto = _mapper.Map<ShuttleSessionSearchDto>(item);
                                         shuttleSessionSearchDto.CompanyName = _companyLogic.GetCompanyNameWithCompanyId(item.CompanyId);
@@ -177,11 +178,15 @@ namespace shuttleasy.Controllers
                                     return Ok(shuttleSessionDtoList);
                                 }
                                 return BadRequest("The bus not found with that destination");
+
                             }
-                            return BadRequest("There is no destination");
+                            
+
+
+
                         }
 
-                        return BadRequest("The destination not in the list");
+                        return BadRequest("The destinations not in the list");
 
                     }
                     return BadRequest("The user that send request not found");
