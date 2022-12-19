@@ -18,7 +18,7 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
             _shuttleSessionRepository = shuttleSessionRepository;
         }
 
-        public ShuttleSession GetShuttleSessionWithCompanyId(int id) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
+        public ShuttleSession GetShuttleSessionWithCompanyId(int id) 
         {
             Func<ShuttleSession, bool> getShuttleSession = getShuttleSession => getShuttleSession.CompanyId == id;
             ShuttleSession shuttleSession = _shuttleSessionRepository.GetSingle(getShuttleSession) ?? throw new ArgumentNullException();

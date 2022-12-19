@@ -153,43 +153,49 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = GetUserInformation();
                 if (_userService.VerifyUser(userInformation))
                 {
-                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(GetUserIdFromRequestToken());
-                    if (companyWorker != null)
-                    {
-                        List<Destination>? destination = _destinationLogic
+                    List<Destination>? destination = _destinationLogic
                           .FindDestinationWithBeginningDestination(searchDestinationDto.LastDestination);
-                        if (destination != null)
+                    if (destination != null)
+                    {
+                        List<ShuttleSessionSearchDto>? shuttleSessionDtoList = new List<ShuttleSessionSearchDto>();
+                        foreach (Destination destinationItem in destination)
                         {
-                            List<ShuttleSessionSearchDto>? shuttleSessionDtoList = new List<ShuttleSessionSearchDto>();
-                            foreach (Destination destinationItem in destination)
-                            {
-                                List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionsWithSpecificLocation(destinationItem.Id);
-                                ShuttleSessionSearchDto shuttleSessionSearchDto = new ShuttleSessionSearchDto();
-                                
-                                if (shuttleSessions != null)
-                                {
-                                    foreach (var item in shuttleSessions)
-                                    {
-                                        shuttleSessionSearchDto = _mapper.Map<ShuttleSessionSearchDto>(item);
-                                        shuttleSessionSearchDto.CompanyName = _companyLogic.GetCompanyNameWithCompanyId(item.CompanyId);
-                                        shuttleSessionSearchDto.BusLicensePlate = _shuttleBusLogic.GetBusLicensePlateWithBusId(item.BusId);
-                                        shuttleSessionDtoList.Add(shuttleSessionSearchDto);
-                                    }
-                                    return Ok(shuttleSessionDtoList);
-                                }
-                                return BadRequest("The bus not found with that destination");
+                            List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionsWithSpecificLocation(destinationItem.Id);
+                            ShuttleSessionSearchDto shuttleSessionSearchDto = new ShuttleSessionSearchDto();
 
+                            if (shuttleSessions != null)
+                            {
+                                foreach (var item in shuttleSessions)
+                                {
+                                    shuttleSessionSearchDto = _mapper.Map<ShuttleSessionSearchDto>(item);
+                                    shuttleSessionSearchDto.CompanyName = _companyLogic.GetCompanyNameWithCompanyId(item.CompanyId);
+                                    shuttleSessionSearchDto.BusLicensePlate = _shuttleBusLogic.GetBusLicensePlateWithBusId(item.BusId);
+                                    shuttleSessionDtoList.Add(shuttleSessionSearchDto);
+                                }
+                                
                             }
                             
 
-
-
                         }
+                        if(shuttleSessionDtoList != null)
+                        {
+                            return Ok(shuttleSessionDtoList);
+                        }
+                        else
+                        {
+                            return BadRequest("Shuttle list empty");
+                        }
+                       
 
-                        return BadRequest("The destinations not in the list");
+
+
 
                     }
-                    return BadRequest("The user that send request not found");
+
+                    return BadRequest("The destinations not in the list");
+
+
+
 
                 }
                 return Unauthorized("Mistake about token");

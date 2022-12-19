@@ -272,7 +272,7 @@ namespace shuttleasy.Services
                 if (!isAnyValidOTP(email))
                 {
                     string otp = GetRandomOTP(6);
-                    // _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
+                     _mailManager.sendMail(email, "Password Reset Request", otp,_configuration);
                     ResetPassword resetPassword = new ResetPassword();
                     resetPassword.Email = email;
                     resetPassword.Date = DateTime.Now;
