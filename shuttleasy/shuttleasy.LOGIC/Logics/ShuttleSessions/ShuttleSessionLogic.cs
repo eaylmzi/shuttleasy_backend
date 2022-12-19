@@ -37,12 +37,13 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
             return isDeleted;
         }
 
-        public List<ShuttleSession>? FindSessionWithSpecificLocation(int destinationNumber)
+        public List<ShuttleSession>? FindSessionsWithSpecificLocation(int destinationNumber)
         {
-            Func<ShuttleSession, bool> getShuttleSession = getShuttleSession => getShuttleSession.BusId == destinationNumber;
+            Func<ShuttleSession, bool> getShuttleSession = getShuttleSession => getShuttleSession.DestinationId == destinationNumber;
             List<ShuttleSession>? shuttleSessionList = _shuttleSessionRepository.Get(getShuttleSession);
             return shuttleSessionList;
         }
+
         public List<ShuttleSession>? GetAllSessionsWithCompanyId(int companyId)
         {
             Func<ShuttleSession, bool> getShuttleSession = getShuttleSession => getShuttleSession.CompanyId == companyId;

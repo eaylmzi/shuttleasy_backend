@@ -37,28 +37,16 @@ namespace shuttleasy.Controllers
     {
         private IPassengerLogic _passengerLogic;
         private readonly IMapper _mapper;
-        private readonly IConfiguration _configuration;
-        private readonly IPassengerService _passengerService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMailManager _mailManager;
-        private readonly IJwtTokenManager _jwtTokenManager;
         private readonly IUserService _userService;
         private readonly IPasswordEncryption _passwordEncryption;
         PassengerString message = new PassengerString();
         
 
-        public PassengerController(IMapper mapper,IConfiguration configuration, IPassengerLogic passengerLogic,
-            IPassengerService passengerService, IHttpContextAccessor httpContextAccessor,IMailManager mailManager,
-            IJwtTokenManager jwtTokenManager,IUserService userService,IPasswordEncryption passwordEncryption)
+        public PassengerController(IMapper mapper,IUserService userService,
+            IPasswordEncryption passwordEncryption, IPassengerLogic passengerLogic)
         {
-
-            _mapper = mapper;
-            _configuration = configuration;
             _passengerLogic = passengerLogic;
-            _passengerService = passengerService;
-            _httpContextAccessor = httpContextAccessor;
-            _mailManager = mailManager;
-            _jwtTokenManager = jwtTokenManager;
+            _mapper = mapper;
             _userService = userService;
             _passwordEncryption = passwordEncryption;
         }
@@ -224,7 +212,7 @@ namespace shuttleasy.Controllers
 
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin},{Roles.SuperAdmin}")]
         public ActionResult<List<Passenger>> GetAllPassengers()
         {
             try

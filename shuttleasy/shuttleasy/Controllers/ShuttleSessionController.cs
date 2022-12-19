@@ -17,6 +17,9 @@ using System.Text;
 using shuttleasy.Models.dto.Driver.dto;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using shuttleasy.Models.dto.Passengers.dto;
+using System.Collections.Generic;
+using shuttleasy.LOGIC.Logics.Companies;
 
 namespace shuttleasy.Controllers
 {
@@ -31,10 +34,11 @@ namespace shuttleasy.Controllers
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly IMapper _mapper;
         private readonly IDestinationLogic _destinationLogic;
+        private readonly ICompanyLogic _companyLogic;
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
                     IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper,
-                    IDestinationLogic destinationLogic)
+                    IDestinationLogic destinationLogic,ICompanyLogic companyLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -43,6 +47,7 @@ namespace shuttleasy.Controllers
             _shuttleSessionLogic = shuttleSessionLogic;
             _mapper = mapper;
             _destinationLogic = destinationLogic;
+            _companyLogic = companyLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> CreateShuttleSession([FromBody] ShuttleSessionDto shuttleSessionDto)
@@ -141,7 +146,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<List<ShuttleSession>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
+        public ActionResult<List<ShuttleSessionSearchDto>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
         {
             try
             {
@@ -157,10 +162,19 @@ namespace shuttleasy.Controllers
                         {
                             if (destination.LastDestination.Equals(searchDestinationDto.LastDestination))
                             {
-                                List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionWithSpecificLocation(destination.Id);
+                                List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionsWithSpecificLocation(destination.Id);
+                                ShuttleSessionSearchDto shuttleSessionSearchDto = new ShuttleSessionSearchDto();
+                                List<ShuttleSessionSearchDto>? shuttleSessionDtoList = new List<ShuttleSessionSearchDto>();
                                 if (shuttleSessions != null)
                                 {
-                                    return Ok(shuttleSessions);
+                                    foreach(var item in shuttleSessions)
+                                    {
+                                        shuttleSessionSearchDto = _mapper.Map<ShuttleSessionSearchDto>(item);
+                                        shuttleSessionSearchDto.CompanyName = _companyLogic.GetCompanyNameWithCompanyId(item.CompanyId);
+                                        shuttleSessionSearchDto.BusLicensePlate = _shuttleBusLogic.GetBusLicensePlateWithBusId(item.BusId);
+                                        shuttleSessionDtoList.Add(shuttleSessionSearchDto);
+                                    }
+                                    return Ok(shuttleSessionDtoList);
                                 }
                                 return BadRequest("The bus not found with that destination");
                             }

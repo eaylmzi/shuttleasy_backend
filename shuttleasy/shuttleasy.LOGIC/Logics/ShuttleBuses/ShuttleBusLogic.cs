@@ -36,5 +36,13 @@ namespace shuttleasy.LOGIC.Logics.ShuttleBuses
             bool isDeleted = _shuttleBusRepository.Delete(getShuttleBus);
             return isDeleted;
         }
+
+        public string? GetBusLicensePlateWithBusId(int busId)
+        {
+            Func<ShuttleBus, bool> getShuttleBus = getShuttleBus => getShuttleBus.Id == busId;
+            ShuttleBus shuttle = _shuttleBusRepository.GetSingle(getShuttleBus);
+
+            return shuttle.LicensePlate;
+        }
     }
 }

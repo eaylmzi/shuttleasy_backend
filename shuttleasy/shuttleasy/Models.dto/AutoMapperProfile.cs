@@ -29,6 +29,8 @@ namespace shuttleasy.Models.dto
 
             CreateMap<CompanyWorker, CompanyWorkerInfoDto>();
             CreateMap<Passenger, PassengerInfoDto>();
+
+            CreateMap<ShuttleSession, ShuttleSessionSearchDto>();
         }
     }
 }

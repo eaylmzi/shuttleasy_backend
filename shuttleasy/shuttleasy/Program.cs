@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using shuttleasy.Controllers;
 using shuttleasy.DAL.EFRepositories;
+using shuttleasy.DAL.EFRepositories.Companies;
 using shuttleasy.DAL.EFRepositories.CompanyWorkers;
 using shuttleasy.DAL.EFRepositories.Destinations;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
@@ -13,6 +14,7 @@ using shuttleasy.DAL.EFRepositories.ShuttleSessions;
 using shuttleasy.Encryption;
 using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
+using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics.Destinations;
 using shuttleasy.LOGIC.Logics.PasswordReset;
@@ -41,6 +43,9 @@ builder.Services.AddScoped<IShuttleBusLogic, ShuttleBusLogic>();
 
 builder.Services.AddScoped<IShuttleSessionRepository, ShuttleSessionRepository>();
 builder.Services.AddScoped<IShuttleSessionLogic, ShuttleSessionLogic>();
+
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<ICompanyLogic, CompanyLogic>();
 
 
 

@@ -59,6 +59,9 @@ namespace shuttleasy.Services
             _driverRepository = driverRepository;
             _passengerRepository = passengerRepository;
         }
+
+      
+
         public bool LoginPassenger(string email, string password)
         {          
             Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
@@ -125,7 +128,7 @@ namespace shuttleasy.Services
             _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
             newPassenger.PasswordHash = passwordHash;
             newPassenger.PasswordSalt = passwordSalt;
-
+            newPassenger.QrString = Guid.NewGuid();
             newPassenger.Verified = true;
 
             _passengerLogic.Add(newPassenger);
@@ -148,7 +151,6 @@ namespace shuttleasy.Services
             _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
             newCompanyWorker.PasswordHash = passwordHash;
             newCompanyWorker.PasswordSalt = passwordSalt;
-            
             newCompanyWorker.Verified = true;
             newCompanyWorker.WorkerType = role;
 
@@ -227,7 +229,7 @@ namespace shuttleasy.Services
             }
             return phoneNumber;
         }
-        private string? setAddress(string? address)
+        public string? setAddress(string? address)
         {
             if (address.IsNullOrEmpty())
             {

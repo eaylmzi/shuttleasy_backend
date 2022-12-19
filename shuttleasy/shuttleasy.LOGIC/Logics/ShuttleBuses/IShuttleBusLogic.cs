@@ -12,5 +12,6 @@ namespace shuttleasy.LOGIC.Logics.ShuttleBuses
         public bool Add(ShuttleBus shuttleBus);
         public List<ShuttleBus>? GetAllShuttleBusesWithCompanyId(int companyId);
         public bool DeleteShuttleBus(int shuttleBusNumber);
+        public string? GetBusLicensePlateWithBusId(int busId);
     }
 }

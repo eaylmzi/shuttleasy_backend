@@ -150,7 +150,7 @@ namespace shuttleasy.Controllers
 
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin},{Roles.SuperAdmin}")]
         public ActionResult<List<CompanyWorker>> GetAllDriver()
         {
             try
