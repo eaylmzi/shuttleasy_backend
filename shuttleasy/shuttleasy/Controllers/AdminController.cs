@@ -48,10 +48,10 @@ namespace shuttleasy.Controllers
                         CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
                         return Ok(driverInfoDto);
                     }
-                    return BadRequest("The admin not found in list");
+                    return BadRequest(Error.NotFoundAdmin);
                     
                 }
-                return BadRequest("Email and password not correct");
+                return BadRequest(Error.NotCorrectEmailAndPassword);
 
             }
             catch (Exception ex)
@@ -76,14 +76,14 @@ namespace shuttleasy.Controllers
                             CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
                             return Ok(driverInfoDto);
                         }
-                        return BadRequest("Not Added");
+                        return BadRequest(Error.NotAdded);
 
                     }
-                    return BadRequest("Registered with this email or phone");
+                    return BadRequest(Error.NotCreatedUser);
                    
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
                
             }
             catch (Exception ex)
@@ -110,13 +110,13 @@ namespace shuttleasy.Controllers
                             PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
                             return Ok(passengerInfoDto);
                         }
-                        return BadRequest("Not Added");
+                        return BadRequest(Error.NotAdded);
 
                     }
-                    return BadRequest("Registered with this email or phone");
+                    return BadRequest(Error.NotCreatedUser);
                     
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
                
             }
             catch (Exception ex)

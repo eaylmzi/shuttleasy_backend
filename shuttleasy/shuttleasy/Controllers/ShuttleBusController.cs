@@ -56,9 +56,9 @@ namespace shuttleasy.Controllers
                         return BadRequest(isAdded);
 
                     }
-                    return BadRequest("The user that send request not found");
+                    return BadRequest(Error.NotFoundUser);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)
@@ -88,9 +88,9 @@ namespace shuttleasy.Controllers
                         return BadRequest(isAdded);
 
                     }
-                    return BadRequest("The user that send request not found");
+                    return BadRequest(Error.NotFoundUser);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
             }
             catch (Exception ex)
             {
@@ -112,10 +112,10 @@ namespace shuttleasy.Controllers
                         var list = _shuttleBusLogic.GetAllShuttleBusesWithCompanyId(companyWorker.CompanyId);
                         return Ok(list);
                     }
-                    return BadRequest("The user that send request not found");
+                    return BadRequest(Error.NotFoundUser);
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
             }

@@ -8,6 +8,7 @@ using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Services;
 using shuttleasy.LOGIC.Logics.Companies;
+using shuttleasy.DAL.Resource.String;
 
 namespace shuttleasy.Controllers
 {
@@ -40,7 +41,7 @@ namespace shuttleasy.Controllers
                 {
                     return Ok(companyName);
                 }
-                return BadRequest("There is no company");
+                return BadRequest(Error.NotFoundCompany);
 
             }
             catch (Exception ex)

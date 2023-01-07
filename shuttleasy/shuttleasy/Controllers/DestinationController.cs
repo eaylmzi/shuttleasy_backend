@@ -49,7 +49,7 @@ namespace shuttleasy.Controllers
                     return BadRequest(isAdded);
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
                
             }
             catch(Exception ex)
@@ -77,7 +77,7 @@ namespace shuttleasy.Controllers
 
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
               
             }
             catch (Exception ex)
@@ -98,9 +98,9 @@ namespace shuttleasy.Controllers
                     {
                         return list;
                     }
-                    return BadRequest("There is no destination in list");
+                    return BadRequest(Error.NotFoundDestination);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)

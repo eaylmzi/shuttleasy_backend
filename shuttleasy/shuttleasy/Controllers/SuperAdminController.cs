@@ -46,10 +46,10 @@ namespace shuttleasy.Controllers
                         CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
                         return Ok(driverInfoDto);
                     }
-                    return BadRequest("The Superadmin not found in list");
+                    return BadRequest(Error.NotFoundSuperAdmin);
 
                 }
-                return BadRequest("Email and password not correct");
+                return BadRequest(Error.NotCorrectEmailAndPassword);
 
             }
             catch (Exception ex)
@@ -74,11 +74,11 @@ namespace shuttleasy.Controllers
                             CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(newCompanyWorker);
                             return Ok(driverInfoDto);
                         }
-                        return BadRequest("Not Added");
+                        return BadRequest(Error.NotAdded);
                     }
-                    return BadRequest("Registered with this email or phone");
+                    return BadRequest(Error.FoundEmailOrTelephone);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
 

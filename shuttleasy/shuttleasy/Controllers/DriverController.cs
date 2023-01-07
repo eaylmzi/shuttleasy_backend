@@ -52,9 +52,9 @@ namespace shuttleasy.Controllers
                         CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
                         return Ok(driverInfoDto);
                     }
-                    return BadRequest("The driver not found in list");
+                    return BadRequest(Error.NotFoundDriver);
                 }
-                return BadRequest("Email and password not correct");
+                return BadRequest(Error.NotCorrectEmailAndPassword);
             }
 
             catch (Exception ex)
@@ -80,12 +80,12 @@ namespace shuttleasy.Controllers
                             CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(updatedDriver);
                             return Ok(driverInfoDto);
                         }
-                        return BadRequest("Driver not updated");
+                        return BadRequest(Error.NotUpdatedInformation);
                     }
-                    return BadRequest("Driver not found");
+                    return BadRequest(Error.NotFoundDriver);
                     
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)
@@ -112,11 +112,11 @@ namespace shuttleasy.Controllers
                             CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(updatedDriver);
                             return Ok(driverInfoDto);
                         }
-                        return BadRequest("Driver not updated");
+                        return BadRequest(Error.NotUpdatedInformation);
                     }
-                    return BadRequest("Driver not found");
+                    return BadRequest(Error.NotFoundDriver);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)
@@ -139,9 +139,9 @@ namespace shuttleasy.Controllers
                         CompanyWorkerInfoDto companyWorkerInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
                         return Ok(companyWorkerInfoDto);
                     }
-                    return BadRequest("Company worker not found");
+                    return BadRequest(Error.NotFoundDriver);
                 }
-                return BadRequest("The user that send request not found");
+                return BadRequest(Error.NotMatchedToken);
             }
             catch (Exception ex)
             {
@@ -164,10 +164,10 @@ namespace shuttleasy.Controllers
                         var list = _driverLogic.GetAllDriverWithCompanyId(companyWorker.CompanyId);
                         return Ok(list);
                     }
-                    return BadRequest("The user that send request not found");
+                    return BadRequest(Error.NotCreatedUser);
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
             }

@@ -32,7 +32,7 @@ namespace shuttleasy.Controllers
             {
                 DateTime? expiredDate = _userService.SendOTP(emailDto.Email);
                 TimeDto timeDto = new TimeDto();
-                timeDto.dateTime = expiredDate;
+                timeDto.Datetime = expiredDate;
                 if (expiredDate != null)
                 {
                     return Ok(timeDto);

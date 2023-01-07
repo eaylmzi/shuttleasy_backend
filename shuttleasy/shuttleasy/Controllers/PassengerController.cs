@@ -67,10 +67,10 @@ namespace shuttleasy.Controllers
                         return Ok(newPassenger);
 
                     }
-                    return BadRequest("Not Added");
+                    return BadRequest(Error.NotAdded);
 
                 }
-                return BadRequest("Registered with this email or phone");
+                return BadRequest(Error.FoundEmailOrTelephone);
             
                
             }  
@@ -94,9 +94,9 @@ namespace shuttleasy.Controllers
                         PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
                         return Ok(passengerInfoDto);
                     }
-                    return BadRequest("The passenger not found in list");
+                    return BadRequest(Error.NotFoundPassenger);
                 }
-                return BadRequest("Email and password not correct");
+                return BadRequest(Error.NotCorrectEmailAndPassword);
 
             }         
             catch (Exception ex)
@@ -131,17 +131,17 @@ namespace shuttleasy.Controllers
                                 }
                                 else
                                 {
-                                    return BadRequest("The user not deleted");
+                                    return BadRequest(Error.NotDeletedPassenger);
                                 }
                             }
-                            return BadRequest("The password not verified");
+                            return BadRequest(Error.NotVerifiedPassword);
                         }
-                        return BadRequest("The user and the person who sent the request are not the same");
+                        return BadRequest(Error.ForeignRequest);
                     }
-                    return BadRequest("The user is null");
+                    return BadRequest(Error.NotFoundPassenger);
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
 
@@ -169,13 +169,13 @@ namespace shuttleasy.Controllers
                             PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(updatedPassenger);
                             return Ok(passengerInfoDto);
                         }
-                        return BadRequest("User not updated");
+                        return BadRequest(Error.NotUpdatedInformation);
                     }
-                    return BadRequest("Passenger not found from token");
+                    return BadRequest(Error.NotFoundPassenger);
 
                 }
 
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
 
@@ -201,9 +201,9 @@ namespace shuttleasy.Controllers
                         PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
                         return Ok(passengerInfoDto);
                     }
-                    return BadRequest("Passenger not found");
+                    return BadRequest(Error.NotFoundPassenger);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
             }
             catch (Exception ex)
             {
@@ -225,9 +225,9 @@ namespace shuttleasy.Controllers
                     {
                         return list;
                     }
-                    return BadRequest("There is no passenger in list");
+                    return BadRequest(Error.NotFoundPassenger);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)

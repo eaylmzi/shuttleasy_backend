@@ -2,6 +2,6 @@
 {
     public class TimeDto
     {
-        public DateTime? dateTime { get; set; }
+        public DateTime? Datetime { get; set; }
     }
 }

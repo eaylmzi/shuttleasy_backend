@@ -73,10 +73,10 @@ namespace shuttleasy.Controllers
                         }
                         return BadRequest(isAdded);
                     }
-                    return BadRequest("The user that send request not found");
+                    return BadRequest(Error.NotFoundUser);
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)
@@ -106,9 +106,9 @@ namespace shuttleasy.Controllers
                         }
                         return BadRequest(isAdded);
                     }
-                    return BadRequest("The user that send request not found");
+                    return BadRequest(Error.NotFoundUser);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
 
@@ -132,10 +132,9 @@ namespace shuttleasy.Controllers
                         var list = _shuttleSessionLogic.GetAllSessionsWithCompanyId(companyWorker.CompanyId);
                         return Ok(list);
                     }
-                    return BadRequest("The user that send request not found");
-
+                    return BadRequest(Error.NotFoundUser);
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
             }
@@ -183,7 +182,7 @@ namespace shuttleasy.Controllers
                         }
                         else
                         {
-                            return BadRequest("Shuttle list empty");
+                            return BadRequest(Error.EmptyList);
                         }
                        
 
@@ -192,13 +191,13 @@ namespace shuttleasy.Controllers
 
                     }
 
-                    return BadRequest("The destinations not in the list");
+                    return BadRequest(Error.NotFoundDestination);
 
 
 
 
                 }
-                return Unauthorized("Mistake about token");
+                return Unauthorized(Error.NotMatchedToken);
 
 
 
