@@ -9349,7 +9349,7 @@
       "projectName": "shuttleasy.unittest",
       "projectPath": "C:\\Users\\Dell\\source\\repos\\shuttleasy_backend\\shuttleasy\\shuttleasy.unittest\\shuttleasy.unittest.csproj",
       "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Dell\\Source\\Repos\\shuttleasy_backend\\shuttleasy\\shuttleasy.unittest\\obj\\",
+      "outputPath": "C:\\Users\\Dell\\source\\repos\\shuttleasy_backend\\shuttleasy\\shuttleasy.unittest\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config",

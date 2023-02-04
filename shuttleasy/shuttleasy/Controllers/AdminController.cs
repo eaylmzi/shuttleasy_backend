@@ -145,7 +145,6 @@ namespace shuttleasy.Controllers
             string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
             return userEmail;
         }
-       
         private string GetUserTokenFromRequestToken()
         {
             string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
