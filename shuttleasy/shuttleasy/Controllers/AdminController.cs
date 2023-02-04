@@ -67,7 +67,7 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = GetUserInformation();
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isCreated = _userService.CheckEmailandPhoneNumber(driverRegisterDto.Email,driverRegisterDto.PhoneNumber);
+                    bool isCreated = _userService.CheckEmailandPhoneNumberForCompanyWorker(driverRegisterDto.Email,driverRegisterDto.PhoneNumber);
                     if (!isCreated)
                     {
                         CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
@@ -101,7 +101,7 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = GetUserInformation();
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isCreated = _userService.CheckEmailandPhoneNumber(passengerRegisterPanelDto.Email,passengerRegisterPanelDto.PhoneNumber);
+                    bool isCreated = _userService.CheckEmailandPhoneNumberForPassengers(passengerRegisterPanelDto.Email,passengerRegisterPanelDto.PhoneNumber);
                     if (!isCreated)
                     {
                         Passenger? newPassenger = _userService.CreatePassenger(passengerRegisterPanelDto, Roles.Passenger);

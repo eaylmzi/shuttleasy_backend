@@ -437,9 +437,7 @@ namespace shuttleasy.Services
             int time = day + hours + minutes + seconds;
             return time;
         }
-
-
-        public bool CheckEmailandPhoneNumber(string email,string phoneNumber)
+        public bool CheckEmailandPhoneNumberForPassengers(string email, string phoneNumber)
         {
             Passenger? forPassengerEmail = _passengerLogic.GetPassengerWithEmail(email);
             Passenger? forPassengerPhone = _passengerLogic.GetPassengerWithPhoneNumber(phoneNumber);
@@ -447,20 +445,20 @@ namespace shuttleasy.Services
             {
                 return true;
             }
-            else
+            return false;
+
+        }
+
+        public bool CheckEmailandPhoneNumberForCompanyWorker(string email,string phoneNumber)
+        {
+            CompanyWorker? forCompanyWorkerEmail = _driverLogic.GetCompanyWorkerWithEmail(email);
+            CompanyWorker? forCompanyWorkerPhone = _driverLogic.GetCompanyWorkerWithPhoneNumber(phoneNumber);
+            if (forCompanyWorkerEmail != null || forCompanyWorkerPhone != null)
             {
-                CompanyWorker? forCompanyWorkerEmail = _driverLogic.GetCompanyWorkerWithEmail(email);
-                CompanyWorker? forCompanyWorkerPhone = _driverLogic.GetCompanyWorkerWithPhoneNumber(phoneNumber);
-                if (forCompanyWorkerEmail != null || forCompanyWorkerPhone != null)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-                
+                return true;
             }
+            return false;
+
 
         }
 

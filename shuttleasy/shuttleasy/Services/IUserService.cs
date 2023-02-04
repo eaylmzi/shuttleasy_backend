@@ -20,7 +20,8 @@ namespace shuttleasy.Services
         public Passenger? UpdatePassengerProfile(Passenger passenger, UserProfileDto userProfileDto);
 
         public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto);
-        public bool CheckEmailandPhoneNumber(string email,string phoneNumber);
+        public bool CheckEmailandPhoneNumberForPassengers(string email, string phoneNumber);
+        public bool CheckEmailandPhoneNumberForCompanyWorker(string email,string phoneNumber);
         public bool CheckEmail(string email);
         public bool VerifyUser(UserVerifyingDto userInformation);
 

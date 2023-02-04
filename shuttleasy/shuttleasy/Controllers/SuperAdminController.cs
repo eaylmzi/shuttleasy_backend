@@ -65,7 +65,7 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = GetUserInformation();
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isCreated = _userService.CheckEmailandPhoneNumber(adminRegisterDto.Email, adminRegisterDto.PhoneNumber);
+                    bool isCreated = _userService.CheckEmailandPhoneNumberForCompanyWorker(adminRegisterDto.Email, adminRegisterDto.PhoneNumber);
                     if (!isCreated)
                     {
                         CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(adminRegisterDto, Roles.Admin);

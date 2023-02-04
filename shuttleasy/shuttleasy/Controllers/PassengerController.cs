@@ -57,7 +57,7 @@ namespace shuttleasy.Controllers
         {           
             try
             {
-                bool isCreated = _userService.CheckEmailandPhoneNumber(passengerRegisterDto.Email,passengerRegisterDto.PhoneNumber);
+                bool isCreated = _userService.CheckEmailandPhoneNumberForPassengers(passengerRegisterDto.Email,passengerRegisterDto.PhoneNumber);
                 if (!isCreated)
                 {
                     Passenger? newPassenger = _userService.SignUp(passengerRegisterDto, Roles.Passenger);
