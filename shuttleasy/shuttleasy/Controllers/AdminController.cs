@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Resource;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Encryption;
 using shuttleasy.LOGIC.Logics;
@@ -11,6 +12,7 @@ using shuttleasy.Models.dto.Credentials.dto;
 using shuttleasy.Models.dto.Driver.dto;
 using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.Passengers.dto;
+using shuttleasy.Resource;
 using shuttleasy.Services;
 using System.Data;
 using System.Data.SqlClient;
@@ -64,7 +66,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
                     bool isCreated = _userService.CheckEmailandPhoneNumberForCompanyWorker(driverRegisterDto.Email,driverRegisterDto.PhoneNumber);
@@ -98,7 +100,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
                     bool isCreated = _userService.CheckEmailandPhoneNumberForPassengers(passengerRegisterPanelDto.Email,passengerRegisterPanelDto.PhoneNumber);
@@ -129,7 +131,8 @@ namespace shuttleasy.Controllers
         
 
 
-
+/*
+ * Yedek tokenhelper
         private int GetUserIdFromRequestToken()
         {
             string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
@@ -153,7 +156,7 @@ namespace shuttleasy.Controllers
         private UserVerifyingDto GetUserInformation()
         {
             UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
-            userVerifyingDto.Id = GetUserIdFromRequestToken();
+            userVerifyingDto.Id = Token.GetUserIdFromRequestToken(Request.Headers);
             userVerifyingDto.Token = GetUserTokenFromRequestToken();
             userVerifyingDto.Role = GetUserRoleFromRequestToken();
             return userVerifyingDto;
@@ -165,7 +168,7 @@ namespace shuttleasy.Controllers
             return adminFromToken;
         }
 
-
+*/
 
         /*
 
