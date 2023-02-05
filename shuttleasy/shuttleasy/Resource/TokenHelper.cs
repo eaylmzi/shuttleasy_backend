@@ -1,4 +1,7 @@
 ﻿using Microsoft.Net.Http.Headers;
+using Org.BouncyCastle.Asn1.Ocsp;
+using shuttleasy.DAL.Models;
+using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.Models.dto.Credentials.dto;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -25,6 +28,13 @@ namespace shuttleasy.Resource
         {
             string requestToken = headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
             return requestToken;
+        }
+
+        public static CompanyWorker? GetCompanyWorkerFromRequestToken(IHeaderDictionary headers,ICompanyWorkerLogic _driverLogic)
+        {
+            string requestToken = headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            CompanyWorker? companyWorkerFromToken = _driverLogic.GetCompanyWorkerWithToken(requestToken);
+            return companyWorkerFromToken;
         }
         public static UserVerifyingDto GetUserInformation(IHeaderDictionary headers)
         {
