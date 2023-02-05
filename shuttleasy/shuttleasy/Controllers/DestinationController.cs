@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using shuttleasy.Models.dto.Credentials.dto;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using shuttleasy.Resource;
 
 namespace shuttleasy.Controllers
 {
@@ -37,7 +38,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
                     Destination destination = _mapper.Map<Destination>(destinationDto);
@@ -65,7 +66,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
                     bool isAdded = _destinationLogic.DeleteDestination(idDto.Id);
@@ -90,7 +91,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
                     var list = _destinationLogic.GetAllDestinations();
@@ -121,34 +122,6 @@ namespace shuttleasy.Controllers
 
 
 
-        private int GetUserIdFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
-            string user = jwt.Claims.First(c => c.Type == "id").Value;
-            int userId = int.Parse(user);
-            return userId;
-        }
-        private string GetUserRoleFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
-            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
-            return userEmail;
-        }
-
-        private string GetUserTokenFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            return requestToken;
-        }
-        private UserVerifyingDto GetUserInformation()
-        {
-            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
-            userVerifyingDto.Id = GetUserIdFromRequestToken();
-            userVerifyingDto.Token = GetUserTokenFromRequestToken();
-            userVerifyingDto.Role = GetUserRoleFromRequestToken();
-            return userVerifyingDto;
-        }
+      
     }
 }
