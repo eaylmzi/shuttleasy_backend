@@ -28,6 +28,7 @@ using shuttleasy.Models.dto.Login.dto;
 using shuttleasy.Models.dto.User.dto;
 using System.Data;
 using Microsoft.Net.Http.Headers;
+using shuttleasy.Resource;
 
 namespace shuttleasy.Controllers
 {
@@ -109,10 +110,10 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    Passenger? passengerFromRequestToken = GetUserFromRequestToken();
+                    Passenger? passengerFromRequestToken = TokenHelper.GetUserFromRequestToken(Request.Headers,_passengerLogic);
                     Passenger? passengerFromEmail = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email);
 
                     if (passengerFromEmail != null && passengerFromRequestToken != null)
@@ -157,10 +158,10 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    Passenger? passengerFromRequestToken = GetUserFromRequestToken();
+                    Passenger? passengerFromRequestToken = TokenHelper.GetUserFromRequestToken(Request.Headers,_passengerLogic);
                     if (passengerFromRequestToken != null)
                     {
                         Passenger? updatedPassenger = _userService.UpdatePassengerProfile(passengerFromRequestToken, userProfileDto);
@@ -192,7 +193,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
                     Passenger? passenger = _passengerLogic.GetPassengerWithId(idDto.Id);
@@ -217,7 +218,7 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                UserVerifyingDto userInformation = GetUserInformation();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
                     var list = _passengerLogic.GetAllPassengers();
@@ -237,7 +238,27 @@ namespace shuttleasy.Controllers
         }
 
 
-        private int GetUserIdFromRequestToken()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*
+         * 
+         *  private int GetUserIdFromRequestToken()
         {
             string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
@@ -245,56 +266,7 @@ namespace shuttleasy.Controllers
             int userId = int.Parse(user);
             return userId;
         }
-        private string GetUserRoleFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
-            string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
-            return userEmail;
-        }
-
-        private string GetUserTokenFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            return requestToken;
-        }
-        private UserVerifyingDto GetUserInformation()
-        {
-            UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
-            userVerifyingDto.Id = GetUserIdFromRequestToken();
-            userVerifyingDto.Token = GetUserTokenFromRequestToken();
-            userVerifyingDto.Role = GetUserRoleFromRequestToken();
-            return userVerifyingDto;
-        }
-        private string GetUserEmailFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
-            string userEmail = jwt.Claims.First(c => c.Type == "Role").Value;
-            return userEmail;
-        }
-        private Passenger? GetUserFromRequestToken()
-        {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            Passenger? passengerFromToken = _passengerLogic.GetPassengerWithToken(requestToken);
-            return passengerFromToken;
-        }
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-        /*private bool IsSamePerson(string email)
+        private bool IsSamePerson(string email)
         {
             string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
             Passenger passengerFromToken = _passengerLogic.GetPassengerWithToken(token)
@@ -317,5 +289,5 @@ namespace shuttleasy.Controllers
 
 
 
-    
+
 }
