@@ -11,6 +11,7 @@ using shuttleasy.DAL.EFRepositories.Destinations;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.ShuttleBuses;
 using shuttleasy.DAL.EFRepositories.ShuttleSessions;
+using shuttleasy.DAL.EFRepositories.ShuttleSessionSearch;
 using shuttleasy.Encryption;
 using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
@@ -46,6 +47,9 @@ builder.Services.AddScoped<IShuttleSessionLogic, ShuttleSessionLogic>();
 
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyLogic, CompanyLogic>();
+
+
+
 
 
 
