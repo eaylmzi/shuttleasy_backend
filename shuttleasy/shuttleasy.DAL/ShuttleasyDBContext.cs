@@ -379,21 +379,14 @@ namespace shuttleasy.DAL
                 entity.ToTable("session_passengers");
 
                 entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.PickupId).HasColumnName("pickup_id");
 
                 entity.Property(e => e.EstimatedPickupTime)
                     .IsRowVersion()
                     .IsConcurrencyToken()
                     .HasColumnName("estimated_pickup_time");
 
-                entity.Property(e => e.PassengerIdentity).HasColumnName("passenger_identity");
-
-                entity.Property(e => e.PickupLatitude)
-                    .HasMaxLength(11)
-                    .HasColumnName("pickup_latitude");
-
-                entity.Property(e => e.PickupLongtitude)
-                    .HasMaxLength(11)
-                    .HasColumnName("pickup_longtitude");
+                
 
                 entity.Property(e => e.PickupOrderNum).HasColumnName("pickup_order_num");
 
