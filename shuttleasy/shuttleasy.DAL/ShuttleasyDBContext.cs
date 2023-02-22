@@ -312,6 +312,18 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.SessionId).HasColumnName("session_id");
 
             });
+            modelBuilder.Entity<PickupPoint>(entity =>
+            {
+                entity.ToTable("pickup_point");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.GeoPointId).HasColumnName("geopoint_id");
+
+            });
+
+            
 
             modelBuilder.Entity<ResetPassword>(entity =>
             {
