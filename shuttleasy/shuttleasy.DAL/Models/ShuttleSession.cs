@@ -12,6 +12,9 @@ namespace shuttleasy.DAL.Models
         public DateTime StartTime { get; set; } 
         public int DriverId { get; set; }
         public bool IsActive { get; set; }
-        public int DestinationId { get; set; }
+        public int StartGeopoint { get; set; }
+        public int FinalGeopoint { get; set; }
+        public string DestinationName { get; set; } = null!;
+
     }
 }

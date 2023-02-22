@@ -450,8 +450,13 @@ namespace shuttleasy.DAL
                     .HasColumnName("start_time");
 
                 entity.Property(e => e.DriverId).HasColumnName("driver_id");
+                entity.Property(e => e.StartGeopoint).HasColumnName("start_geopoint");
+                entity.Property(e => e.FinalGeopoint).HasColumnName("final_geopoint");
+                entity.Property(e => e.DestinationName)
+                .HasMaxLength(50)
+                .HasColumnName("destination_name");
 
-                entity.Property(e => e.DestinationId).HasColumnName("destination_id");
+
 
             });
 
