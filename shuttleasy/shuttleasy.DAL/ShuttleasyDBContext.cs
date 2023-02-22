@@ -163,6 +163,22 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.WorkingHours).HasColumnName("working_hours");
 
             });
+            modelBuilder.Entity<GeoPoint>(entity =>
+            {
+                entity.ToTable("geopoint");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Latitude)
+                    .HasMaxLength(50)
+                    .HasColumnName("latitude");
+
+                entity.Property(e => e.Longitude)
+                    .HasMaxLength(50)
+                    .HasColumnName("longitude");
+
+            });
+
 
             modelBuilder.Entity<NotificationPassenger>(entity =>
             {
