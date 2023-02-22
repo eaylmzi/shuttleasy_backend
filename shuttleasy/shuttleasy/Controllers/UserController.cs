@@ -2,8 +2,8 @@
 using shuttleasy.DAL.Models;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics;
-using shuttleasy.Models.dto.Credentials.dto;
-using shuttleasy.Models.dto.Login.dto;
+using shuttleasy.DAL.Models.dto.Credentials.dto;
+using shuttleasy.DAL.Models.dto.Login.dto;
 using shuttleasy.Services;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;

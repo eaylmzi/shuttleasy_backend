@@ -16,10 +16,10 @@ using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.Mail;
 using shuttleasy.Models;
-using shuttleasy.Models.dto.Credentials.dto;
-using shuttleasy.Models.dto.Driver.dto;
-using shuttleasy.Models.dto.Passengers.dto;
-using shuttleasy.Models.dto.User.dto;
+using shuttleasy.DAL.Models.dto.Credentials.dto;
+using shuttleasy.DAL.Models.dto.Driver.dto;
+using shuttleasy.DAL.Models.dto.Passengers.dto;
+using shuttleasy.DAL.Models.dto.User.dto;
 using System;
 using System.Data;
 

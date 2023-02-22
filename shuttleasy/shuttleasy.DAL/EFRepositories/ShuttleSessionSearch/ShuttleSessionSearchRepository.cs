@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Models.dto;
+using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;

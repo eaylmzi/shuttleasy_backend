@@ -3,7 +3,7 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using shuttleasy.DAL.Models;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
-using shuttleasy.Models.dto.Credentials.dto;
+using shuttleasy.DAL.Models.dto.Credentials.dto;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace shuttleasy.Resource

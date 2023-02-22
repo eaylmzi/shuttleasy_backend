@@ -4,15 +4,15 @@ using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics;
-using shuttleasy.Models.dto.Driver.dto;
+using shuttleasy.DAL.Models.dto.Driver.dto;
 using shuttleasy.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
-using shuttleasy.Models.dto.Login.dto;
+using shuttleasy.DAL.Models.dto.Login.dto;
 using Microsoft.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
-using shuttleasy.Models.dto.Credentials.dto;
-using shuttleasy.Models.dto.Passengers.dto;
+using shuttleasy.DAL.Models.dto.Credentials.dto;
+using shuttleasy.DAL.Models.dto.Passengers.dto;
 
 namespace shuttleasy.Controllers
 {
