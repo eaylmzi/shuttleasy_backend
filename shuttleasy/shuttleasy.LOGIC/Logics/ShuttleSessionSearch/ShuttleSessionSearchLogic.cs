@@ -8,12 +8,13 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessionSearch
 {
     public class ShuttleSessionSearchLogic
     {
-
+        /*
         public List< ShuttleSessionSearchDto> InnerJoinTables(string lastPoint)
         {
             ShuttleSessionSearchRepository shuttleSessionSearchRepository = new ShuttleSessionSearchRepository();
             var list = shuttleSessionSearchRepository.InnerJoinTables(lastPoint);
             return list;
         }
+        */
     }
 }

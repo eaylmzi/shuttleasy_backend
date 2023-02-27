@@ -11,6 +11,7 @@ using shuttleasy.DAL.Models.dto.Driver.dto;
 using shuttleasy.DAL.Models.dto.ShuttleBuses.dto;
 using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
 using shuttleasy.DAL.Models.dto.User.dto;
+using shuttleasy.DAL.Models.dto.GeoPoints.dto;
 
 namespace shuttleasy.Models.dto
 {
@@ -26,6 +27,7 @@ namespace shuttleasy.Models.dto
             CreateMap<DestinationDto, Destination>();
             CreateMap<ShuttleBusDto, ShuttleBus>();
             CreateMap<ShuttleSessionDto, ShuttleSession>();
+            CreateMap<GeoPointDto, GeoPoint>();
 
             CreateMap<CompanyWorker, CompanyWorkerInfoDto>();
             CreateMap<Passenger, PassengerInfoDto>();

@@ -19,6 +19,7 @@ using shuttleasy.Services;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Authentication;
+using shuttleasy.LOGIC.Logics.GeoPoints;
 
 namespace shuttleasy.Controllers
 {
@@ -28,8 +29,9 @@ namespace shuttleasy.Controllers
     {
         private readonly IUserService _userService;
         private readonly IPassengerLogic _passengerLogic;
-        private readonly ICompanyWorkerLogic _driverLogic;
+        private readonly ICompanyWorkerLogic _driverLogic;       
         private readonly IMapper _mapper;
+        
         public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic,
             IMapper mapper)
         {

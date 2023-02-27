@@ -8,6 +8,7 @@ using shuttleasy.DAL.EFRepositories;
 using shuttleasy.DAL.EFRepositories.Companies;
 using shuttleasy.DAL.EFRepositories.CompanyWorkers;
 using shuttleasy.DAL.EFRepositories.Destinations;
+using shuttleasy.DAL.EFRepositories.GeoPoints;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.ShuttleBuses;
 using shuttleasy.DAL.EFRepositories.ShuttleSessions;
@@ -18,6 +19,7 @@ using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics.Destinations;
+using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.LOGIC.Logics.ShuttleBuses;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
@@ -47,6 +49,9 @@ builder.Services.AddScoped<IShuttleSessionLogic, ShuttleSessionLogic>();
 
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyLogic, CompanyLogic>();
+
+builder.Services.AddScoped<IGeoPointRepository, GeoPointRepository>();
+builder.Services.AddScoped<IGeoPointLogic, GeoPointLogic>();
 
 
 

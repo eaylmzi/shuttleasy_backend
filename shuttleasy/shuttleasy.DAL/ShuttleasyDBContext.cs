@@ -26,11 +26,14 @@ namespace shuttleasy.DAL
         public virtual DbSet<CompanyWorker> CompanyWorkers { get; set; } = null!;
         public virtual DbSet<Destination> Destinations { get; set; } = null!;
         public virtual DbSet<DriversStatistic> DriversStatistics { get; set; } = null!;
+        public virtual DbSet<GeoPoint> GeoPoint { get; set; } = null!;   
         public virtual DbSet<NotificationPassenger> NotificationPassengers { get; set; } = null!;
         public virtual DbSet<NotificationWorker> NotificationWorkers { get; set; } = null!;
         public virtual DbSet<Passenger> Passengers { get; set; } = null!;
         public virtual DbSet<PassengerPayment> PassengerPayments { get; set; } = null!;
         public virtual DbSet<PassengerRating> PassengerRatings { get; set; } = null!;
+        public virtual DbSet<PickupArea> PickupArea { get; set; } = null!;
+        public virtual DbSet<PickupPoint> PickupPoint { get; set; } = null!;
         public virtual DbSet<ResetPassword> ResetPasswords { get; set; } = null!;
         public virtual DbSet<SessionHistory> SessionHistories { get; set; } = null!;
         public virtual DbSet<SessionPassenger> SessionPassengers { get; set; } = null!;
@@ -173,9 +176,9 @@ namespace shuttleasy.DAL
                     .HasMaxLength(50)
                     .HasColumnName("latitude");
 
-                entity.Property(e => e.Longitude)
+                entity.Property(e => e.Longtitude)
                     .HasMaxLength(50)
-                    .HasColumnName("longitude");
+                    .HasColumnName("longtitude");
 
             });
 
@@ -314,7 +317,7 @@ namespace shuttleasy.DAL
             });
             modelBuilder.Entity<PickupArea>(entity =>
             {
-                entity.ToTable("pickup_point");
+                entity.ToTable("pickup_area");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 

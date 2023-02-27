@@ -147,7 +147,7 @@ namespace shuttleasy.Controllers
             }
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+       /* [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<List<ShuttleSessionSearchDto>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
         {
             try
@@ -209,7 +209,8 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
+        }*/
+       /*
 
         [HttpPost]
         public ActionResult<List<ShuttleSessionSearchDto>> LAAAA(string lastPoint)
@@ -220,7 +221,7 @@ namespace shuttleasy.Controllers
             return Ok(list);
         }
 
-
+        */
 
 
 

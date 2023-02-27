@@ -10,6 +10,6 @@ namespace shuttleasy.DAL.Models
     {
         public int Id { get; set; }
         public string Latitude { get; set; } = null!;
-        public string Longitude { get; set; } = null!;  
+        public string Longtitude { get; set; } = null!;  
     }
 }

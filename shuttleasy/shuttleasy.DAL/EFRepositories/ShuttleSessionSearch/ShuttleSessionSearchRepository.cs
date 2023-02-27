@@ -25,12 +25,12 @@ namespace shuttleasy.DAL.EFRepositories.ShuttleSessionSearch
             table2 = _context.Set<Destination>();
         }
 
-       
+       /* 
          public List<ShuttleSessionSearchDto> InnerJoinTables(string lastPoint)
 
          {
 
-             var result =( from t1 in table1
+            var result =( from t1 in table1
                           join t2 in table2
                           on t1.DestinationId equals t2.Id
                            where t2.LastDestination == lastPoint
@@ -55,7 +55,7 @@ namespace shuttleasy.DAL.EFRepositories.ShuttleSessionSearch
             return result;
          } 
 
-
+        */
  
 
     }
