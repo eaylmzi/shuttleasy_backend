@@ -51,6 +51,21 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
             List<ShuttleSession>? shuttleSessionList = _shuttleSessionRepository.Get(getShuttleSession);
             return shuttleSessionList;
         }
+        /*
+        public List<Destination>? FindDestinationWithBeginningDestination(string lastDestination)
+        {
+            Func<Destination, bool> getDestinationNumber = getDestinationNumber => getDestinationNumber.LastDestination == lastDestination;
+            List<Destination>? destination = _destinationRepository.Get(getDestinationNumber);
+            return destination;
+
+        }*/
+        public List<ShuttleSession>? FindShuttleSessionWithDestinationName(string destinationName)
+        {
+            Func<ShuttleSession, bool> getShuttleSession = getShuttleSession => getShuttleSession.DestinationName == destinationName;
+            List<ShuttleSession>? shuttleSessions = _shuttleSessionRepository.Get(getShuttleSession);
+            return shuttleSessions ;
+
+        }
 
     }
 }

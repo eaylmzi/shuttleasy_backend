@@ -146,70 +146,31 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-       /* [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<List<ShuttleSessionSearchDto>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
+        
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<List<ShuttleSession>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    List<Destination>? destination = _destinationLogic
-                          .FindDestinationWithBeginningDestination(searchDestinationDto.LastDestination);
-                    if (destination != null)
+                    List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindShuttleSessionWithDestinationName(searchDestinationDto.DestinationName); 
+                    if (shuttleSessions != null)
                     {
-                        List<ShuttleSessionSearchDto>? shuttleSessionDtoList = new List<ShuttleSessionSearchDto>();
-                        foreach (Destination destinationItem in destination)
-                        {
-                            List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindSessionsWithSpecificLocation(destinationItem.Id);
-                            ShuttleSessionSearchDto shuttleSessionSearchDto = new ShuttleSessionSearchDto();
-
-                            if (shuttleSessions != null)
-                            {
-                                foreach (var item in shuttleSessions)
-                                {
-                                    shuttleSessionSearchDto = _mapper.Map<ShuttleSessionSearchDto>(item);
-                                    shuttleSessionSearchDto.CompanyName = _companyLogic.GetCompanyNameWithCompanyId(item.CompanyId);
-                                    shuttleSessionSearchDto.BusLicensePlate = _shuttleBusLogic.GetBusLicensePlateWithBusId(item.BusId);
-                                    shuttleSessionDtoList.Add(shuttleSessionSearchDto);
-                                }
-                                
-                            }
-                            
-
-                        }
-                        if(shuttleSessionDtoList != null)
-                        {
-                            return Ok(shuttleSessionDtoList);
-                        }
-                        else
-                        {
-                            return BadRequest(Error.EmptyList);
-                        }
-                       
-
-
-
-
+                        return Ok(shuttleSessions);
                     }
 
                     return BadRequest(Error.NotFoundDestination);
-
-
-
-
                 }
                 return Unauthorized(Error.NotMatchedToken);
-
-
 
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-        }*/
+        }
        /*
 
         [HttpPost]

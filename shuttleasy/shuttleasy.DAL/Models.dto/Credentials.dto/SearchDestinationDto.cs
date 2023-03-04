@@ -2,6 +2,6 @@
 {
     public class SearchDestinationDto
     {
-        public string LastDestination { get; set; } = null!;
+        public string DestinationName { get; set; } = null!;
     }
 }
