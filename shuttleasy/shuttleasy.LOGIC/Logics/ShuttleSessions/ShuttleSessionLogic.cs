@@ -1,5 +1,4 @@
-﻿using shuttleasy.DAL.EFRepositories.Destinations;
-using shuttleasy.DAL.EFRepositories.ShuttleSessions;
+﻿using shuttleasy.DAL.EFRepositories.ShuttleSessions;
 using shuttleasy.DAL.Models;
 using System;
 using System.Collections.Generic;

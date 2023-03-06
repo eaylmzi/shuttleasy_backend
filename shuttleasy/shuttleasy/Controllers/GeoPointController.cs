@@ -11,7 +11,6 @@ using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Resource;
 using shuttleasy.DAL.Models.dto.GeoPoints.dto;
-using shuttleasy.DAL.Models.dto.Destinations.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -76,6 +75,31 @@ namespace shuttleasy.Controllers
 
                 }
                 return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<List<GeoPoint>> GetAllGeoPoint()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                   var list = _geoPointLogic.GetAll();
+                   if(list != null)
+                    {
+                        return Ok(list);
+                    }
+                    return BadRequest(Error.EmptyList);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
 
             }
             catch (Exception ex)

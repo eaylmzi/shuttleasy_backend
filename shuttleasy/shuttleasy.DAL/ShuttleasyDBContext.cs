@@ -24,7 +24,6 @@ namespace shuttleasy.DAL
         public virtual DbSet<City> Cities { get; set; } = null!;
         public virtual DbSet<Company> Companies { get; set; } = null!;
         public virtual DbSet<CompanyWorker> CompanyWorkers { get; set; } = null!;
-        public virtual DbSet<Destination> Destinations { get; set; } = null!;
         public virtual DbSet<DriversStatistic> DriversStatistics { get; set; } = null!;
         public virtual DbSet<GeoPoint> GeoPoint { get; set; } = null!;   
         public virtual DbSet<NotificationPassenger> NotificationPassengers { get; set; } = null!;
@@ -130,24 +129,6 @@ namespace shuttleasy.DAL
 
             });
 
-            modelBuilder.Entity<Destination>(entity =>
-            {
-                entity.ToTable("destination");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.BeginningDestination)
-                    .HasMaxLength(50)
-                    .HasColumnName("beginning_destination");
-
-                entity.Property(e => e.CityNumber).HasColumnName("city_number");
-
-                entity.Property(e => e.LastDestination)
-                    .HasMaxLength(50)
-                    .HasColumnName("last_destination");
-
-
-            });
 
             modelBuilder.Entity<DriversStatistic>(entity =>
             {

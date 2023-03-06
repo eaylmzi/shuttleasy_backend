@@ -11,5 +11,6 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
     {
         public bool Add(GeoPoint geoPoint);
         public bool Delete(int geoPointNumber);
+        public List<GeoPoint>? GetAll();
     }
 }

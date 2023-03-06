@@ -92,6 +92,8 @@ namespace shuttleasy.Controllers
 
         }
 
+
+
         private int GetUserIdFromRequestToken()
         {
             string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");

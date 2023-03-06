@@ -11,7 +11,6 @@ using shuttleasy.Services;
 using Newtonsoft.Json.Linq;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.DAL.Models.dto.Credentials.dto;
-using shuttleasy.LOGIC.Logics.Destinations;
 using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
 using System.Text;
 using shuttleasy.DAL.Models.dto.Driver.dto;
@@ -36,12 +35,11 @@ namespace shuttleasy.Controllers
         private readonly IShuttleBusLogic _shuttleBusLogic;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly IMapper _mapper;
-        private readonly IDestinationLogic _destinationLogic;
         private readonly ICompanyLogic _companyLogic;
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
                     IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper,
-                    IDestinationLogic destinationLogic,ICompanyLogic companyLogic)
+                    ICompanyLogic companyLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -49,7 +47,6 @@ namespace shuttleasy.Controllers
             _shuttleBusLogic = shuttleBusLogic;
             _shuttleSessionLogic = shuttleSessionLogic;
             _mapper = mapper;
-            _destinationLogic = destinationLogic;
             _companyLogic = companyLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]

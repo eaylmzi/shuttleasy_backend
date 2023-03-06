@@ -1,5 +1,4 @@
-﻿using shuttleasy.DAL.EFRepositories.Destinations;
-using shuttleasy.DAL.EFRepositories.GeoPoints;
+﻿using shuttleasy.DAL.EFRepositories.GeoPoints;
 using shuttleasy.DAL.Models;
 using System;
 using System.Collections.Generic;
@@ -26,6 +25,11 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
             Func<GeoPoint, bool> getGeoPointNumber = getGeoPointNumber => getGeoPointNumber.Id == geoPointNumber;
             bool isDeleted = _geoPointRepository.Delete(getGeoPointNumber);
             return isDeleted;
+        }
+        public List<GeoPoint>? GetAll()
+        {
+            List<GeoPoint>? geoPointList = _geoPointRepository.Get();
+            return geoPointList;
         }
     }
 }

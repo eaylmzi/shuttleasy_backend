@@ -7,7 +7,6 @@ using shuttleasy.Controllers;
 using shuttleasy.DAL.EFRepositories;
 using shuttleasy.DAL.EFRepositories.Companies;
 using shuttleasy.DAL.EFRepositories.CompanyWorkers;
-using shuttleasy.DAL.EFRepositories.Destinations;
 using shuttleasy.DAL.EFRepositories.GeoPoints;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.PickupAreas;
@@ -20,7 +19,6 @@ using shuttleasy.JwtToken;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
-using shuttleasy.LOGIC.Logics.Destinations;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.LOGIC.Logics.PickupAreas;
@@ -41,9 +39,6 @@ builder.Services.AddScoped<ICompanyWorkerLogic, CompanyWorkerLogic>();
 
 builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 builder.Services.AddScoped<IPasswordResetLogic, PasswordResetLogic>();
-
-builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
-builder.Services.AddScoped<IDestinationLogic, DestinationLogic>();
 
 builder.Services.AddScoped<IShuttleBusRepository, ShuttleBusRepository>();
 builder.Services.AddScoped<IShuttleBusLogic, ShuttleBusLogic>();
