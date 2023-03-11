@@ -8,7 +8,7 @@ namespace shuttleasy.DAL.Resource.String
 {
     public static class Error
     {
-        public const string EmptyList = "The list ist empty";
+        public const string EmptyList = "The list is empty";
         public const string ForeignRequest = "The user and the person who sent the request are not the same";
         public const string FoundEmailOrTelephone = "Registered with this email or phone";
         public const string NotAdded = "Not Added";

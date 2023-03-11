@@ -4,8 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
-using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace shuttleasy.DAL.Interfaces
@@ -88,10 +89,27 @@ namespace shuttleasy.DAL.Interfaces
                 };
             }
         }
+        public async Task<bool> AddAsync(T entity)
+        {
+            using (var context = new ShuttleasyDBContext())
+            {
+                if (entity != null)
+                {
+                    await context.Set<T>().AddAsync(entity);
+                    context.SaveChanges();
+                    return true;
+
+                }
+                else
+                {
+                    return false;
+                };
+            }
+        }
 
         public T? GetSingle(Func<T, bool> metot)
         {
-            T? entity = query
+            T? entity =query
                       .Where(metot)
                       .Select(m => m)
                       .SingleOrDefault();
@@ -99,5 +117,11 @@ namespace shuttleasy.DAL.Interfaces
 
             return entity;
         }
+        public async Task<T?> GetSingleAsync(Func<T, bool> metot)
+        {
+            return await query.FirstOrDefaultAsync(metot);
+        }
+
+    
     }
 }
