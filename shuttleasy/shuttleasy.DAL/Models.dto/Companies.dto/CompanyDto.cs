@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace shuttleasy.DAL.Models.dto.Company.dto
+namespace shuttleasy.DAL.Models.dto.Companies.dto
 {
     public class CompanyDto
     {

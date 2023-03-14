@@ -12,5 +12,6 @@
         public int DriverId { get; set; }
         public bool IsActive { get; set; }
         public int DestinationId { get; set; }
+        public bool Return { get; set; }
     }
 }

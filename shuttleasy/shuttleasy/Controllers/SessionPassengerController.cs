@@ -5,9 +5,18 @@ using shuttleasy.LOGIC.Logics.SessionHistories;
 using shuttleasy.LOGIC.Logics;
 using shuttleasy.Services;
 using shuttleasy.LOGIC.Logics.SessionPassengers;
+using Microsoft.AspNetCore.Authorization;
+using shuttleasy.DAL.Models.dto.Credentials.dto;
+using shuttleasy.DAL.Models.dto.GeoPoints.dto;
+using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Resource.String;
+using shuttleasy.Resource;
+using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
 
 namespace shuttleasy.Controllers
 {
+    [Route("api/[controller]/[action]")]
+    [ApiController]
     public class SessionPassengerController : Controller
     {
         private readonly IUserService _userService;
@@ -24,6 +33,57 @@ namespace shuttleasy.Controllers
             _driverLogic = driverLogic;
             _sessionPassengerLogic = sessionPassengerLogic;
             _mapper = mapper;
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<bool> AddSessionPassenger([FromBody] SessionPassengerDto sessionPassengerDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    SessionPassenger sessionPassenger = _mapper.Map<SessionPassenger>(sessionPassengerDto);
+                    bool isAdded = _sessionPassengerLogic.Add(sessionPassenger);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+  
+                    }
+                    return BadRequest(isAdded);
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<bool> DeleteSessionPassenger([FromBody] IdDto idDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    bool isAdded = _sessionPassengerLogic.Delete(idDto.Id);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

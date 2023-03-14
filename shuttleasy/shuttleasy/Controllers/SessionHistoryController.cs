@@ -8,6 +8,8 @@ using shuttleasy.LOGIC.Logics.SessionHistories;
 
 namespace shuttleasy.Controllers
 {
+    [Route("api/[controller]/[action]")]
+    [ApiController]
     public class SessionHistoryController : Controller
     {
         private readonly IUserService _userService;

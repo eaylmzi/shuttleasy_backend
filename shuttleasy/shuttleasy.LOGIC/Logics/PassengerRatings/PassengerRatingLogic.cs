@@ -1,5 +1,6 @@
 ﻿using shuttleasy.DAL.EFRepositories.PassengerPayments;
 using shuttleasy.DAL.EFRepositories.PassengerRatings;
+using shuttleasy.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,18 @@ namespace shuttleasy.LOGIC.Logics.PassengerRatings
         public PassengerRatingLogic(IPassengerRatingRepository passengerRatingRepository)
         {
             _passengerRatingRepository = passengerRatingRepository;
+        }
+
+        public bool Add(PassengerRating passengerRating)
+        {
+            bool isAdded = _passengerRatingRepository.Add(passengerRating);
+            return isAdded;
+        }
+        public bool Delete(int passengerRatingNumber) 
+        {
+            Func<PassengerRating, bool> getPassengerRatingNumber = getPassengerRatingNumber => getPassengerRatingNumber.Id == passengerRatingNumber;
+            bool isDeleted = _passengerRatingRepository.Delete(getPassengerRatingNumber);
+            return isDeleted;
         }
     }
 }

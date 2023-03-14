@@ -11,9 +11,12 @@ using shuttleasy.DAL.EFRepositories.DriversStatistics;
 using shuttleasy.DAL.EFRepositories.GeoPoints;
 using shuttleasy.DAL.EFRepositories.NotificationPassengers;
 using shuttleasy.DAL.EFRepositories.NotificationWorkers;
+using shuttleasy.DAL.EFRepositories.PassengerRatings;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.PickupAreas;
 using shuttleasy.DAL.EFRepositories.PickupPoints;
+using shuttleasy.DAL.EFRepositories.SessionHistories;
+using shuttleasy.DAL.EFRepositories.SessionPassengers;
 using shuttleasy.DAL.EFRepositories.ShuttleBuses;
 using shuttleasy.DAL.EFRepositories.ShuttleSessions;
 using shuttleasy.DAL.EFRepositories.ShuttleSessionSearch;
@@ -26,10 +29,14 @@ using shuttleasy.LOGIC.Logics.DriversStatistics;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.LOGIC.Logics.NotificationPassengers;
 using shuttleasy.LOGIC.Logics.NotificationWorkers;
+using shuttleasy.LOGIC.Logics.PassengerRatings;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.LOGIC.Logics.PickupAreas;
 using shuttleasy.LOGIC.Logics.PickupPoints;
+using shuttleasy.LOGIC.Logics.SessionHistories;
+using shuttleasy.LOGIC.Logics.SessionPassengers;
 using shuttleasy.LOGIC.Logics.ShuttleBuses;
+using shuttleasy.LOGIC.Logics.ShuttleDetails;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.Mail;
 using shuttleasy.Services;
@@ -64,6 +71,18 @@ builder.Services.AddScoped<INotificationPassengerLogic, NotificationPassengerLog
 builder.Services.AddScoped<INotificationWorkerRepository, NotificationWorkerRepository>();
 builder.Services.AddScoped<INotificationWorkerLogic, NotificationWorkerLogic>();
 
+builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
+builder.Services.AddScoped<IPassengerLogic, PassengerLogic>();
+
+builder.Services.AddScoped<IPassengerRatingRepository, PassengerRatingRepository>();
+builder.Services.AddScoped<IPassengerRatingLogic, PassengerRatingLogic>();
+
+builder.Services.AddScoped<ISessionHistoryRepository, SessionHistoryRepository>();
+builder.Services.AddScoped<ISessionHistoryLogic, SessionHistoryLogic>();
+
+builder.Services.AddScoped<ISessionPassengerRepository, SessionPassengerRepository>();
+builder.Services.AddScoped<ISessionPassengerLogic, SessionPassengerLogic>();
+
 builder.Services.AddScoped<IDriversStatisticRepository, DriversStatisticRepository>();
 builder.Services.AddScoped<IDriversStatisticLogic, DriversStatisticLogic>();
 
@@ -72,6 +91,8 @@ builder.Services.AddScoped<IPickupAreaLogic, PickupAreaLogic>();
 
 builder.Services.AddScoped<IPickupPointRepository, PickupPointRepository>();
 builder.Services.AddScoped<IPickupPointLogic, PickupPointLogic>();
+
+builder.Services.AddScoped<IShuttleDetailsLogic, ShuttleDetailsLogic>();
 
 
 

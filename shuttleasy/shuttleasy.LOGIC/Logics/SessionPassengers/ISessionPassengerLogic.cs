@@ -1,4 +1,5 @@
-﻿using System;
+﻿using shuttleasy.DAL.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace shuttleasy.LOGIC.Logics.SessionPassengers
 {
     public interface ISessionPassengerLogic
     {
+        public bool Add(SessionPassenger sessionPassenger);
+        public bool Delete(int sessionPassengerNumber);
     }
 }

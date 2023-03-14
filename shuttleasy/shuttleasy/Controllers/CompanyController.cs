@@ -12,6 +12,8 @@ using shuttleasy.DAL.Resource.String;
 using Microsoft.AspNetCore.Authorization;
 using shuttleasy.DAL.Models.dto.GeoPoints.dto;
 using shuttleasy.Resource;
+using shuttleasy.DAL.Models.dto.ShuttleDetails.dto;
+using shuttleasy.LOGIC.Logics.ShuttleDetails;
 
 namespace shuttleasy.Controllers
 {
@@ -24,15 +26,17 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IMapper _mapper;
         private readonly ICompanyLogic _companyLogic;
+        private readonly IShuttleDetailsLogic _shuttleDetailsLogic;
 
         public CompanyController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
-            IMapper mapper,ICompanyLogic companyLogic)
+            IMapper mapper,ICompanyLogic companyLogic, IShuttleDetailsLogic shuttleDetailsLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _mapper = mapper;
             _companyLogic = companyLogic;
+            _shuttleDetailsLogic = shuttleDetailsLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<bool> AddCompany([FromBody] Company companyDto)
@@ -93,7 +97,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<string> GetCompanyName([FromBody] IdDto idDto)
         {
             try
@@ -112,6 +116,26 @@ namespace shuttleasy.Controllers
             }
         }
 
-       
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<ShuttleDetailsDto> GetShuttleDetails([FromBody] IdDto companyId)
+        {
+            try
+            {
+                
+                var details = _shuttleDetailsLogic.InnerJoinTables(companyId.Id);
+                if(details != null)
+                {
+                    return Ok(details);
+                }
+
+                return BadRequest(Error.EmptyList);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

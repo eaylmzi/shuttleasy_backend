@@ -8,6 +8,8 @@ using shuttleasy.LOGIC.Logics.PassengerPayments;
 
 namespace shuttleasy.Controllers
 {
+    [Route("api/[controller]/[action]")]
+    [ApiController]
     public class PassengerPaymentController : Controller
     {
         private readonly IUserService _userService;

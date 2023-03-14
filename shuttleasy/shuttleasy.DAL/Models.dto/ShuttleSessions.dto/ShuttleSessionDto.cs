@@ -11,5 +11,6 @@
         public int? StartGeopoint { get; set; }
         public int? FinalGeopoint { get; set; }
         public string DestinationName { get; set; } = null!;
+        public bool Return { get; set; }
     }
 }
