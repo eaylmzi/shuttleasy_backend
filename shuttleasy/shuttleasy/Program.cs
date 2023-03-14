@@ -9,6 +9,8 @@ using shuttleasy.DAL.EFRepositories.Companies;
 using shuttleasy.DAL.EFRepositories.CompanyWorkers;
 using shuttleasy.DAL.EFRepositories.DriversStatistics;
 using shuttleasy.DAL.EFRepositories.GeoPoints;
+using shuttleasy.DAL.EFRepositories.NotificationPassengers;
+using shuttleasy.DAL.EFRepositories.NotificationWorkers;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.PickupAreas;
 using shuttleasy.DAL.EFRepositories.PickupPoints;
@@ -22,6 +24,8 @@ using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics.DriversStatistics;
 using shuttleasy.LOGIC.Logics.GeoPoints;
+using shuttleasy.LOGIC.Logics.NotificationPassengers;
+using shuttleasy.LOGIC.Logics.NotificationWorkers;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.LOGIC.Logics.PickupAreas;
 using shuttleasy.LOGIC.Logics.PickupPoints;
@@ -51,8 +55,14 @@ builder.Services.AddScoped<IShuttleSessionLogic, ShuttleSessionLogic>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyLogic, CompanyLogic>();
 
-builder.Services.AddScoped<IGeoPointRepository, GeoPointRepository>();
-builder.Services.AddScoped<IGeoPointLogic, GeoPointLogic>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<ICompanyLogic, CompanyLogic>();
+
+builder.Services.AddScoped<INotificationPassengerRepository, NotificationPassengerRepository>();
+builder.Services.AddScoped<INotificationPassengerLogic, NotificationPassengerLogic>();
+
+builder.Services.AddScoped<INotificationWorkerRepository, NotificationWorkerRepository>();
+builder.Services.AddScoped<INotificationWorkerLogic, NotificationWorkerLogic>();
 
 builder.Services.AddScoped<IDriversStatisticRepository, DriversStatisticRepository>();
 builder.Services.AddScoped<IDriversStatisticLogic, DriversStatisticLogic>();
