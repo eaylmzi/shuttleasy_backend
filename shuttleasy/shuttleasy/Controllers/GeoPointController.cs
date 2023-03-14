@@ -33,7 +33,7 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public async Task<ActionResult<int>> AddGeoPoint([FromBody] GeoPointDto geoPointDto)
+        public async Task<ActionResult<bool>> AddGeoPoint([FromBody] GeoPointDto geoPointDto)
         {
             try
             {
@@ -44,6 +44,8 @@ namespace shuttleasy.Controllers
                     bool isAdded = await _geoPointLogic.AddAsync(geoPoint);
                     if (isAdded)
                     {
+                        return Ok(isAdded);
+                        /*
                         GeoPoint addedGeoPoint = await _geoPointLogic.GetGeoPointWithLocationName(geoPointDto.LocationName);
                         int idNumber = addedGeoPoint.Id;
                         if (idNumber != null)
@@ -51,6 +53,7 @@ namespace shuttleasy.Controllers
                             return Ok(idNumber);
                         }
                         return BadRequest(Error.EmptyList);
+                        */
                     }
                     return BadRequest(isAdded);
 

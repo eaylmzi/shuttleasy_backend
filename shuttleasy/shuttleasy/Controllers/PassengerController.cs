@@ -188,7 +188,7 @@ namespace shuttleasy.Controllers
             
         }
         
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<PassengerInfoDto> GetPassenger([FromBody] IdDto idDto)
         {
             try

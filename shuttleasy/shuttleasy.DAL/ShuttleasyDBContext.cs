@@ -80,6 +80,14 @@ namespace shuttleasy.DAL
                     .HasColumnName("name");
 
                 entity.Property(e => e.Rating).HasColumnName("rating");
+
+                entity.Property(e => e.PhoneNumber)
+                   .HasMaxLength(10)
+                   .HasColumnName("phone_number");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(100)
+                    .HasColumnName("email");
             });
 
             modelBuilder.Entity<CompanyWorker>(entity =>
@@ -440,7 +448,7 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.StartGeopoint).HasColumnName("start_geopoint");
                 entity.Property(e => e.FinalGeopoint).HasColumnName("final_geopoint");
                 entity.Property(e => e.DestinationName)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("destination_name");
 
 

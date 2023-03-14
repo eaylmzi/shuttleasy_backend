@@ -13,6 +13,7 @@ using shuttleasy.DAL.Models.dto.User.dto;
 using shuttleasy.DAL.Models.dto.GeoPoints.dto;
 using shuttleasy.DAL.Models.dto.PickupArea.dto;
 using shuttleasy.DAL.Models.dto.PickupPoint.dto;
+using shuttleasy.DAL.Models.dto.Company.dto;
 
 namespace shuttleasy.Models.dto
 {
@@ -30,6 +31,8 @@ namespace shuttleasy.Models.dto
             CreateMap<GeoPointDto, GeoPoint>();
             CreateMap<PickupAreaDto, PickupArea>();
             CreateMap<PickupPointDto, PickupPoint>();
+            CreateMap<CompanyDto, Company>();
+
 
             CreateMap<CompanyWorker, CompanyWorkerInfoDto>();
             CreateMap<Passenger, PassengerInfoDto>();

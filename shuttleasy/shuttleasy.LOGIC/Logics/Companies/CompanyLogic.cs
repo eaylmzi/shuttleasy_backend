@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace shuttleasy.LOGIC.Logics.Companies
 {
@@ -16,6 +17,17 @@ namespace shuttleasy.LOGIC.Logics.Companies
         public CompanyLogic(ICompanyRepository companyRepository)
         {
             _companyRepository = companyRepository;
+        }
+        public bool Add(Company company)
+        {
+            bool isAdded = _companyRepository.Add(company);
+            return isAdded;
+        }
+        public bool Delete(int companyNumber) 
+        {
+            Func<Company, bool> getCompanyNumber = getCompanyNumber => getCompanyNumber.Id == companyNumber;
+            bool isDeleted = _companyRepository.Delete(getCompanyNumber);
+            return isDeleted;
         }
 
         public string? GetCompanyNameWithCompanyId(int companyId)

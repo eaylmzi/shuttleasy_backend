@@ -2,9 +2,8 @@
 using shuttleasy.DAL.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace shuttleasy.LOGIC.Logics.GeoPoints
 {
@@ -36,6 +35,7 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
             List<GeoPoint>? geoPointList = _geoPointRepository.Get();
             return geoPointList;
         }
+        /*
         public async Task<GeoPoint?> GetGeoPointWithLocationName(string locationName) 
         {
             Func<GeoPoint, bool> getGeoPoint = getGeoPoint => getGeoPoint.LocationName == locationName;
@@ -43,5 +43,6 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
             return geoPoint;
 
         }
+        */
     }
 }

@@ -3,8 +3,6 @@ using shuttleasy.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static System.Net.Mime.MediaTypeNames;
@@ -117,11 +115,12 @@ namespace shuttleasy.DAL.Interfaces
 
             return entity;
         }
+        /*
         public async Task<T?> GetSingleAsync(Func<T, bool> metot)
         {
             return await query.FirstOrDefaultAsync(metot);
         }
-
+        */
     
     }
 }

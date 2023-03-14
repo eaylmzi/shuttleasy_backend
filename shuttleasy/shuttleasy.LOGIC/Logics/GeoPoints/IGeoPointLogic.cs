@@ -13,7 +13,7 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
         public Task<bool> AddAsync(GeoPoint geoPoint);
         public bool Delete(int geoPointNumber);
         public List<GeoPoint>? GetAll();
-        public Task<GeoPoint?> GetGeoPointWithLocationName(string locationName);
+      //  public Task<GeoPoint?> GetGeoPointWithLocationName(string locationName);
 
     }
 }

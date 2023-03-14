@@ -9,6 +9,9 @@ using shuttleasy.DAL.Models.dto.Login.dto;
 using shuttleasy.Services;
 using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.DAL.Resource.String;
+using Microsoft.AspNetCore.Authorization;
+using shuttleasy.DAL.Models.dto.GeoPoints.dto;
+using shuttleasy.Resource;
 
 namespace shuttleasy.Controllers
 {
@@ -31,6 +34,65 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
             _companyLogic = companyLogic;
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<bool> AddCompany([FromBody] Company companyDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    Company company = _mapper.Map<Company>(companyDto);
+                    bool isAdded =  _companyLogic.Add(company);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                        /*
+                        GeoPoint addedGeoPoint = await _geoPointLogic.GetGeoPointWithLocationName(geoPointDto.LocationName);
+                        int idNumber = addedGeoPoint.Id;
+                        if (idNumber != null)
+                        {
+                            return Ok(idNumber);
+                        }
+                        return BadRequest(Error.EmptyList);
+                        */
+                    }
+                    return BadRequest(isAdded);
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<bool> DeleteCompany([FromBody] IdDto idDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    bool isAdded = _companyLogic.Delete(idDto.Id);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost]
         public ActionResult<string> GetCompanyName([FromBody] IdDto idDto)
         {
@@ -49,6 +111,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
        
     }
 }
