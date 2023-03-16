@@ -36,7 +36,7 @@ namespace shuttleasy.Models.dto
             CreateMap<CompanyDto, Company>();
             CreateMap<CommentDto, PassengerRating>();
             CreateMap<SessionPassengerDto, SessionPassenger>();
-
+            CreateMap<EditCompanyDto,Company>();
 
 
             CreateMap<CompanyWorker, CompanyWorkerInfoDto>();

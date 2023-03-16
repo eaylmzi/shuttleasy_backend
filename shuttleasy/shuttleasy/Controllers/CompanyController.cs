@@ -12,8 +12,9 @@ using shuttleasy.DAL.Resource.String;
 using Microsoft.AspNetCore.Authorization;
 using shuttleasy.DAL.Models.dto.GeoPoints.dto;
 using shuttleasy.Resource;
-using shuttleasy.DAL.Models.dto.ShuttleDetails.dto;
-using shuttleasy.LOGIC.Logics.ShuttleDetails;
+using shuttleasy.LOGIC.Logics.JoinTables;
+using shuttleasy.DAL.Models.dto.JoinTables.dto;
+using shuttleasy.DAL.Models.dto.Companies.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -26,20 +27,20 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IMapper _mapper;
         private readonly ICompanyLogic _companyLogic;
-        private readonly IShuttleDetailsLogic _shuttleDetailsLogic;
+        private readonly IJoinTableLogic _joinTableLogic;
 
         public CompanyController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
-            IMapper mapper,ICompanyLogic companyLogic, IShuttleDetailsLogic shuttleDetailsLogic)
+            IMapper mapper,ICompanyLogic companyLogic, IJoinTableLogic joinTableLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _mapper = mapper;
             _companyLogic = companyLogic;
-            _shuttleDetailsLogic = shuttleDetailsLogic;
+            _joinTableLogic = joinTableLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<bool> AddCompany([FromBody] Company companyDto)
+        public ActionResult<bool> AddCompany([FromBody] CompanyDto companyDto)
         {
             try
             {
@@ -121,14 +122,52 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                
-                var details = _shuttleDetailsLogic.InnerJoinTables(companyId.Id);
-                if(details != null)
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
                 {
-                    return Ok(details);
+                    var details = _joinTableLogic.ShuttleDetailsInnerJoinTables(companyId.Id);
+                    if (details != null)
+                    {
+                        return Ok(details);
+                    }
+
+                    return BadRequest(Error.EmptyList);
                 }
 
-                return BadRequest(Error.EmptyList);
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public async Task<ActionResult<bool>> EditCompany([FromBody] EditCompanyDto editCompanyDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    int id = editCompanyDto.Id;
+                    Company? company = _companyLogic.Find(id);
+                    if(company != null)
+                    {
+                        Company updatedCompany = _mapper.Map<Company>(editCompanyDto);
+                        updatedCompany.Rating = company.Rating;
+                        bool isUpdated = await _companyLogic.UpdateAsync(id, updatedCompany);
+                        if (isUpdated)
+                        {
+                            return Ok(isUpdated);
+                        }
+                        return BadRequest(isUpdated);
+                    }
+                    return BadRequest(Error.NotFoundCompany);
+                   
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)

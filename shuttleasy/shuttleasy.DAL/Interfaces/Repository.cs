@@ -53,6 +53,27 @@ namespace shuttleasy.DAL.Interfaces
             return false;
 
         }
+        public async Task<bool> UpdateAsync(Func<T, bool> metot,T? updatedEntity)
+        {
+            T? entity = query
+                     .Where(metot)
+                     .Select(m => m)
+                     .SingleOrDefault();
+
+            if (entity != null)
+            {
+                // update the properties of the entity with the values from the updated entity
+                _context.Entry(entity).CurrentValues.SetValues(updatedEntity);
+
+                // save the changes to the database
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
+
+        }
 
         public bool Delete(Func<T, bool> metot)
         {
@@ -121,6 +142,10 @@ namespace shuttleasy.DAL.Interfaces
             return await query.FirstOrDefaultAsync(metot);
         }
         */
-    
+        public async Task<T?> GetSingleAsync(int number)
+        {
+            return await query.FindAsync(number);
+        }
+
     }
 }

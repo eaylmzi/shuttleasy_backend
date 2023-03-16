@@ -27,6 +27,7 @@ using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.LOGIC.Logics.DriversStatistics;
 using shuttleasy.LOGIC.Logics.GeoPoints;
+using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.LOGIC.Logics.NotificationPassengers;
 using shuttleasy.LOGIC.Logics.NotificationWorkers;
 using shuttleasy.LOGIC.Logics.PassengerRatings;
@@ -36,7 +37,7 @@ using shuttleasy.LOGIC.Logics.PickupPoints;
 using shuttleasy.LOGIC.Logics.SessionHistories;
 using shuttleasy.LOGIC.Logics.SessionPassengers;
 using shuttleasy.LOGIC.Logics.ShuttleBuses;
-using shuttleasy.LOGIC.Logics.ShuttleDetails;
+
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.Mail;
 using shuttleasy.Services;
@@ -92,7 +93,7 @@ builder.Services.AddScoped<IPickupAreaLogic, PickupAreaLogic>();
 builder.Services.AddScoped<IPickupPointRepository, PickupPointRepository>();
 builder.Services.AddScoped<IPickupPointLogic, PickupPointLogic>();
 
-builder.Services.AddScoped<IShuttleDetailsLogic, ShuttleDetailsLogic>();
+builder.Services.AddScoped<IJoinTableLogic, JoinTableLogic>();
 
 
 

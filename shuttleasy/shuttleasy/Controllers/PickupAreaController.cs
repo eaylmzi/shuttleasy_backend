@@ -13,6 +13,7 @@ using shuttleasy.Services;
 using shuttleasy.DAL.EFRepositories.PickupAreas;
 using shuttleasy.LOGIC.Logics.PickupAreas;
 using shuttleasy.DAL.Models.dto.PickupArea.dto;
+using System.ComponentModel.Design;
 
 namespace shuttleasy.Controllers
 {
@@ -83,6 +84,19 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
+        public ActionResult<bool> GetShuttlePickUpArea(int companyId, string destinationlong, string destinationLat)
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
     }
 }

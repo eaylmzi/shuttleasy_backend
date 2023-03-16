@@ -21,6 +21,7 @@ namespace shuttleasy.DAL.Resource.String
         public const string NotFoundDriver = "The driver not found in list";
         public const string NotFoundPassenger = "The passenger not found in list";
         public const string NotFoundSuperAdmin = "The Superadmin not found in list";
+        public const string NotFound = "Not Found";
         public const string NotFoundUser= "The user that send request not found";
         public const string NotMatchedToken = "Mistake about token";
         public const string NotUpdatedInformation = "Not updated information";
