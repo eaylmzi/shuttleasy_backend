@@ -88,6 +88,8 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.Email)
                     .HasMaxLength(100)
                     .HasColumnName("email");
+                entity.Property(e => e.VotesNumber)
+                    .HasColumnName("votes_number");
             });
 
             modelBuilder.Entity<CompanyWorker>(entity =>
@@ -389,9 +391,6 @@ namespace shuttleasy.DAL
                     .HasMaxLength(15)
                     .HasColumnName("pickup_state");
 
-                entity.Property(e => e.SessionDate)
-                    .HasColumnType("date")
-                    .HasColumnName("session_date");
 
                 entity.Property(e => e.SessionId).HasColumnName("session_id");
 
@@ -450,6 +449,10 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.DestinationName)
                 .HasMaxLength(100)
                 .HasColumnName("destination_name");
+                entity.Property(e => e.Return).HasColumnName("return");
+                entity.Property(e => e.SessionDate)
+                .HasMaxLength(15)
+                .HasColumnName("session_date");
 
 
 

@@ -8,8 +8,7 @@ namespace shuttleasy.DAL.Models.dto.PassengerRatingDto
 {
     public class CommentDto
     {
-        public int PassengerIdentity { get; set; }
-        public int Rating { get; set; }
+        public double Rating { get; set; }
         public int SessionId { get; set; }
         public string Comment { get; set; } = null!;
     }

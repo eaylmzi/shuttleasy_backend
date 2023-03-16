@@ -14,8 +14,9 @@ namespace shuttleasy.DAL.Models
         public bool IsActive { get; set; }
         public int? StartGeopoint { get; set; }
         public int? FinalGeopoint { get; set; } 
-        public string DestinationName { get; set; } = null!;
+        public string? DestinationName { get; set; } 
         public bool Return { get; set; }
+        public string SessionDate { get; set; } = null!;
 
     }
 }

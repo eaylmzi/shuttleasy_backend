@@ -10,6 +10,6 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
 {
     public interface IJoinTableLogic
     {
-        public List<ShuttleDetailsDto> ShuttleDetailsInnerJoinTables(int companyId);
+        public List<ShuttleDetailsDto> ShuttleDetailsInnerJoinTables(string destinationName);
     }
 }

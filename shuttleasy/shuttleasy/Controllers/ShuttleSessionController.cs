@@ -22,6 +22,7 @@ using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.Resource;
 using shuttleasy.DAL.EFRepositories.ShuttleSessionSearch;
 using shuttleasy.LOGIC.Logics.ShuttleSessionSearch;
+using shuttleasy.LOGIC.Logics.JoinTables;
 
 namespace shuttleasy.Controllers
 {
@@ -35,10 +36,11 @@ namespace shuttleasy.Controllers
         private readonly IShuttleBusLogic _shuttleBusLogic;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly IMapper _mapper;
+        private readonly IJoinTableLogic _joinTableLogic;
         private readonly ICompanyLogic _companyLogic;
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
-                    IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper,
+                    IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper, IJoinTableLogic joinTableLogic,
                     ICompanyLogic companyLogic)
         {
             _userService = userService;
@@ -47,6 +49,7 @@ namespace shuttleasy.Controllers
             _shuttleBusLogic = shuttleBusLogic;
             _shuttleSessionLogic = shuttleSessionLogic;
             _mapper = mapper;
+            _joinTableLogic = joinTableLogic;
             _companyLogic = companyLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
@@ -152,13 +155,13 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    List<ShuttleSession>? shuttleSessions = _shuttleSessionLogic.FindShuttleSessionWithDestinationName(searchDestinationDto.DestinationName); 
-                    if (shuttleSessions != null)
+                    var list = _joinTableLogic.ShuttleDetailsInnerJoinTables(searchDestinationDto.DestinationName);
+                    if (list != null)
                     {
-                        return Ok(shuttleSessions);
+                        return Ok(list);
                     }
 
-                    return BadRequest(Error.NotFoundDestination);
+                    return BadRequest(Error.NotFoundShuttleSession);
                 }
                 return Unauthorized(Error.NotMatchedToken);
 
@@ -168,24 +171,49 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-       /*
-
-        [HttpPost]
-        public ActionResult<List<ShuttleSessionSearchDto>> LAAAA(string lastPoint)
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<List<ShuttleSession>> GetShuttle([FromBody] IdDto idDto )
         {
-            ShuttleSessionSearchLogic shuttleSessionSearchLogic = new ShuttleSessionSearchLogic();
-            var list = shuttleSessionSearchLogic.InnerJoinTables(lastPoint);
-            
-            return Ok(list);
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(idDto.Id);
+                    if (shuttleSession != null)
+                    {
+                        return Ok(shuttleSession);
+                    }
+                    return BadRequest(Error.NotFoundShuttleSession);
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        /*
 
-        */
+         [HttpPost]
+         public ActionResult<List<ShuttleSessionSearchDto>> LAAAA(string lastPoint)
+         {
+             ShuttleSessionSearchLogic shuttleSessionSearchLogic = new ShuttleSessionSearchLogic();
+             var list = shuttleSessionSearchLogic.InnerJoinTables(lastPoint);
+
+             return Ok(list);
+         }
+
+         */
 
 
 
 
 
-            private static string GetTimestamp(DateTime value)
+        private static string GetTimestamp(DateTime value)
         {
             return value.ToString("yyyyMMddHHmmssffff");
         }

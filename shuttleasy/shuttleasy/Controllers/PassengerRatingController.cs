@@ -14,6 +14,8 @@ using shuttleasy.DAL.Models.dto.ShuttleBuses.dto;
 using shuttleasy.DAL.Models.dto.Credentials.dto;
 using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
 using shuttleasy.Resource;
+using shuttleasy.LOGIC.Logics.ShuttleSessions;
+using shuttleasy.LOGIC.Logics.Companies;
 
 namespace shuttleasy.Controllers
 {
@@ -26,14 +28,18 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IPassengerRatingLogic _passengerRatingLogic;
         private readonly IMapper _mapper;
+        private readonly IShuttleSessionLogic _shuttleSessionLogic;
+        private readonly ICompanyLogic _companyLogic;
         public PassengerRatingController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
-            IPassengerRatingLogic passengerRatingLogic,
+            IPassengerRatingLogic passengerRatingLogic, IShuttleSessionLogic shuttleSessionLogic, ICompanyLogic companyLogic,
            IMapper mapper)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _passengerRatingLogic = passengerRatingLogic;
+            _shuttleSessionLogic = shuttleSessionLogic;
+            _companyLogic = companyLogic;
             _mapper = mapper;
         }
 
@@ -46,13 +52,22 @@ namespace shuttleasy.Controllers
                 try
                 {
                     PassengerRating passengerRating = _mapper.Map<PassengerRating>(commentDto);
+                    passengerRating.PassengerIdentity = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
                     passengerRating.Date = DateTime.Now;
                     bool isAdded = _passengerRatingLogic.Add(passengerRating);
                     if (isAdded)
                     {
-                        return Ok(isAdded);
+                        bool isUpdated = _userService.calculateRating(commentDto.SessionId, commentDto.Rating);
+                        if (isUpdated)
+                        {
+                            return Ok(isUpdated);
+                        }
+                        return Ok(isUpdated);
                     }
                     return BadRequest(isAdded);
+
+
+
 
                 }
                 catch (Exception ex)
@@ -64,5 +79,6 @@ namespace shuttleasy.Controllers
             return Unauthorized(Error.NotMatchedToken);
 
         }
+       
     }
 }

@@ -31,7 +31,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         }
 
        
-         public List<ShuttleDetailsDto> ShuttleDetailsInnerJoinTables(int companyId)
+         public List<ShuttleDetailsDto> ShuttleDetailsInnerJoinTables(string destinationName)
 
          {
 
@@ -43,7 +43,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           join t4 in PassengerTable
                               on pr.PassengerIdentity equals t4.Id into passengers
                           from p in passengers.DefaultIfEmpty()
-                          where t1.Id == companyId
+                          where t2.DestinationName == destinationName
                           select new ShuttleDetailsDto
                           {
                               CompanyDetails = t1,

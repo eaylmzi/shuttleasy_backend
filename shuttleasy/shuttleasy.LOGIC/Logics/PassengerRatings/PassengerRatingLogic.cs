@@ -28,5 +28,6 @@ namespace shuttleasy.LOGIC.Logics.PassengerRatings
             bool isDeleted = _passengerRatingRepository.Delete(getPassengerRatingNumber);
             return isDeleted;
         }
+  
     }
 }

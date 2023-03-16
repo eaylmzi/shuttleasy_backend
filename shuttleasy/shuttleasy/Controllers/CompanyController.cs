@@ -48,6 +48,7 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     Company company = _mapper.Map<Company>(companyDto);
+                    company.VotesNumber = 0;
                     bool isAdded =  _companyLogic.Add(company);
                     if (isAdded)
                     {
@@ -101,14 +102,21 @@ namespace shuttleasy.Controllers
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<string> GetCompanyName([FromBody] IdDto idDto)
         {
+
             try
             {
-                string? companyName = _companyLogic.GetCompanyNameWithCompanyId(idDto.Id);
-                if(companyName != null)
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
                 {
-                    return Ok(companyName);
+                    string? companyName = _companyLogic.GetCompanyNameWithCompanyId(idDto.Id);
+                    if (companyName != null)
+                    {
+                        return Ok(companyName);
+                    }
+                    return BadRequest(Error.NotFoundCompany);
+
                 }
-                return BadRequest(Error.NotFoundCompany);
+                return Unauthorized(Error.NotMatchedToken);
 
             }
             catch (Exception ex)
@@ -116,7 +124,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        /*
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<ShuttleDetailsDto> GetShuttleDetails([FromBody] IdDto companyId)
         {
@@ -142,6 +150,7 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        */
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public async Task<ActionResult<bool>> EditCompany([FromBody] EditCompanyDto editCompanyDto)
         {
@@ -167,6 +176,32 @@ namespace shuttleasy.Controllers
                    
 
                 }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<Company> GetCompany([FromBody] IdDto companyId)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    Company? company = _companyLogic.Find(companyId.Id);
+                    if (company != null)
+                    {
+                        return Ok(company);
+                    }
+
+                    return BadRequest(Error.NotFoundCompany);
+                }
+
                 return Unauthorized(Error.NotMatchedToken);
 
             }

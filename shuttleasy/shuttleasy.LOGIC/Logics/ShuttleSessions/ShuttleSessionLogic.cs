@@ -65,7 +65,14 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
             return shuttleSessions ;
 
         }
+        public ShuttleSession? FindShuttleSessionById(int sessionNumber)
+        {
+            Func<ShuttleSession, bool> getSessionNumber = getSessionNumber => getSessionNumber.Id == sessionNumber;
+            ShuttleSession? shuttleSessions = _shuttleSessionRepository.GetSingle(getSessionNumber);
+            return shuttleSessions;
 
+        }
+  
     }
 }
 

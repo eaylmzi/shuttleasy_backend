@@ -13,5 +13,6 @@
         public bool IsActive { get; set; }
         public int DestinationId { get; set; }
         public bool Return { get; set; }
+        public string SessionDate { get; set; } = null!;
     }
 }

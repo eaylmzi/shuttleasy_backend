@@ -12,5 +12,6 @@ namespace shuttleasy.DAL.Models
         public double? Rating { get; set; }
         public string PhoneNumber { get; set; } = null!;
         public string Email { get; set; } = null!;
+        public int VotesNumber { get; set; }
     }
 }

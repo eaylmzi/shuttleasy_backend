@@ -22,6 +22,8 @@ using shuttleasy.DAL.Models.dto.Passengers.dto;
 using shuttleasy.DAL.Models.dto.User.dto;
 using System;
 using System.Data;
+using shuttleasy.LOGIC.Logics.Companies;
+using shuttleasy.LOGIC.Logics.ShuttleSessions;
 
 namespace shuttleasy.Services
 {
@@ -38,6 +40,8 @@ namespace shuttleasy.Services
         private readonly IConfiguration _configuration;
         private readonly IMailManager _mailManager;
         private readonly IPassengerRepository _passengerRepository;
+        private readonly ICompanyLogic _companyLogic;
+        private readonly IShuttleSessionLogic _shuttleSessionLogic;
 
 
 
@@ -45,7 +49,8 @@ namespace shuttleasy.Services
         public UserService(IPassengerLogic passengerLogic, IPasswordEncryption passwordEncryption, IMapper mapper,
             IJwtTokenManager jwtTokenManager, IConfiguration configuration, ICompanyWorkerLogic driverLogic,
             IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
-            ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository)
+            ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
+            IShuttleSessionLogic shuttleSessionLogic)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -58,6 +63,8 @@ namespace shuttleasy.Services
             _passwordResetRepository = passwordResetRepository;
             _driverRepository = driverRepository;
             _passengerRepository = passengerRepository;
+            _companyLogic = companyLogic;
+            _shuttleSessionLogic = shuttleSessionLogic;
         }
 
       
@@ -501,7 +508,50 @@ namespace shuttleasy.Services
             return false;
         }
 
+        public bool calculateRating(int sessionId,double rating)
+        {
+            ShuttleSession? shuttleSession  = _shuttleSessionLogic.FindShuttleSessionById(sessionId);
+            if (shuttleSession != null)
+            {
+                int companyID = shuttleSession.CompanyId;
+                Company? company = _companyLogic.Find(companyID);
+                if(company != null)
+                {
+                    int voteNumber = company.VotesNumber;
+                    double? companyRating = company.Rating;
+                    if(companyRating != null)
+                    {
+                        double totalRating = (double)(companyRating * voteNumber);
+                        double newRating = (totalRating + rating) / (voteNumber + 1);
+                        company.Rating = newRating;
+                        company.VotesNumber = voteNumber + 1;
+                        int companyId = company.Id;
+                        bool isUpdated = _companyLogic.Update(companyId, company);
+                        if (isUpdated)
+                        {
+                            return isUpdated;
+                        }
+                        return isUpdated;
+                    }
+                    else
+                    {
+                        company.Rating = rating;
+                        company.VotesNumber = voteNumber + 1;
+                        int companyId = company.Id;
+                        bool isUpdated = _companyLogic.Update(companyId, company);
+                        if (isUpdated)
+                        {
+                            return isUpdated;
+                        }
+                        return isUpdated;
+                    }
+                    
 
+                }
+                return false;
+            }
+            return false;
+        }
 
 
 
