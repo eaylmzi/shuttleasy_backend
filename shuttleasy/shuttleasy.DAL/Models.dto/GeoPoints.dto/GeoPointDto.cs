@@ -10,6 +10,6 @@ namespace shuttleasy.DAL.Models.dto.GeoPoints.dto
     {
         public string Latitude { get; set; } = null!;
         public string Longtitude { get; set; } =null !;
-        public string LocationName { get; set; } = null!;
+        public string? LocationName { get; set; } 
     }
 }

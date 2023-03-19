@@ -19,6 +19,10 @@ using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Globalization;
 using shuttleasy.Route;
+using shuttleasy.DAL.Models.dto.Companies.dto;
+using shuttleasy.LOGIC.Logics.JoinTables;
+using shuttleasy.DAL.Models.dto.PassengerRatingDto;
+using shuttleasy.DAL.Models.dto.JoinTables.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -30,13 +34,15 @@ namespace shuttleasy.Controllers
         private readonly IPassengerLogic _passengerLogic;
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IMapper _mapper;
+        private readonly IJoinTableLogic _joinTableLogic;
         public AdminController(IUserService userService, IPassengerLogic passengerLogic ,ICompanyWorkerLogic driverLogic,
-            IMapper mapper)
+            IMapper mapper, IJoinTableLogic joinTableLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _mapper = mapper;
+            _joinTableLogic = joinTableLogic;
         }
         [HttpPost]
         public ActionResult<CompanyWorkerInfoDto> Login([FromBody]EmailPasswordDto emailPasswordDto)
@@ -127,6 +133,39 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<CommentDetailsDto> GetAllComment()
+        {
+            UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+            if (_userService.VerifyUser(userInformation))
+            {
+               
+                try
+                {
+                    CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
+                    if(companyWorker != null)
+                    {
+                        var list = _joinTableLogic.CommentDetailsInnerJoinTables(companyWorker.CompanyId);
+                        if (list != null)
+                        {
+                            return Ok(list);
+                        }
+                        return BadRequest(Error.EmptyList);
+
+                    }
+                    
+
+
+
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+            return Unauthorized(Error.NotMatchedToken);
         }
 
         [HttpPost]

@@ -22,6 +22,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
 
 
 
+
         public JoinTableLogic()
         {
             CompanyTable = _context.Set<Company>();
@@ -63,6 +64,32 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             return result;
 
          }
+        public List<CommentDetailsDto> CommentDetailsInnerJoinTables(int companyId)
+
+        {
+
+            var result = (from t1 in ShuttleSessionTable
+                          join t2 in PassengerRatingTable on t1.Id equals t2.SessionId
+                          join t3 in PassengerTable on t2.PassengerIdentity equals t3.Id
+                          where t1.CompanyId == companyId
+                          select new CommentDetailsDto
+                          {
+                              PassengerIdentity = t2.PassengerIdentity,
+                              Rating = t2.Rating,
+                              SessionId = t2.SessionId,
+                              Date = t2.Date,
+                              Comment = t2.Comment,
+                              CompanyId = t1.CompanyId,
+                              Name = t3.Name,
+                              Surname = t3.Surname,
+                              ProfilePic = t3.ProfilePic
+                             
+                          }).ToList();
+
+            return result;
+
+        }
+
 
 
     }

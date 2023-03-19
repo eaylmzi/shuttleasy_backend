@@ -16,6 +16,8 @@ using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
 using shuttleasy.Resource;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.LOGIC.Logics.Companies;
+using shuttleasy.DAL.Models.dto.JoinTables.dto;
+using shuttleasy.LOGIC.Logics.JoinTables;
 
 namespace shuttleasy.Controllers
 {
@@ -30,9 +32,10 @@ namespace shuttleasy.Controllers
         private readonly IMapper _mapper;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly ICompanyLogic _companyLogic;
+        private readonly IJoinTableLogic _joinTableLogic;
         public PassengerRatingController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
             IPassengerRatingLogic passengerRatingLogic, IShuttleSessionLogic shuttleSessionLogic, ICompanyLogic companyLogic,
-           IMapper mapper)
+           IMapper mapper, IJoinTableLogic joinTableLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -41,6 +44,7 @@ namespace shuttleasy.Controllers
             _shuttleSessionLogic = shuttleSessionLogic;
             _companyLogic = companyLogic;
             _mapper = mapper;
+            _joinTableLogic = joinTableLogic;
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
@@ -79,6 +83,33 @@ namespace shuttleasy.Controllers
             return Unauthorized(Error.NotMatchedToken);
 
         }
-       
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public ActionResult<bool> GetComment([FromBody] IdDto companyIdDto)
+        {
+            UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+            if (_userService.VerifyUser(userInformation))
+            {
+                try
+                {
+                    var list = _joinTableLogic.CommentDetailsInnerJoinTables(companyIdDto.Id);
+                    if(list != null)
+                    {
+                        return Ok(list);
+                    }
+                    return BadRequest(Error.EmptyList);
+
+
+
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+            return Unauthorized(Error.NotMatchedToken);
+
+        }
+
     }
 }

@@ -10,8 +10,10 @@ namespace shuttleasy.DAL.Interfaces
     {
 
         public bool Add(T entity);
+        public int AddReturnId(T entity);
         public Task<bool> AddAsync(T entity);
         public T? GetSingle(Func<T, bool> metot);
+        public T? GetSingle(Func<T, bool> metot, Func<T, bool> metot2);
         // public Task<T?> GetSingleAsync(Func<T, bool> metot);
         public Task<T?> GetSingleAsync(int number);
         public List<T>? Get();

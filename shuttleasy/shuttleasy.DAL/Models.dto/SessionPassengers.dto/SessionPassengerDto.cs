@@ -9,9 +9,8 @@ namespace shuttleasy.DAL.Models.dto.SessionPassengers.dto
     public class SessionPassengerDto
     {
         public int SessionId { get; set; }
-        public byte[] EstimatedPickupTime { get; set; } = null!;
-        public int PickupOrderNum { get; set; }
-        public string PickupState { get; set; } = null!;
-        public int PickupId { get; set; }
+        public string Longitude { get; set; } = null!;
+        public string Latitude { get; set; } = null!;
+
     }
 }

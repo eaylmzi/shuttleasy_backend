@@ -171,7 +171,7 @@ namespace shuttleasy.DAL
                     .HasMaxLength(50)
                     .HasColumnName("longtitude");
                 entity.Property(e => e.LocationName)
-                   .HasMaxLength(50)
+                   .HasMaxLength(100)
                    .HasColumnName("location_name");
 
             });

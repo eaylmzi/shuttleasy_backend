@@ -95,6 +95,9 @@ builder.Services.AddScoped<IPickupPointLogic, PickupPointLogic>();
 
 builder.Services.AddScoped<IJoinTableLogic, JoinTableLogic>();
 
+builder.Services.AddScoped<IGeoPointLogic, GeoPointLogic>();
+builder.Services.AddScoped<IGeoPointRepository, GeoPointRepository>();
+
 
 
 

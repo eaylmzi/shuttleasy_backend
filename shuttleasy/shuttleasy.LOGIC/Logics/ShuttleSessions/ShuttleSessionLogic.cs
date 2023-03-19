@@ -72,7 +72,13 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
             return shuttleSessions;
 
         }
-  
+        public async Task<bool> UpdateAsync(int id, ShuttleSession updatedShuttleSession)
+        {
+            Func<ShuttleSession, bool> getCompanyNumber = getCompanyNumber => getCompanyNumber.Id == id;
+            bool isUpdated = await _shuttleSessionRepository.UpdateAsync(getCompanyNumber, updatedShuttleSession);
+            return isUpdated;
+        }
+
     }
 }
 

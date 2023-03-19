@@ -23,6 +23,10 @@ using shuttleasy.Resource;
 using shuttleasy.DAL.EFRepositories.ShuttleSessionSearch;
 using shuttleasy.LOGIC.Logics.ShuttleSessionSearch;
 using shuttleasy.LOGIC.Logics.JoinTables;
+using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
+using shuttleasy.LOGIC.Logics.SessionPassengers;
+using shuttleasy.LOGIC.Logics.GeoPoints;
+using shuttleasy.DAL.Models.dto.GeoPoints.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -38,10 +42,12 @@ namespace shuttleasy.Controllers
         private readonly IMapper _mapper;
         private readonly IJoinTableLogic _joinTableLogic;
         private readonly ICompanyLogic _companyLogic;
+        private readonly ISessionPassengerLogic _sessionPassengerLogic;
+        private readonly IGeoPointLogic _geoPointLogic;
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
                     IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper, IJoinTableLogic joinTableLogic,
-                    ICompanyLogic companyLogic)
+                    ICompanyLogic companyLogic, ISessionPassengerLogic sessionPassengerLogic, IGeoPointLogic geoPointLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -51,6 +57,8 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
             _joinTableLogic = joinTableLogic;
             _companyLogic = companyLogic;
+            _sessionPassengerLogic = sessionPassengerLogic;
+            _geoPointLogic = geoPointLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> CreateShuttleSession([FromBody] ShuttleSessionDto shuttleSessionDto)
@@ -185,6 +193,81 @@ namespace shuttleasy.Controllers
                         return Ok(shuttleSession);
                     }
                     return BadRequest(Error.NotFoundShuttleSession);
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public async Task<ActionResult<bool>> EnrollPassenger([FromBody] SessionPassengerDto sessionPassengerDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionPassengerDto.SessionId);
+                    if(shuttleSession != null)
+                    {
+                        shuttleSession.PassengerCount = shuttleSession.PassengerCount + 1;
+                        await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
+
+                        GeoPoint geoPoint = new GeoPoint();
+                        geoPoint.Longtitude = sessionPassengerDto.Longitude;
+                        geoPoint.Latitude = sessionPassengerDto.Latitude;
+                        int? geoPointId = _geoPointLogic.AddReturnId(geoPoint);
+                        SessionPassenger sessionPassenger = _mapper.Map<SessionPassenger>(sessionPassengerDto);
+                        
+                        if (geoPointId != null)
+                        {
+                            sessionPassenger.PickupId = geoPointId;
+                        }
+                        //BURAYI SONRA SİLECEKSİN
+                        sessionPassenger.PickupOrderNum = null;
+                        sessionPassenger.PickupState = null;
+                        sessionPassenger.EstimatedPickupTime = null;
+                        bool isAdded = _sessionPassengerLogic.Add(sessionPassenger);
+                        if (isAdded)
+                        {
+                            return Ok(isAdded);
+
+                        }
+                        return BadRequest(isAdded);
+
+
+                    }
+                    return BadRequest(Error.NotFoundShuttleSession);
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<bool> DeleteSessionPassenger([FromBody] IdDto idDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    bool isAdded = _sessionPassengerLogic.Delete(idDto.Id);
+                    if (isAdded)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(isAdded);
 
 
                 }

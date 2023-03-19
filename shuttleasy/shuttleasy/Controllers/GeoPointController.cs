@@ -116,5 +116,10 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<string> Lalalalalal()
+        {
+            return Ok("lalalalalal");
+        }
     }
 }

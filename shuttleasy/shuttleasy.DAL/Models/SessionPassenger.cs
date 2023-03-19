@@ -7,9 +7,9 @@ namespace shuttleasy.DAL.Models
     {
         public int Id { get; set; }
         public int SessionId { get; set; }
-        public byte[] EstimatedPickupTime { get; set; } = null!;
-        public int PickupOrderNum { get; set; }
-        public string PickupState { get; set; } = null!;
-        public int PickupId { get; set; }
+        public byte[]? EstimatedPickupTime { get; set; } 
+        public int? PickupOrderNum { get; set; }
+        public string? PickupState { get; set; }
+        public int? PickupId { get; set; }
     }
 }

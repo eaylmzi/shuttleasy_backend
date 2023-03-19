@@ -16,5 +16,6 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
         public List<ShuttleSession>? GetAllSessionsWithCompanyId(int companyId);
         public List<ShuttleSession>? FindShuttleSessionWithDestinationName(string destinationName);
         public ShuttleSession? FindShuttleSessionById(int sessionNumber);
+        public Task<bool> UpdateAsync(int id, ShuttleSession updatedShuttleSession);
     }
 }

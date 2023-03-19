@@ -108,6 +108,25 @@ namespace shuttleasy.DAL.Interfaces
                 };
             }
         }
+        public int AddReturnId(T entity)
+        {
+            using (var context = new ShuttleasyDBContext())
+            {
+                if (entity != null)
+                {
+                    context.Set<T>().Add(entity);
+                    context.SaveChanges();
+
+                    // Get the generated primary key value from the entity object
+                    var id = context.Entry(entity).Property("Id").CurrentValue;
+                    return (int)id;
+                }
+                else
+                {
+                   throw new ArgumentNullException(); // or throw an exception
+                }
+            }
+        }
         public async Task<bool> AddAsync(T entity)
         {
             using (var context = new ShuttleasyDBContext())
@@ -132,6 +151,18 @@ namespace shuttleasy.DAL.Interfaces
                       .Where(metot)
                       .Select(m => m)
                       .SingleOrDefault();
+
+
+            return entity;
+        }
+        public T? GetSingle(Func<T, bool> metot , Func<T, bool> metot2)
+        {
+            T? entity = query
+                      .AsEnumerable()
+                      .Where(m => metot(m) && metot2(m))
+                      .Select(m => m)
+                      .SingleOrDefault();
+
 
 
             return entity;

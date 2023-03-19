@@ -19,6 +19,11 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
             bool isAdded = _geoPointRepository.Add(geoPoint);
             return isAdded;
         }
+        public int? AddReturnId(GeoPoint geoPoint)
+        {
+            int? isAdded = _geoPointRepository.AddReturnId(geoPoint);
+            return isAdded;
+        }
         public async Task<bool> AddAsync(GeoPoint geoPoint)
         {
             bool isAdded = await _geoPointRepository.AddAsync(geoPoint);
@@ -29,6 +34,12 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
             Func<GeoPoint, bool> getGeoPointNumber = getGeoPointNumber => getGeoPointNumber.Id == geoPointNumber;
             bool isDeleted = _geoPointRepository.Delete(getGeoPointNumber);
             return isDeleted;
+        }
+        public GeoPoint? Find(int geoPointId)
+        {
+            Func<GeoPoint, bool> getGeoPointId = getGeoPointId => getGeoPointId.Id == geoPointId;       
+            GeoPoint? isFound = _geoPointRepository.GetSingle(getGeoPointId);
+            return isFound;
         }
         public List<GeoPoint>? GetAll()
         {
