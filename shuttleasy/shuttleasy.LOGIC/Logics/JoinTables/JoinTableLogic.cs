@@ -18,21 +18,26 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<Company> CompanyTable { get; set; }
         private DbSet<ShuttleSession> ShuttleSessionTable { get; set; }
         private DbSet<PassengerRating> PassengerRatingTable { get; set; }
-        private DbSet<SessionPassenger> SessionPassengerTable { get; set; }
-        private DbSet<Passenger> PassengerTable { get; set; }
-        private DbSet<GeoPoint> GeoPointTable { get; set; }
-
-
-
        
-    
-        
+        private DbSet<Passenger> PassengerTable { get; set; }
+        private DbSet<SessionPassenger> SessionPassengerTable { get; set; }
+        private DbSet<GeoPoint> GeoPointTable { get; set; }
+        private DbSet<ShuttleBus> ShuttleBusTable { get; set; }
+
+
+
+
+
+
         public JoinTableLogic()
         {
             CompanyTable = _context.Set<Company>();
             ShuttleSessionTable = _context.Set<ShuttleSession>();
             PassengerRatingTable = _context.Set<PassengerRating>();
             PassengerTable = _context.Set<Passenger>();
+            SessionPassengerTable = _context.Set<SessionPassenger>();
+            GeoPointTable = _context.Set<GeoPoint>(); 
+            ShuttleBusTable = _context.Set<ShuttleBus>();
         }
 
 
@@ -40,6 +45,18 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<ShuttleDetailsGroupDto> ShuttleDetailsInnerJoinTables(string destinationName)
 
          {
+            if (CompanyTable == null )
+            {
+                // Handle the null tables here or throw an exception
+            }
+            if ( ShuttleSessionTable == null )
+            {
+                // Handle the null tables here or throw an exception
+            }
+            if (ShuttleBusTable == null)
+            {
+                // Handle the null tables here or throw an exception
+            }
 
             var result = (from t1 in CompanyTable
                           join t2 in ShuttleSessionTable on t1.Id equals t2.CompanyId
@@ -48,14 +65,55 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           from pr in passengerRatings.DefaultIfEmpty()
                           join t4 in PassengerTable
                               on pr.PassengerIdentity equals t4.Id into passengers
-                          from p in passengers.DefaultIfEmpty()                         
+                          from p in passengers.DefaultIfEmpty()
+
+                          join t5 in ShuttleBusTable on t2.BusId equals t5.Id 
+                          join t6 in GeoPointTable on t2.FinalGeopoint equals t6.Id
                           where t2.DestinationName == destinationName
                           select new ShuttleDetailsDto
                           {
                               CompanyDetails = t1,
-                              ShuttleSessionDeparture = t2.Return == false ? t2 : null,
-                              ShuttleSessionReturn = t2.Return == true ? t2 : null,
-                             
+                              ShuttleSessionDeparture = t2.Return == false ? new ShuttleSessionDetailsDto
+                              {
+                                  Id = t2.Id,
+                                  CompanyId = t2.CompanyId,
+                                  BusId = t2.BusId,
+                                  PassengerCount = t2.PassengerCount,
+                                  StartTime = t2.StartTime,
+                                  DriverId = t2.DriverId,
+                                  IsActive = t2.IsActive,
+                                  Longitude = t6.Longtitude,
+                                  Latitude = t6.Latitude,
+                                  DestinationName = t2.DestinationName,
+                                  Return = t2.Return,
+                                  SessionDate = t2.SessionDate,
+                                  Capacity = t5.Capacity,
+                                  BusModel = t5.BusModel,
+                                  LicensePlate = t5.LicensePlate,
+                                  State = t5.State
+
+                              } : null,
+                              ShuttleSessionReturn = t2.Return == true ? new ShuttleSessionDetailsDto
+                              {
+                                  Id = t2.Id,
+                                  CompanyId = t2.CompanyId,
+                                  BusId = t2.BusId,
+                                  PassengerCount = t2.PassengerCount,
+                                  StartTime = t2.StartTime,
+                                  DriverId = t2.DriverId,
+                                  IsActive = t2.IsActive,
+                                  Longitude = t6.Longtitude,
+                                  Latitude = t6.Latitude,
+                                  DestinationName = t2.DestinationName,
+                                  Return = t2.Return,
+                                  SessionDate = t2.SessionDate,
+                                  Capacity = t5.Capacity,
+                                  BusModel = t5.BusModel,
+                                  LicensePlate = t5.LicensePlate,
+                                  State = t5.State
+
+                              } : null,
+
                           }).ToList();
 
             var groupedResult = result.GroupBy(x => x.CompanyDetails.Id)

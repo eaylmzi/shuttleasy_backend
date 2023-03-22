@@ -11,8 +11,8 @@ namespace shuttleasy.DAL.Models.dto.JoinTables.dto
     public class ShuttleDetailsDto
     {
         public Company CompanyDetails { get; set; } = null!;
-        public ShuttleSession ShuttleSessionDeparture { get; set; } = null!;
-        public ShuttleSession ShuttleSessionReturn { get; set; } = null!;
+        public ShuttleSessionDetailsDto ShuttleSessionDeparture { get; set; } = null!;
+        public ShuttleSessionDetailsDto ShuttleSessionReturn { get; set; } = null!;
 
     }
 }

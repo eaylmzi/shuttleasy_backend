@@ -21,5 +21,9 @@ namespace shuttleasy.DAL.Models.dto.JoinTables.dto
         public string? DestinationName { get; set; }
         public bool Return { get; set; }
         public string SessionDate { get; set; } = null!;
+        public int Capacity { get; set; }
+        public string BusModel { get; set; } = null!;
+        public string LicensePlate { get; set; } = null!;
+        public bool? State { get; set; }
     }
 }

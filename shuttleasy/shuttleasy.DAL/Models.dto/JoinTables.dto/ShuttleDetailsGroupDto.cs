@@ -9,7 +9,7 @@ namespace shuttleasy.DAL.Models.dto.JoinTables.dto
     public class ShuttleDetailsGroupDto
     {
         public Company CompanyDetail { get; set; }
-        public List<ShuttleSession> ShuttleSessionDeparture { get; set; }
-        public List<ShuttleSession> ShuttleSessionReturn { get; set; }
+        public List<ShuttleSessionDetailsDto> ShuttleSessionDeparture { get; set; }
+        public List<ShuttleSessionDetailsDto> ShuttleSessionReturn { get; set; }
     }
 }
