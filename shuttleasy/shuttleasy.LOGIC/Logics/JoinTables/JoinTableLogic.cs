@@ -23,6 +23,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<SessionPassenger> SessionPassengerTable { get; set; }
         private DbSet<GeoPoint> GeoPointTable { get; set; }
         private DbSet<ShuttleBus> ShuttleBusTable { get; set; }
+        private DbSet<PickupPoint> PickupPointTable { get; set; }
 
 
 
@@ -38,6 +39,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             SessionPassengerTable = _context.Set<SessionPassenger>();
             GeoPointTable = _context.Set<GeoPoint>(); 
             ShuttleBusTable = _context.Set<ShuttleBus>();
+            PickupPointTable = _context.Set<PickupPoint>();
         }
 
 
@@ -132,6 +134,84 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             return groupedResult;
 
         }
+        public List<ShuttleDetailsGroupDto> ShuttleDetailsByGeoPointInnerJoinTables(string longitude,string latitude)
+
+        {
+
+
+            var result = (from t1 in CompanyTable
+                          join t2 in ShuttleSessionTable on t1.Id equals t2.CompanyId
+                          join t3 in PassengerRatingTable
+                              on t2.Id equals t3.SessionId into passengerRatings
+                          from pr in passengerRatings.DefaultIfEmpty()
+                          join t4 in PassengerTable
+                              on pr.PassengerIdentity equals t4.Id into passengers
+                          from p in passengers.DefaultIfEmpty()
+                          join t5 in ShuttleBusTable on t2.BusId equals t5.Id
+                          join t6 in GeoPointTable on t2.FinalGeopoint equals t6.Id
+                          where t6.Longtitude == longitude && t6.Latitude ==latitude
+                          select new ShuttleDetailsDto
+                          {
+                              CompanyDetails = t1,
+                              ShuttleSessionDeparture = t2.Return == false ? new ShuttleSessionDetailsDto
+                              {
+                                  Id = t2.Id,
+                                  CompanyId = t2.CompanyId,
+                                  BusId = t2.BusId,
+                                  PassengerCount = t2.PassengerCount,
+                                  StartTime = t2.StartTime,
+                                  DriverId = t2.DriverId,
+                                  IsActive = t2.IsActive,
+                                  Longitude = t6.Longtitude,
+                                  Latitude = t6.Latitude,
+                                  DestinationName = t2.DestinationName,
+                                  Return = t2.Return,
+                                  SessionDate = t2.SessionDate,
+                                  Capacity = t5.Capacity,
+                                  BusModel = t5.BusModel,
+                                  LicensePlate = t5.LicensePlate,
+                                  State = t5.State
+
+                              } : null,
+                              ShuttleSessionReturn = t2.Return == true ? new ShuttleSessionDetailsDto
+                              {
+                                  Id = t2.Id,
+                                  CompanyId = t2.CompanyId,
+                                  BusId = t2.BusId,
+                                  PassengerCount = t2.PassengerCount,
+                                  StartTime = t2.StartTime,
+                                  DriverId = t2.DriverId,
+                                  IsActive = t2.IsActive,
+                                  Longitude = t6.Longtitude,
+                                  Latitude = t6.Latitude,
+                                  DestinationName = t2.DestinationName,
+                                  Return = t2.Return,
+                                  SessionDate = t2.SessionDate,
+                                  Capacity = t5.Capacity,
+                                  BusModel = t5.BusModel,
+                                  LicensePlate = t5.LicensePlate,
+                                  State = t5.State
+
+                              } : null,
+
+                          }).ToList();
+
+            var groupedResult = result.GroupBy(x => x.CompanyDetails.Id)
+                                      .Select(g => new ShuttleDetailsGroupDto
+                                      {
+                                          CompanyDetail = g.First().CompanyDetails,
+                                          ShuttleSessionDeparture = g.Where(x => x.ShuttleSessionDeparture != null)
+                                                                      .Select(x => x.ShuttleSessionDeparture)
+                                                                      .ToList(),
+                                          ShuttleSessionReturn = g.Where(x => x.ShuttleSessionReturn != null)
+                                                                   .Select(x => x.ShuttleSessionReturn)
+                                                                   .ToList(),
+
+                                      }).ToList();
+
+            return groupedResult;
+
+        }
         public List<CommentDetailsDto> CommentDetailsInnerJoinTables(int companyId)
 
         {
@@ -196,6 +276,30 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             return groupedResult;
 
         }
+        public List<PassengerShuttleDetailsDto> PassengerShuttleInnerJoinTables(int userId)
+
+        {
+
+            var result = (from t1 in SessionPassengerTable
+                          join t2 in PickupPointTable on t1.PickupId equals t2.Id
+                          where t2.UserId == userId
+
+                          select new PassengerShuttleDetailsDto
+                          {
+                              Id =t1.Id,
+                              SessionId = t1.SessionId,
+                              EstimatedPickupTime = t1.EstimatedPickupTime,
+                              PickupOrderNum = t1.PickupOrderNum,
+                              PickupState = t1.PickupState,
+                              PickupId = t1.PickupId,
+                              UserId = t2.UserId,
+                              GeoPointId = t2.GeoPointId,
+                          }).ToList();
+            return result;
+           
+
+        }
+
         public List<SessionGeoPointsDto> SessionGeoPointsInnerJoinTables(int? sessionId)
 
         {

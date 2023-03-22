@@ -92,7 +92,7 @@ namespace shuttleasy.Controllers
                 try
                 {
                     var list = _joinTableLogic.CommentDetailsInnerJoinTables(companyIdDto.Id);
-                    if(list != null)
+                    if(list.Capacity != 0)
                     {
                         return Ok(list);
                     }

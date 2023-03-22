@@ -195,7 +195,7 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     var list = _joinTableLogic.CompanyDetailsInnerJoinTables(companyId.Id);
-                    if(list != null)
+                    if(list.Capacity != 0)
                     {
                         return Ok(list);
                     }

@@ -29,6 +29,7 @@ using shuttleasy.DAL.Models.dto.User.dto;
 using System.Data;
 using Microsoft.Net.Http.Headers;
 using shuttleasy.Resource;
+using shuttleasy.LOGIC.Logics.JoinTables;
 
 namespace shuttleasy.Controllers
 {
@@ -40,16 +41,18 @@ namespace shuttleasy.Controllers
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IPasswordEncryption _passwordEncryption;
+        private readonly IJoinTableLogic _joinTableLogic;
         PassengerString message = new PassengerString();
         
 
         public PassengerController(IMapper mapper,IUserService userService,
-            IPasswordEncryption passwordEncryption, IPassengerLogic passengerLogic)
+            IPasswordEncryption passwordEncryption, IPassengerLogic passengerLogic, IJoinTableLogic joinTableLogic)
         {
             _passengerLogic = passengerLogic;
             _mapper = mapper;
             _userService = userService;
             _passwordEncryption = passwordEncryption;
+            _joinTableLogic = joinTableLogic;
         }
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
@@ -203,6 +206,30 @@ namespace shuttleasy.Controllers
                         return Ok(passengerInfoDto);
                     }
                     return BadRequest(Error.NotFoundPassenger);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<PassengerInfoDto> GetMyShuttleSessions()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
+                    var list = _joinTableLogic.PassengerShuttleInnerJoinTables(userId);
+                    if(list.Capacity != 0)
+                    {
+                        return Ok(list);
+                    }
+                    return BadRequest(Error.EmptyList);
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }

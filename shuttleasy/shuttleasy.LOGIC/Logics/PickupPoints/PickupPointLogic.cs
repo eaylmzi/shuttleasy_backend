@@ -21,6 +21,11 @@ namespace shuttleasy.LOGIC.Logics.PickupPoints
             bool isAdded = _pickupPointRepository.Add(pickupPoint);
             return isAdded;
         }
+        public int? AddReturnId(PickupPoint pickupPoint)
+        {
+            int? isAdded = _pickupPointRepository.AddReturnId(pickupPoint);
+            return isAdded;
+        }
         public bool Delete(int pickupPointNumber)
         {
             Func<PickupPoint, bool> getPickupPointNumber = getPickupPointNumber => getPickupPointNumber.Id == pickupPointNumber;

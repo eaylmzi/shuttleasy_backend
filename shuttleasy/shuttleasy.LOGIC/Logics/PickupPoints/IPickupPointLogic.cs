@@ -10,6 +10,7 @@ namespace shuttleasy.LOGIC.Logics.PickupPoints
     public interface IPickupPointLogic
     {
         public bool Add(PickupPoint pickupPoint);
+        public int? AddReturnId(PickupPoint pickupPoint);
         public bool Delete(int pickupPointNumber);
     }
 }

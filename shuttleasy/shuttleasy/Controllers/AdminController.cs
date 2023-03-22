@@ -147,7 +147,7 @@ namespace shuttleasy.Controllers
                     if(companyWorker != null)
                     {
                         var list = _joinTableLogic.CommentDetailsInnerJoinTables(companyWorker.CompanyId);
-                        if (list != null)
+                        if (list.Capacity != 0)
                         {
                             return Ok(list);
                         }
