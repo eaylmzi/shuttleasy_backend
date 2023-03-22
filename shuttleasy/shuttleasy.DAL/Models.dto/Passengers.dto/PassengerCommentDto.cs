@@ -13,5 +13,6 @@ namespace shuttleasy.DAL.Models.dto.Passengers.dto
         public string Comments { get; set; } = null!;
         public DateTime Date { get; set; }
         public byte[]? ProfilePic { get; set; }
+        public int Rating { get; set; }
     }
 }

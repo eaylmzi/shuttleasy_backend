@@ -15,6 +15,7 @@ using shuttleasy.Resource;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.DAL.Models.dto.Companies.dto;
+using static shuttleasy.LOGIC.Logics.JoinTables.JoinTableLogic;
 
 namespace shuttleasy.Controllers
 {
@@ -186,20 +187,19 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<Company> GetCompany([FromBody] IdDto companyId)
+        public ActionResult<CompanyDetailGroupDto> GetCompany([FromBody] IdDto companyId)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    Company? company = _companyLogic.Find(companyId.Id);
-                    if (company != null)
+                    var list = _joinTableLogic.CompanyDetailsInnerJoinTables(companyId.Id);
+                    if(list != null)
                     {
-                        return Ok(company);
+                        return Ok(list);
                     }
-
-                    return BadRequest(Error.NotFoundCompany);
+                    return BadRequest(Error.EmptyList);
                 }
 
                 return Unauthorized(Error.NotMatchedToken);

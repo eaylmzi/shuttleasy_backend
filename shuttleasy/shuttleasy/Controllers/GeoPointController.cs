@@ -117,6 +117,30 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<GeoPoint> GetGeoPoint([FromBody] IdDto idDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    GeoPoint? geoPoint = _geoPointLogic.Find(idDto.Id);
+                    if(geoPoint != null)
+                    {
+                        return Ok(geoPoint);
+                    }
+                    return BadRequest(Error.NotFound);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<string> Lalalalalal()
         {
             return Ok("lalalalalal");

@@ -34,6 +34,7 @@ namespace shuttleasy.Controllers
             _sessionPassengerLogic = sessionPassengerLogic;
             _mapper = mapper;
         }
+        /*
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<bool> AddSessionPassenger([FromBody] SessionPassengerDto sessionPassengerDto)
         {
@@ -85,5 +86,6 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        */
     }
 }

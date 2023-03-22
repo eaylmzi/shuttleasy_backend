@@ -27,6 +27,7 @@ using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
 using shuttleasy.LOGIC.Logics.SessionPassengers;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.DAL.Models.dto.GeoPoints.dto;
+using shuttleasy.DAL.Models.dto.JoinTables.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -156,7 +157,7 @@ namespace shuttleasy.Controllers
         }
         
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<List<ShuttleSession>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
+        public ActionResult<List<ShuttleDetailsDto>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
         {
             try
             {
@@ -204,6 +205,33 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        /*
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<List<ShuttleSession>> GetLocationList([FromBody] IdDto sessionDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    int sessionId = sessionDto.Id;
+                    var list = _joinTableLogic.SessionGeoPointsInnerJoinTables(sessionId);
+                    if (list != null) 
+                    {
+                        return Ok(list);
+                    }
+                    return BadRequest(Error.EmptyList);
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        */
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public async Task<ActionResult<bool>> EnrollPassenger([FromBody] SessionPassengerDto sessionPassengerDto)
