@@ -11,6 +11,8 @@ using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Resource.String;
 using shuttleasy.Resource;
 using shuttleasy.DAL.Models.dto.GeoPoints.dto;
+using Microsoft.EntityFrameworkCore;
+using shuttleasy.LOGIC.Logics.PickupAreas;
 
 namespace shuttleasy.Controllers
 {
@@ -23,14 +25,16 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IGeoPointLogic _geoPointLogic;
         private readonly IMapper _mapper;
+        private readonly IPickupAreaLogic _pickupAreaLogic;
         public GeoPointController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,IGeoPointLogic geoPointLogic,
-           IMapper mapper)
+           IMapper mapper, IPickupAreaLogic pickupAreaLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _geoPointLogic = geoPointLogic; 
             _mapper = mapper;
+            _pickupAreaLogic = pickupAreaLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public async Task<ActionResult<bool>> AddGeoPoint([FromBody] GeoPointDto geoPointDto)
@@ -41,6 +45,11 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     GeoPoint geoPoint = _mapper.Map<GeoPoint>(geoPointDto);
+                    int? isAddedGeoPoint = _geoPointLogic.FindByCoordinate(geoPoint.Longtitude, geoPoint.Latitude);
+                    if(isAddedGeoPoint != null)
+                    {
+                        return BadRequest(Error.AlreadyFound);
+                    }
                     bool isAdded = await _geoPointLogic.AddAsync(geoPoint);
                     if (isAdded)
                     {

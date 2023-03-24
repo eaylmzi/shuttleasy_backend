@@ -79,6 +79,11 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
             bool isUpdated = await _shuttleSessionRepository.UpdateAsync(getCompanyNumber, updatedShuttleSession);
             return isUpdated;
         }
+        public int? AddReturnId(ShuttleSession shuttleSession)
+        {
+            int? shuttleId = _shuttleSessionRepository.AddReturnId(shuttleSession);
+            return shuttleId;
+        }
 
     }
 }

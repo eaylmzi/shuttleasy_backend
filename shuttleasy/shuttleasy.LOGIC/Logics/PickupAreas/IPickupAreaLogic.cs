@@ -11,5 +11,7 @@ namespace shuttleasy.LOGIC.Logics.PickupAreas
     {
         public bool Add(PickupArea pickupArea);
         public bool Delete(int pickupAreaNumber);
+        public PickupArea? Find(int sessionId);
+        public bool DeleteBySessionId(int sessionId);
     }
 }

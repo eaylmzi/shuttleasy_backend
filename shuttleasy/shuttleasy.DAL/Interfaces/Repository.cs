@@ -157,6 +157,7 @@ namespace shuttleasy.DAL.Interfaces
         }
         public T? GetSingle(Func<T, bool> metot , Func<T, bool> metot2)
         {
+
             T? entity = query
                       .AsEnumerable()
                       .Where(m => metot(m) && metot2(m))
@@ -177,6 +178,20 @@ namespace shuttleasy.DAL.Interfaces
         {
             return await query.FindAsync(number);
         }
-
+        public int? GetId(Func<T, bool> metot, Func<T, bool> metot2)
+        {
+            using (var context = new ShuttleasyDBContext())
+            {
+                // Belirtilen kriterlere göre tek bir entity seçin veya yoksa null dönün
+                T? entity = context.Set<T>().AsEnumerable()
+                    .SingleOrDefault(m => metot(m) && metot2(m));
+                if (entity == null)
+                {
+                    return null;
+                }
+                // Seçilen entity'nin Id özelliğini döndürün
+                return (int)context.Entry(entity).Property("Id").CurrentValue;
+            }
+        }
     }
 }

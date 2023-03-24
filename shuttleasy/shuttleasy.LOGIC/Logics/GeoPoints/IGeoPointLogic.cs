@@ -15,6 +15,7 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
         public bool Delete(int geoPointNumber);
         public List<GeoPoint>? GetAll();
         public GeoPoint? Find(int geoPointId);
+        public int? FindByCoordinate(string longitude, string latitude);
       //  public Task<GeoPoint?> GetGeoPointWithLocationName(string locationName);
 
     }

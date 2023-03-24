@@ -8,6 +8,7 @@ namespace shuttleasy.DAL.Resource.String
 {
     public static class Error
     {
+        public const string AlreadyFound = "The item is already in table";
         public const string EmptyList = "The list is empty";
         public const string ForeignRequest = "The user and the person who sent the request are not the same";
         public const string FoundEmailOrTelephone = "Registered with this email or phone";
@@ -15,6 +16,7 @@ namespace shuttleasy.DAL.Resource.String
         public const string NotCreatedUser = "Registered with this email or phone";
         public const string NotCorrectEmailAndPassword = "Email and password not correct";
         public const string NotDeletedPassenger = "The passenger not deleted";
+        public const string NotDeletedPickupArea = "The pick-up area not deleted";
         public const string NotFoundAdmin = "The admin not found in list";
         public const string NotFoundCompany = "Not found company";
         public const string NotFoundShuttleSession = "Not Found Shuttle Session";

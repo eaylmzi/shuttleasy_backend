@@ -29,6 +29,8 @@ using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.DAL.Models.dto.GeoPoints.dto;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.LOGIC.Logics.PickupPoints;
+using Microsoft.EntityFrameworkCore;
+using shuttleasy.LOGIC.Logics.PickupAreas;
 
 namespace shuttleasy.Controllers
 {
@@ -46,12 +48,13 @@ namespace shuttleasy.Controllers
         private readonly ICompanyLogic _companyLogic;
         private readonly ISessionPassengerLogic _sessionPassengerLogic;
         private readonly IGeoPointLogic _geoPointLogic;
+        private readonly IPickupAreaLogic _pickupAreaLogic;
         private readonly IPickupPointLogic _pickupPointLogic;
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
                     IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper, IJoinTableLogic joinTableLogic,
                     ICompanyLogic companyLogic, ISessionPassengerLogic sessionPassengerLogic, IGeoPointLogic geoPointLogic,
-                    IPickupPointLogic pickupPointLogic)
+                    IPickupAreaLogic pickupAreaLogic, IPickupPointLogic pickupPointLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -63,7 +66,9 @@ namespace shuttleasy.Controllers
             _companyLogic = companyLogic;
             _sessionPassengerLogic = sessionPassengerLogic;
             _geoPointLogic = geoPointLogic;
+            _pickupAreaLogic = pickupAreaLogic;
             _pickupPointLogic = pickupPointLogic;
+
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> CreateShuttleSession([FromBody] ShuttleSessionDto shuttleSessionDto)
@@ -82,12 +87,12 @@ namespace shuttleasy.Controllers
                         // byte[] timeStampBytes = Encoding.ASCII.GetBytes(timeStamp); //STRİNG TO TİMESTAMP YAPÇAN
                         // shuttleSession.StartTime = DateTime.Now;
                         //Shuttlesessionda timestamp ve dateyi sor
-                        bool isAdded = _shuttleSessionLogic.CreateShuttleSession(shuttleSession);
-                        if (isAdded)
+                        int? isAdded = _shuttleSessionLogic.AddReturnId(shuttleSession);
+                        if (isAdded != 0)
                         {
                             return Ok(isAdded);
                         }
-                        return BadRequest(isAdded);
+                        return BadRequest(Error.NotFound);
                     }
                     return BadRequest(Error.NotFoundUser);
 
@@ -115,12 +120,19 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(TokenHelper.GetUserIdFromRequestToken(Request.Headers));
                     if (companyWorker != null)
                     {
-                        bool isAdded = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
-                        if (isAdded)
+                        bool isDeleted = _pickupAreaLogic.DeleteBySessionId(idDto.Id);
+                        if (isDeleted)
                         {
-                            return Ok(isAdded);
+                            bool isDeletedShuttle = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
+                            if (isDeletedShuttle)
+                            {
+                                return Ok(isDeletedShuttle);
+                            }
+                            return BadRequest(isDeletedShuttle);
+
                         }
-                        return BadRequest(isAdded);
+                        return BadRequest(Error.NotDeletedPickupArea);
+                       
                     }
                     return BadRequest(Error.NotFoundUser);
                 }
@@ -248,20 +260,16 @@ namespace shuttleasy.Controllers
                     ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionPassengerDto.SessionId);
                     if(shuttleSession != null)
                     {
-                        shuttleSession.PassengerCount = shuttleSession.PassengerCount + 1;
-                        await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
-
                         GeoPoint geoPoint = new GeoPoint();
                         geoPoint.Longtitude = sessionPassengerDto.Longitude;
                         geoPoint.Latitude = sessionPassengerDto.Latitude;
-                        int? geoPointId = _geoPointLogic.AddReturnId(geoPoint);
-                        int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
+                        int? geoPointId = _geoPointLogic.FindByCoordinate(geoPoint.Longtitude, geoPoint.Latitude);
 
-                        
+                        int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
+                        shuttleSession.PassengerCount = shuttleSession.PassengerCount + 1;
+                        await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
                         SessionPassenger sessionPassenger = _mapper.Map<SessionPassenger>(sessionPassengerDto);
                         PickupPoint pickupPoint = new PickupPoint();
-                        
-                        
                         if (geoPointId != null)
                         {
                             pickupPoint.GeoPointId = (int)geoPointId;
@@ -269,6 +277,15 @@ namespace shuttleasy.Controllers
                             int? pickUpId = _pickupPointLogic.AddReturnId(pickupPoint);
                             sessionPassenger.PickupId = pickUpId;
                         }
+                        else
+                        {
+                            int? addedGeoPointId = _geoPointLogic.AddReturnId(geoPoint);
+                            pickupPoint.GeoPointId = (int)addedGeoPointId;
+                            pickupPoint.UserId = userId;
+                            int? pickUpId = _pickupPointLogic.AddReturnId(pickupPoint);
+                            sessionPassenger.PickupId = pickUpId;
+                        }
+
                         //BURAYI SONRA SİLECEKSİN
                         sessionPassenger.PickupOrderNum = null;
                         sessionPassenger.PickupState = null;
@@ -287,6 +304,10 @@ namespace shuttleasy.Controllers
 
                 }
                 return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException(Error.AlreadyFound);
             }
             catch (Exception ex)
             {

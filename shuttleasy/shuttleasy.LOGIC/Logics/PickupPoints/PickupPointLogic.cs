@@ -32,5 +32,6 @@ namespace shuttleasy.LOGIC.Logics.PickupPoints
             bool isDeleted = _pickupPointRepository.Delete(getPickupPointNumber);
             return isDeleted;
         }
+       
     }
 }

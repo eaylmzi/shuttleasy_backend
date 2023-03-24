@@ -1,5 +1,7 @@
-﻿using shuttleasy.DAL.EFRepositories.GeoPoints;
+﻿using Microsoft.EntityFrameworkCore;
+using shuttleasy.DAL.EFRepositories.GeoPoints;
 using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Resource.String;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,13 +23,29 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
         }
         public int? AddReturnId(GeoPoint geoPoint)
         {
-            int? isAdded = _geoPointRepository.AddReturnId(geoPoint);
-            return isAdded;
+            try
+            {
+                int? isAdded = _geoPointRepository.AddReturnId(geoPoint);
+                return isAdded;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException(Error.AlreadyFound);
+            }
+           
         }
         public async Task<bool> AddAsync(GeoPoint geoPoint)
         {
-            bool isAdded = await _geoPointRepository.AddAsync(geoPoint);
-            return isAdded;
+            try
+            {
+                bool isAdded = await _geoPointRepository.AddAsync(geoPoint);
+                return isAdded;
+            }
+            catch(DbUpdateException ex)
+            {
+                throw new DbUpdateException(Error.AlreadyFound);
+            }
+                
         }
         public bool Delete(int geoPointNumber) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
@@ -46,6 +64,14 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
             List<GeoPoint>? geoPointList = _geoPointRepository.Get();
             return geoPointList;
         }
+        public int? FindByCoordinate(string longitude,string latitude)
+        {
+            Func<GeoPoint, bool> getGeoPointLongitude = getGeoPointLongitude => getGeoPointLongitude.Longtitude == longitude;
+            Func<GeoPoint, bool> getGeoPointLatitude = getGeoPointLatitude => getGeoPointLatitude.Latitude == latitude;
+            int? isFound = _geoPointRepository.GetId(getGeoPointLongitude, getGeoPointLatitude);
+            return isFound;
+        }
+
         /*
         public async Task<GeoPoint?> GetGeoPointWithLocationName(string locationName) 
         {

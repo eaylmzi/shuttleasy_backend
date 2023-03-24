@@ -27,5 +27,17 @@ namespace shuttleasy.LOGIC.Logics.PickupAreas
             bool isDeleted = _pickupAreaRepository.Delete(getPickupAreaNumber);
             return isDeleted;
         }
+        public PickupArea? Find(int sessionId)
+        {
+            Func<PickupArea, bool> getPickupAreaId = getPickupAreaId => getPickupAreaId.SessionId == sessionId;
+            PickupArea? isFound = _pickupAreaRepository.GetSingle(getPickupAreaId);
+            return isFound;
+        }
+        public bool DeleteBySessionId(int sessionId)
+        {
+            Func<PickupArea, bool> getSessionId = getSessionId => getSessionId.SessionId == sessionId;
+            bool isDeleted = _pickupAreaRepository.Delete(getSessionId);
+            return isDeleted;
+        }
     }
 }

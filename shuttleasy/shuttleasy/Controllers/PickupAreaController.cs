@@ -86,11 +86,23 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
-        public ActionResult<bool> GetShuttlePickUpArea(int companyId, string destinationlong, string destinationLat)
+        public ActionResult<bool> GetShuttlePickUpArea([FromBody] IdDto idDto)
         {
             try
             {
-                return Ok();
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    PickupArea? isAdded = _pickupAreaLogic.Find(idDto.Id);
+                    if (isAdded != null)
+                    {
+                        return Ok(isAdded);
+                    }
+                    return BadRequest(Error.NotFound);
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
             }
             catch (Exception ex)
             {

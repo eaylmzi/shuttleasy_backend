@@ -242,15 +242,17 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         {
 
             var result = (from t1 in ShuttleSessionTable
-                          join t2 in PassengerRatingTable on t1.Id equals t2.SessionId
+                          join t2 in PassengerRatingTable on t1.Id equals t2.SessionId into t2Group
+                          from t2 in t2Group.DefaultIfEmpty()
                           join t3 in CompanyTable on t1.CompanyId equals t3.Id
-                          join t4 in PassengerTable on t2.PassengerIdentity equals t4.Id
+                          join t4 in PassengerTable on t2.PassengerIdentity equals t4.Id into t4Group
+                          from t4 in t4Group.DefaultIfEmpty()
+                          
                           where t3.Id == companyId
-
                           select new CompanyDetailDto
                           {
                               Company = t3,
-                              CommentDetails = new CommentDetailsDto
+                              CommentDetails = (t2 == null) ? null : new CommentDetailsDto
                               {
                                   PassengerIdentity = t4.Id,
                                   Rating = t2.Rating,
