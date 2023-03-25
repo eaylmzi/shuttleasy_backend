@@ -67,7 +67,7 @@ namespace shuttleasy.Controllers
                         {
                             return Ok(isUpdated);
                         }
-                        return Ok(isUpdated);
+                        return BadRequest(isUpdated);
                     }
                     return BadRequest(isAdded);
 

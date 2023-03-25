@@ -30,6 +30,7 @@ using System.Data;
 using Microsoft.Net.Http.Headers;
 using shuttleasy.Resource;
 using shuttleasy.LOGIC.Logics.JoinTables;
+using shuttleasy.DAL.Models.dto.JoinTables.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -43,6 +44,7 @@ namespace shuttleasy.Controllers
         private readonly IPasswordEncryption _passwordEncryption;
         private readonly IJoinTableLogic _joinTableLogic;
         PassengerString message = new PassengerString();
+        List<PassengerShuttleDetailsDto> emptyList = new List<PassengerShuttleDetailsDto>();
         
 
         public PassengerController(IMapper mapper,IUserService userService,
@@ -216,7 +218,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<PassengerInfoDto> GetMyShuttleSessions()
+        public ActionResult<PassengerShuttleDetailsDto> GetMyShuttleSessions()
         {
             try
             {
@@ -225,11 +227,11 @@ namespace shuttleasy.Controllers
                 {
                     int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
                     var list = _joinTableLogic.PassengerShuttleInnerJoinTables(userId);
-                    if(list.Capacity != 0)
+                    if(list.Count != 0)
                     {
                         return Ok(list);
                     }
-                    return BadRequest(Error.EmptyList);
+                    return Ok(emptyList);
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }

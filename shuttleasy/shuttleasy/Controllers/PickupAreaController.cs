@@ -98,7 +98,7 @@ namespace shuttleasy.Controllers
                     {
                         return Ok(isAdded);
                     }
-                    return BadRequest(Error.NotFound);
+                    return Ok(isAdded);
 
 
                 }

@@ -20,6 +20,7 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Authentication;
 using shuttleasy.LOGIC.Logics.GeoPoints;
+using shuttleasy.LOGIC.Logics.JoinTables;
 
 namespace shuttleasy.Controllers
 {
@@ -31,14 +32,17 @@ namespace shuttleasy.Controllers
         private readonly IPassengerLogic _passengerLogic;
         private readonly ICompanyWorkerLogic _driverLogic;       
         private readonly IMapper _mapper;
-        
+        private readonly IJoinTableLogic _joinTableLogic;
+        List<ShuttleSession> emptyList = new List<ShuttleSession>();
+
         public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic,
-            IMapper mapper)
+            IMapper mapper, IJoinTableLogic joinTableLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _mapper = mapper;
+            _joinTableLogic = joinTableLogic;
         }
         [HttpPost]
         public ActionResult<CompanyWorkerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
@@ -167,6 +171,61 @@ namespace shuttleasy.Controllers
                         return Ok(list);
                     }
                     return BadRequest(Error.NotCreatedUser);
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
+        public ActionResult<List<ShuttleSession>> GetSessions()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    int driverId = TokenHelper.GetDriverIdFromRequestToken(Request.Headers);
+                    var list = _joinTableLogic.DriverShuttleInnerJoinTables(driverId);
+                    if(list != null)
+                    {
+                        return Ok(list);
+                    }
+                    return Ok(emptyList);
+
+                  
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+             [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
+        public ActionResult<List<ShuttleSession>> GetPassengers(IdDto idDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    var list = _joinTableLogic.PassengerSessionPassengerJoinTables(idDto.Id);
+                    if (list != null)
+                    {
+                        return Ok(list);
+                    }
+                    return Ok(emptyList);
+
 
                 }
                 return Unauthorized(Error.NotMatchedToken);

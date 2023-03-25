@@ -26,6 +26,7 @@ namespace shuttleasy.Controllers
         private readonly IGeoPointLogic _geoPointLogic;
         private readonly IMapper _mapper;
         private readonly IPickupAreaLogic _pickupAreaLogic;
+        List<GeoPoint> emptyList = new List<GeoPoint>();
         public GeoPointController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,IGeoPointLogic geoPointLogic,
            IMapper mapper, IPickupAreaLogic pickupAreaLogic)
         {
@@ -101,7 +102,7 @@ namespace shuttleasy.Controllers
             }
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver}{Roles.Admin}")]
         public ActionResult<List<GeoPoint>> GetAllGeoPoint()
         {
             try
@@ -114,7 +115,7 @@ namespace shuttleasy.Controllers
                     {
                         return Ok(list);
                     }
-                    return BadRequest(Error.EmptyList);
+                    return Ok(emptyList);
                 }
                 return Unauthorized(Error.NotMatchedToken);
 
@@ -138,7 +139,7 @@ namespace shuttleasy.Controllers
                     {
                         return Ok(geoPoint);
                     }
-                    return BadRequest(Error.NotFound);
+                    return Ok(geoPoint);
                 }
                 return Unauthorized(Error.NotMatchedToken);
 

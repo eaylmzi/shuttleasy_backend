@@ -24,9 +24,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<GeoPoint> GeoPointTable { get; set; }
         private DbSet<ShuttleBus> ShuttleBusTable { get; set; }
         private DbSet<PickupPoint> PickupPointTable { get; set; }
-
-
-
+        private DbSet<CompanyWorker> CompanyWorkerTable { get; set; }
 
 
 
@@ -40,6 +38,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             GeoPointTable = _context.Set<GeoPoint>(); 
             ShuttleBusTable = _context.Set<ShuttleBus>();
             PickupPointTable = _context.Set<PickupPoint>();
+            CompanyWorkerTable = _context.Set<CompanyWorker>();
         }
 
 
@@ -301,6 +300,105 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
            
 
         }
+        
+        public List<EnrolledPassengersGroupDto> ShuttlePassengersInnerJoinTables(int companyId)
+
+        {
+
+            var result = (from t1 in CompanyTable
+                          join t2 in ShuttleSessionTable on t1.Id equals t2.CompanyId
+                          join t3 in SessionPassengerTable on t2.Id equals t3.SessionId
+                          join t4 in PickupPointTable on t3.PickupId equals t4.Id
+                          join t5 in PassengerTable on t4.UserId equals t5.Id
+                          where t1.Id == companyId
+
+                          select new EnrolledPassengersDto
+                          {
+                              ShuttleSession = t2,
+                              PassengerDetailsDto = new PassengerDetailsDto
+                              {
+                                  ProfilePic = t5.ProfilePic,
+                                  Name = t5.Name,
+                                  Surname =t5.Surname,
+                                  PhoneNumber = t5.PhoneNumber,
+                                  Email = t5.Email,
+                                  City = t5.City,
+                                  PassengerAddress = t5.PassengerAddress,
+                              },
+                              
+                          }).ToList();
+            var groupedResult = result.GroupBy(x => x.ShuttleSession.Id)
+                                  .Select(g => new EnrolledPassengersGroupDto
+                                  {
+                                      ShuttleSession = g.First().ShuttleSession,
+                                      PassengerDetailsDtoList = g.Where(x => x.PassengerDetailsDto != null)
+                                                                  .Select(x => x.PassengerDetailsDto)
+                                                                  .ToList(),
+                                  }).ToList();
+
+            return groupedResult;
+
+
+        }
+        public List<ShuttleSession> DriverShuttleInnerJoinTables(int driverId)
+
+        {
+
+            var result = (from t1 in CompanyWorkerTable
+                          join t2 in ShuttleSessionTable on t1.Id equals t2.DriverId
+                          where t1.Id == driverId
+
+                          select new ShuttleSession
+                          {
+                              Id = t2.Id,
+                              CompanyId = t2.CompanyId,
+                              BusId = t2.BusId,
+                              PassengerCount = t2.PassengerCount,
+                              StartTime = t2.StartTime,
+                              DriverId = t2.DriverId,
+                              IsActive = t2.IsActive,
+                              StartGeopoint = t2.StartGeopoint,
+                              FinalGeopoint = t2.FinalGeopoint,
+                              DestinationName = t2.DestinationName,
+                              Return = t2.Return,
+                              SessionDate = t2.SessionDate,
+
+
+                          }).ToList();
+
+
+            return result;
+
+
+        }
+        public List<PassengerDetailsDto> PassengerSessionPassengerJoinTables(int sessionId)
+
+        {
+
+            var result = (from t1 in PassengerTable
+                          join t2 in PickupPointTable on t1.Id equals t2.UserId
+                          join t3 in SessionPassengerTable on t2.Id equals t3.PickupId
+                          where t3.SessionId == sessionId
+
+                          select new PassengerDetailsDto
+                          {
+                              ProfilePic = t1.ProfilePic,
+                              Name = t1.Name,
+                              Surname = t1.Surname,
+                              PhoneNumber = t1.PhoneNumber,
+                              Email = t1.Email,
+                              City = t1.City,
+                              PassengerAddress = t1.PassengerAddress,
+                          }).ToList();
+
+
+
+
+            return result;
+
+
+        }
+
 
         public List<SessionGeoPointsDto> SessionGeoPointsInnerJoinTables(int? sessionId)
 

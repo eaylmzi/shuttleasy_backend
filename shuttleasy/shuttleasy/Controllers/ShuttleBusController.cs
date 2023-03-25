@@ -109,7 +109,12 @@ namespace shuttleasy.Controllers
                     if (companyWorker != null)
                     {
                         var list = _shuttleBusLogic.GetAllShuttleBusesWithCompanyId(companyWorker.CompanyId);
+                        if(list != null)
+                        {
+                            return Ok(list);
+                        }
                         return Ok(list);
+                       
                     }
                     return BadRequest(Error.NotFoundUser);
 

@@ -31,8 +31,9 @@ namespace shuttleasy.LOGIC.Logics.SessionPassengers
         public bool DeleteBySessionId(int sessionID)
         {
             Func<SessionPassenger, bool> getSessionPassenger = getSessionPassenger => getSessionPassenger.SessionId == sessionID;
-            bool isDeleted = _sessionPassengerRepository.Delete(getSessionPassenger);
+            bool isDeleted = _sessionPassengerRepository.DeleteList(getSessionPassenger);
             return isDeleted;
         }
+
     }
 }

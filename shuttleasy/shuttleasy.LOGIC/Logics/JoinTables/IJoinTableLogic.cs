@@ -1,4 +1,5 @@
 ﻿
+using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,8 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<CompanyDetailGroupDto> CompanyDetailsInnerJoinTables(int companyId);
         public List<SessionGeoPointsDto> SessionGeoPointsInnerJoinTables(int? sessionId);
         public List<PassengerShuttleDetailsDto> PassengerShuttleInnerJoinTables(int userId);
+        public List<EnrolledPassengersGroupDto> ShuttlePassengersInnerJoinTables(int companyId);
+        public List<ShuttleSession> DriverShuttleInnerJoinTables(int driverId);
+        public List<PassengerDetailsDto> PassengerSessionPassengerJoinTables(int sessionId);
     }
 }

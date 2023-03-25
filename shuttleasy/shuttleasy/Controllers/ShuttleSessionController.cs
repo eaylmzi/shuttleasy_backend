@@ -174,7 +174,7 @@ namespace shuttleasy.Controllers
         }
         
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<List<ShuttleDetailsDto>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
+        public ActionResult<List<ShuttleDetailsGroupDto>> SearchShuttle([FromBody] SearchDestinationDto searchDestinationDto)
         {
             try
             {
@@ -182,12 +182,12 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     var list = _joinTableLogic.ShuttleDetailsInnerJoinTables(searchDestinationDto.DestinationName);
-                    if (list.Capacity != 0)
+                    if (list.Count != 0)
                     {
-                        return Ok(emptyList);
+                        return Ok(list);
                     }
 
-                    return BadRequest(Error.NotFoundShuttleSession);
+                    return Ok(emptyList);
                 }
                 return Unauthorized(Error.NotMatchedToken);
 
@@ -210,7 +210,7 @@ namespace shuttleasy.Controllers
                     {
                         return Ok(shuttleSession);
                     }
-                    return BadRequest(Error.NotFoundShuttleSession);
+                    return Ok(shuttleSession);
 
 
                 }
@@ -342,7 +342,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<List<ShuttleSession>> GetShuttleByGeoPoint([FromBody] SessionGeoPointsDto geoPointDto)
+        public ActionResult<List<ShuttleDetailsGroupDto>> GetShuttleByGeoPoint([FromBody] SessionGeoPointsDto geoPointDto)
         {
             try
             {
@@ -350,12 +350,12 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     var list = _joinTableLogic.ShuttleDetailsByGeoPointInnerJoinTables(geoPointDto.Longtitude, geoPointDto.Latitude);
-                    if (list.Capacity != 0)
+                    if (list.Count != 0)
                     {
                         return Ok(list);
                     }
 
-                    return BadRequest(Error.NotFoundShuttleSession);
+                    return Ok(emptyList);
                 }
                 return Unauthorized(Error.NotMatchedToken);
 

@@ -18,6 +18,14 @@ namespace shuttleasy.Resource
             int userId = int.Parse(user);
             return userId;
         }
+        public static int GetDriverIdFromRequestToken(IHeaderDictionary headers)
+        {
+            string requestToken = headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+            string user = jwt.Claims.First(c => c.Type == "id").Value;
+            int userId = int.Parse(user);
+            return userId;
+        }
         public static string GetUserRoleFromRequestToken(IHeaderDictionary headers)
         {
             string requestToken = headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");

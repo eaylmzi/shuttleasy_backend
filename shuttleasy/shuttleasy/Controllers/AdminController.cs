@@ -35,6 +35,7 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IMapper _mapper;
         private readonly IJoinTableLogic _joinTableLogic;
+        List<CommentDetailsDto> emptyList = new List<CommentDetailsDto>();
         public AdminController(IUserService userService, IPassengerLogic passengerLogic ,ICompanyWorkerLogic driverLogic,
             IMapper mapper, IJoinTableLogic joinTableLogic)
         {
@@ -147,14 +148,46 @@ namespace shuttleasy.Controllers
                     if(companyWorker != null)
                     {
                         var list = _joinTableLogic.CommentDetailsInnerJoinTables(companyWorker.CompanyId);
-                        if (list.Capacity != 0)
+                        if (list.Count != 0)
                         {
                             return Ok(list);
                         }
-                        return BadRequest(Error.EmptyList);
+                        return Ok(emptyList);
 
                     }
                     
+
+
+
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+            return Unauthorized(Error.NotMatchedToken);
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<EnrolledPassengersGroupDto> GetAllRegisteredPassengers()
+        {
+            UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+            if (_userService.VerifyUser(userInformation))
+            {
+
+                try
+                {
+                    CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
+                    if (companyWorker != null)
+                    {
+                        var list = _joinTableLogic.ShuttlePassengersInnerJoinTables(companyWorker.CompanyId);
+                        if (list.Count != 0)
+                        {
+                            return Ok(list);
+                        }
+                        return Ok(emptyList);
+
+                    }
 
 
 

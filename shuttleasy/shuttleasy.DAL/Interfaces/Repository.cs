@@ -90,6 +90,25 @@ namespace shuttleasy.DAL.Interfaces
             }
             return false;
         }
+        public bool DeleteList(Func<T, bool> metot)
+        {
+            var entityList = query
+                     .Where(metot)
+                     .Select(m => m)
+                     .ToList();
+            if (entityList != null)
+            {
+                for (int i = 0; i < entityList.Count; i++)
+                {
+                    query.Remove(entityList[i]);
+                    _context.SaveChanges();
+                }
+             
+                return true;
+
+            }
+            return false;
+        }
 
         public bool Add(T entity)
         {

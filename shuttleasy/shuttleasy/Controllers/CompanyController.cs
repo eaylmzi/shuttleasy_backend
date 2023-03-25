@@ -29,6 +29,7 @@ namespace shuttleasy.Controllers
         private readonly IMapper _mapper;
         private readonly ICompanyLogic _companyLogic;
         private readonly IJoinTableLogic _joinTableLogic;
+        List<CompanyDetailGroupDto> emptyList = new List<CompanyDetailGroupDto>();
 
         public CompanyController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
             IMapper mapper,ICompanyLogic companyLogic, IJoinTableLogic joinTableLogic)
@@ -197,9 +198,9 @@ namespace shuttleasy.Controllers
                     var list = _joinTableLogic.CompanyDetailsInnerJoinTables(companyId.Id);
                     if(list.Capacity != 0)
                     {
-                        return Ok(list);
+                        return Ok(list[0]);
                     }
-                    return BadRequest(Error.EmptyList);
+                    return Ok(emptyList);
                 }
 
                 return Unauthorized(Error.NotMatchedToken);
