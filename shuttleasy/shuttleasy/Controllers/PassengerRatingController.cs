@@ -33,6 +33,7 @@ namespace shuttleasy.Controllers
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly ICompanyLogic _companyLogic;
         private readonly IJoinTableLogic _joinTableLogic;
+        List<PassengerRating> emptyList = new List<PassengerRating>();
         public PassengerRatingController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
             IPassengerRatingLogic passengerRatingLogic, IShuttleSessionLogic shuttleSessionLogic, ICompanyLogic companyLogic,
            IMapper mapper, IJoinTableLogic joinTableLogic)
@@ -83,7 +84,7 @@ namespace shuttleasy.Controllers
             return Unauthorized(Error.NotMatchedToken);
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
         public ActionResult<bool> GetComment([FromBody] IdDto companyIdDto)
         {
             UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
@@ -92,11 +93,12 @@ namespace shuttleasy.Controllers
                 try
                 {
                     var list = _joinTableLogic.CommentDetailsInnerJoinTables(companyIdDto.Id);
-                    if(list.Capacity != 0)
+                    if(list.Count != 0)
                     {
                         return Ok(list);
                     }
-                    return BadRequest(Error.EmptyList);
+                    
+                    return Ok(emptyList);
 
 
 

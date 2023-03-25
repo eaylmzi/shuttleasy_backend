@@ -71,6 +71,13 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
             int? isFound = _geoPointRepository.GetId(getGeoPointLongitude, getGeoPointLatitude);
             return isFound;
         }
+        public GeoPoint? FindByCoordinateGeoPoint(string longitude, string latitude)
+        {
+            Func<GeoPoint, bool> getGeoPointLongitude = getGeoPointLongitude => getGeoPointLongitude.Longtitude == longitude;
+            Func<GeoPoint, bool> getGeoPointLatitude = getGeoPointLatitude => getGeoPointLatitude.Latitude == latitude;
+            GeoPoint? isFound = _geoPointRepository.GetSingle(getGeoPointLongitude, getGeoPointLatitude);
+            return isFound;
+        }
 
         /*
         public async Task<GeoPoint?> GetGeoPointWithLocationName(string locationName) 

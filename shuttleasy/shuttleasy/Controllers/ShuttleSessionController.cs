@@ -50,6 +50,7 @@ namespace shuttleasy.Controllers
         private readonly IGeoPointLogic _geoPointLogic;
         private readonly IPickupAreaLogic _pickupAreaLogic;
         private readonly IPickupPointLogic _pickupPointLogic;
+        List<ShuttleSession> emptyList = new List<ShuttleSession>();
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
                     IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper, IJoinTableLogic joinTableLogic,
@@ -120,19 +121,19 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(TokenHelper.GetUserIdFromRequestToken(Request.Headers));
                     if (companyWorker != null)
                     {
-                        bool isDeleted = _pickupAreaLogic.DeleteBySessionId(idDto.Id);
-                        if (isDeleted)
+                        bool isDeletedArea = _pickupAreaLogic.DeleteBySessionId(idDto.Id);
+                        bool isDeletedSessionPassenger = _sessionPassengerLogic.DeleteBySessionId(idDto.Id);
+                        bool isDeletedShuttle = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
+                        if (isDeletedShuttle)
                         {
-                            bool isDeletedShuttle = _shuttleSessionLogic.DeleteShuttleSession(idDto.Id);
-                            if (isDeletedShuttle)
-                            {
-                                return Ok(isDeletedShuttle);
-                            }
-                            return BadRequest(isDeletedShuttle);
-
+                            return Ok(isDeletedShuttle);
                         }
-                        return BadRequest(Error.NotDeletedPickupArea);
-                       
+                        return BadRequest(isDeletedShuttle);
+
+
+
+
+
                     }
                     return BadRequest(Error.NotFoundUser);
                 }
@@ -183,7 +184,7 @@ namespace shuttleasy.Controllers
                     var list = _joinTableLogic.ShuttleDetailsInnerJoinTables(searchDestinationDto.DestinationName);
                     if (list.Capacity != 0)
                     {
-                        return Ok(list);
+                        return Ok(emptyList);
                     }
 
                     return BadRequest(Error.NotFoundShuttleSession);

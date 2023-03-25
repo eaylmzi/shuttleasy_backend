@@ -45,10 +45,10 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     GeoPoint geoPoint = _mapper.Map<GeoPoint>(geoPointDto);
-                    int? isAddedGeoPoint = _geoPointLogic.FindByCoordinate(geoPoint.Longtitude, geoPoint.Latitude);
+                    GeoPoint? isAddedGeoPoint = _geoPointLogic.FindByCoordinateGeoPoint(geoPoint.Longtitude, geoPoint.Latitude);
                     if(isAddedGeoPoint != null)
                     {
-                        return BadRequest(Error.AlreadyFound);
+                        return Ok(isAddedGeoPoint);
                     }
                     bool isAdded = await _geoPointLogic.AddAsync(geoPoint);
                     if (isAdded)
