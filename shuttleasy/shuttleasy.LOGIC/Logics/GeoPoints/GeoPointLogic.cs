@@ -23,16 +23,13 @@ namespace shuttleasy.LOGIC.Logics.GeoPoints
         }
         public int? AddReturnId(GeoPoint geoPoint)
         {
-            try
-            {
-                int? isAdded = _geoPointRepository.AddReturnId(geoPoint);
-                return isAdded;
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new DbUpdateException(Error.AlreadyFound);
-            }
-           
+            int? isAdded = _geoPointRepository.AddReturnId(geoPoint);
+            return isAdded;
+
+
+
+
+
         }
         public async Task<bool> AddAsync(GeoPoint geoPoint)
         {

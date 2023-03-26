@@ -37,6 +37,7 @@ namespace shuttleasy.Models.dto
             CreateMap<CommentDto, PassengerRating>();
             CreateMap<SessionPassengerDto, SessionPassenger>();
             CreateMap<EditCompanyDto,Company>();
+            CreateMap<SessionPassengerMultipleDto, SessionPassenger>();
 
 
             CreateMap<CompanyWorker, CompanyWorkerInfoDto>();

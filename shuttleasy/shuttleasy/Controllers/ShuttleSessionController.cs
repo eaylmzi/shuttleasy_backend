@@ -297,6 +297,11 @@ namespace shuttleasy.Controllers
                             return Ok(isAdded);
 
                         }
+                        else
+                        {
+                            shuttleSession.PassengerCount = shuttleSession.PassengerCount - 1;
+                            await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
+                        }
                         return BadRequest(isAdded);
 
 
@@ -316,6 +321,83 @@ namespace shuttleasy.Controllers
             }
 
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public async Task<ActionResult<List<int>>> EnrollMultiplePassenger([FromBody] SessionPassengerMultipleDto sessionPassengerMultipleDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    List<int> shuttleList = new List<int>();
+
+                    for (int i = 0;i < sessionPassengerMultipleDto.SessionIdList.Count; i++)
+                    {
+                        GeoPoint geoPoint = new GeoPoint();
+                        geoPoint.Longtitude = sessionPassengerMultipleDto.Longitude;
+                        geoPoint.Latitude = sessionPassengerMultipleDto.Latitude;
+                        int? geoPointId = _geoPointLogic.FindByCoordinate(geoPoint.Longtitude, geoPoint.Latitude);
+                        int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
+                        ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionPassengerMultipleDto.SessionIdList[i]);
+                        if (shuttleSession != null)
+                        {
+                                       
+                            shuttleSession.PassengerCount = shuttleSession.PassengerCount + 1;
+                            await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
+                            SessionPassenger sessionPassenger = _mapper.Map<SessionPassenger>(sessionPassengerMultipleDto);
+                            sessionPassenger.SessionId = sessionPassengerMultipleDto.SessionIdList[i];
+
+                            PickupPoint pickupPoint = new PickupPoint();
+                            if (geoPointId != null)
+                            {
+                                pickupPoint.GeoPointId = (int)geoPointId;
+                                pickupPoint.UserId = userId;
+                                int? pickUpId = _pickupPointLogic.AddReturnId(pickupPoint);
+                                sessionPassenger.PickupId = pickUpId;
+                            }
+                            else
+                            {
+                                int? addedGeoPointId = _geoPointLogic.AddReturnId(geoPoint);
+                                pickupPoint.GeoPointId = (int)addedGeoPointId;
+                                pickupPoint.UserId = userId;
+                                int? pickUpId = _pickupPointLogic.AddReturnId(pickupPoint);
+                                sessionPassenger.PickupId = pickUpId;
+                            }
+
+                            //BURAYI SONRA SİLECEKSİN
+                            sessionPassenger.PickupOrderNum = null;
+                            sessionPassenger.PickupState = null;
+                            sessionPassenger.EstimatedPickupTime = null;
+                            bool isAdded =_sessionPassengerLogic.Add(sessionPassenger);
+                            if (isAdded)
+                            {
+                                shuttleList.Add(sessionPassengerMultipleDto.SessionIdList[i]);
+                            }
+                            else
+                            {
+                                shuttleSession.PassengerCount = shuttleSession.PassengerCount - 1 ;
+                                await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
+                            }
+                            
+
+
+
+                        }
+                        
+
+                    }
+                    return Ok(shuttleList);
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> DeleteSessionPassenger([FromBody] IdDto idDto)
         {
