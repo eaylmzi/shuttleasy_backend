@@ -49,18 +49,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<ShuttleDetailsGroupDto> ShuttleDetailsInnerJoinTables(string destinationName)
 
          {
-            if (CompanyTable == null )
-            {
-                // Handle the null tables here or throw an exception
-            }
-            if ( ShuttleSessionTable == null )
-            {
-                // Handle the null tables here or throw an exception
-            }
-            if (ShuttleBusTable == null)
-            {
-                // Handle the null tables here or throw an exception
-            }
+
 
             var result = (from t1 in CompanyTable
                           join t2 in ShuttleSessionTable on t1.Id equals t2.CompanyId
@@ -73,7 +62,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
 
                           join t5 in ShuttleBusTable on t2.BusId equals t5.Id 
                           join t6 in GeoPointTable on t2.FinalGeopoint equals t6.Id
-                          where t2.DestinationName == destinationName
+                          where t2.DestinationName.ToLower().Contains(destinationName.ToLower())
                           select new ShuttleDetailsDto
                           {
                               CompanyDetails = t1,
