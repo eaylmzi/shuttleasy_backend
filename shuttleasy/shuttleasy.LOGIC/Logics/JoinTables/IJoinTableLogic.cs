@@ -23,5 +23,6 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<ShuttleSession> DriverShuttleInnerJoinTables(int driverId);
         public List<PassengerDetailsDto> PassengerSessionPassengerJoinTables(int sessionId);
         public List<PickupArea> ShuttlePickUpAreaInnerJoinTables(List<int> sessionId);
+        public List<ShuttleDto> MertimYapmaz(int driverId);
     }
 }
