@@ -131,7 +131,7 @@ namespace shuttleasy.Controllers
             }
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<CompanyWorkerInfoDto> GetDriver([FromBody] IdDto idDto)
         {
             try
@@ -211,7 +211,7 @@ namespace shuttleasy.Controllers
             }
         }
         
-             [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
         public ActionResult<List<ShuttleSession>> GetPassengers(IdDto idDto)
         {
             try

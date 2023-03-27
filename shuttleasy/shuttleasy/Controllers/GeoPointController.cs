@@ -38,7 +38,7 @@ namespace shuttleasy.Controllers
             _pickupAreaLogic = pickupAreaLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public async Task<ActionResult<bool>> AddGeoPoint([FromBody] GeoPointDto geoPointDto)
+        public async Task<ActionResult<GeoPoint>> AddGeoPoint([FromBody] GeoPointDto geoPointDto)
         {
             try
             {

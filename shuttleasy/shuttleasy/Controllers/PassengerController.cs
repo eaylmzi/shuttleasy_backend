@@ -226,7 +226,7 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
-                    var list = _joinTableLogic.PassengerShuttleInnerJoinTables(userId);
+                    var list = _joinTableLogic.OzimYapmaz(userId);
                     if(list.Count != 0)
                     {
                         return Ok(list);

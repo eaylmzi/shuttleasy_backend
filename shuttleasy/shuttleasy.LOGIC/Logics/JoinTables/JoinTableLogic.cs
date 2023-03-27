@@ -544,6 +544,9 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                                   StartTime = t2.StartTime,
                                   DriverId = t2.DriverId,
                                   IsActive = t2.IsActive,
+                                  LongitudeStart = t7.Longtitude,
+                                  LatitudeStart = t7.Latitude,
+                                  StartName = t7.LocationName,
                                   LongitudeFinal = t6.Longtitude,
                                   LatitudeFinal = t6.Latitude,
                                   DestinationName = t2.DestinationName,
@@ -558,32 +561,70 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
-        //YUKARDIKİNİN FOREACHLİ ÖRNEĞİ
-     /*   public List<PickupArea> ShuttlePickUpAresaInnerJoinTables(List<int> sessionIds)
-
+        public List<ShuttleDto> OzimYapmaz(int passengerId)
         {
+            var result = (from t1 in PickupPointTable
+                          join t2 in SessionPassengerTable on t1.Id equals t2.PickupId
+                          join t3 in ShuttleSessionTable on t2.SessionId equals t3.Id
+                          join t4 in CompanyTable on t3.CompanyId equals t4.Id
+                          join t5 in GeoPointTable on t3.StartGeopoint equals t5.Id
+                          join t6 in GeoPointTable on t3.FinalGeopoint equals t6.Id
+                          join t7 in ShuttleBusTable on t3.BusId equals t7.Id
 
-            var pickupAreas = new List<PickupArea>();
+                          where t1.UserId == passengerId
+                          select new ShuttleDto
+                          {
 
-            foreach (int sessionId in sessionIds)
-            {
-                var result = (from t1 in ShuttleSessionTable
-                              join t2 in PickupAreaTable on t1.Id equals t2.SessionId
-                              where t1.Id == sessionId
-                              select new PickupArea
-                              {
-                                  Id = t2.Id,
-                                  SessionId = t2.SessionId,
-                                  PolygonPoints = t2.PolygonPoints,
-                              }).ToList();
+                              Id = t2.Id,
+                              CompanyId = t4.Id,
+                              BusId = t3.BusId,
+                              PassengerCount = t3.PassengerCount,
+                              StartTime = t3.StartTime,
+                              DriverId = t3.DriverId,
+                              IsActive = t3.IsActive,
+                              LongitudeStart = t5.Longtitude,
+                              LatitudeStart = t5.Latitude,
+                              StartName = t5.LocationName,
+                              LongitudeFinal = t6.Longtitude,
+                              LatitudeFinal = t6.Latitude,
+                              DestinationName = t3.DestinationName,
+                              Return = t3.Return,
+                              SessionDate = t3.SessionDate,
+                              Capacity = t7.Capacity,
+                              BusModel = t7.BusModel,
+                              LicensePlate = t7.LicensePlate,
+                              State = t7.State
 
-                pickupAreas.AddRange(result);
-            }
 
-            return pickupAreas;
-
+                          }).ToList();
+            return result;
         }
-     */
+        //YUKARDIKİNİN FOREACHLİ ÖRNEĞİ
+        /*   public List<PickupArea> ShuttlePickUpAresaInnerJoinTables(List<int> sessionIds)
+
+           {
+
+               var pickupAreas = new List<PickupArea>();
+
+               foreach (int sessionId in sessionIds)
+               {
+                   var result = (from t1 in ShuttleSessionTable
+                                 join t2 in PickupAreaTable on t1.Id equals t2.SessionId
+                                 where t1.Id == sessionId
+                                 select new PickupArea
+                                 {
+                                     Id = t2.Id,
+                                     SessionId = t2.SessionId,
+                                     PolygonPoints = t2.PolygonPoints,
+                                 }).ToList();
+
+                   pickupAreas.AddRange(result);
+               }
+
+               return pickupAreas;
+
+           }
+        */
 
 
     }
