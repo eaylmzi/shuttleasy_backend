@@ -14,6 +14,7 @@ using shuttleasy.DAL.EFRepositories.PickupAreas;
 using shuttleasy.LOGIC.Logics.PickupAreas;
 using shuttleasy.DAL.Models.dto.PickupArea.dto;
 using System.ComponentModel.Design;
+using shuttleasy.LOGIC.Logics.JoinTables;
 
 namespace shuttleasy.Controllers
 {
@@ -25,15 +26,17 @@ namespace shuttleasy.Controllers
         private readonly IPassengerLogic _passengerLogic;
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IPickupAreaLogic _pickupAreaLogic;
+        private readonly IJoinTableLogic _joinTableLogic;
         private readonly IMapper _mapper;
         public PickupAreaController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic, IPickupAreaLogic pickupAreaLogic,
-           IMapper mapper)
+           IMapper mapper, IJoinTableLogic joinTableLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _pickupAreaLogic = pickupAreaLogic;
             _mapper = mapper;
+            _joinTableLogic = joinTableLogic;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<bool> AddPickupArea([FromBody] PickupAreaDto pickupAreaDto)
@@ -99,6 +102,31 @@ namespace shuttleasy.Controllers
                         return Ok(isAdded);
                     }
                     return Ok(isAdded);
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
+        public ActionResult<List<PickupArea>> GetShuttlePickUpAreas([FromBody] ListIdDto listIdDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    var list = _joinTableLogic.ShuttlePickUpAreaInnerJoinTables(listIdDto.IdList);
+                    if (list != null)
+                    {
+                        return Ok(list);
+                    }
+                    return Ok(list);
 
 
                 }

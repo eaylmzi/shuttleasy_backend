@@ -13,6 +13,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
     public interface IJoinTableLogic
     {
         public List<ShuttleDetailsGroupDto> ShuttleDetailsInnerJoinTables(string destinationName);
+        public List<ShuttleDetailsGroupDto> ShuttleDetailsInnerJoinTables(int driverId);
         public List<ShuttleDetailsGroupDto> ShuttleDetailsByGeoPointInnerJoinTables(string longitude, string latitude);
         public List<CommentDetailsDto> CommentDetailsInnerJoinTables(int companyId);
         public List<CompanyDetailGroupDto> CompanyDetailsInnerJoinTables(int companyId);
@@ -21,5 +22,6 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<EnrolledPassengersGroupDto> ShuttlePassengersInnerJoinTables(int companyId);
         public List<ShuttleSession> DriverShuttleInnerJoinTables(int driverId);
         public List<PassengerDetailsDto> PassengerSessionPassengerJoinTables(int sessionId);
+        public List<PickupArea> ShuttlePickUpAreaInnerJoinTables(List<int> sessionId);
     }
 }

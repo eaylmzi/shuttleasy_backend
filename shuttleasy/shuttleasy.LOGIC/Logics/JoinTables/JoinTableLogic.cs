@@ -25,6 +25,8 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<ShuttleBus> ShuttleBusTable { get; set; }
         private DbSet<PickupPoint> PickupPointTable { get; set; }
         private DbSet<CompanyWorker> CompanyWorkerTable { get; set; }
+        private DbSet<PickupArea> PickupAreaTable { get; set; }
+
 
 
 
@@ -39,6 +41,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             ShuttleBusTable = _context.Set<ShuttleBus>();
             PickupPointTable = _context.Set<PickupPoint>();
             CompanyWorkerTable = _context.Set<CompanyWorker>();
+            PickupAreaTable = _context.Set<PickupArea>();
         }
 
 
@@ -128,6 +131,96 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                                                                    .Select(x => x.ShuttleSessionReturn)
                                                                    .ToList(),
                                        
+                                      }).ToList();
+
+            return groupedResult;
+
+        }
+        public List<ShuttleDetailsGroupDto> ShuttleDetailsInnerJoinTables(int driverId)
+
+        {
+            if (CompanyTable == null)
+            {
+                // Handle the null tables here or throw an exception
+            }
+            if (ShuttleSessionTable == null)
+            {
+                // Handle the null tables here or throw an exception
+            }
+            if (ShuttleBusTable == null)
+            {
+                // Handle the null tables here or throw an exception
+            }
+
+            var result = (from t1 in CompanyTable
+                          join t2 in ShuttleSessionTable on t1.Id equals t2.CompanyId
+                          join t3 in PassengerRatingTable
+                              on t2.Id equals t3.SessionId into passengerRatings
+                          from pr in passengerRatings.DefaultIfEmpty()
+                          join t4 in PassengerTable
+                              on pr.PassengerIdentity equals t4.Id into passengers
+                          from p in passengers.DefaultIfEmpty()
+
+                          join t5 in ShuttleBusTable on t2.BusId equals t5.Id
+                          join t6 in GeoPointTable on t2.FinalGeopoint equals t6.Id
+                          where t2.DriverId == driverId
+                          select new ShuttleDetailsDto
+                          {
+                              CompanyDetails = t1,
+                              ShuttleSessionDeparture = t2.Return == false ? new ShuttleSessionDetailsDto
+                              {
+                                  Id = t2.Id,
+                                  CompanyId = t2.CompanyId,
+                                  BusId = t2.BusId,
+                                  PassengerCount = t2.PassengerCount,
+                                  StartTime = t2.StartTime,
+                                  DriverId = t2.DriverId,
+                                  IsActive = t2.IsActive,
+                                  Longitude = t6.Longtitude,
+                                  Latitude = t6.Latitude,
+                                  DestinationName = t2.DestinationName,
+                                  Return = t2.Return,
+                                  SessionDate = t2.SessionDate,
+                                  Capacity = t5.Capacity,
+                                  BusModel = t5.BusModel,
+                                  LicensePlate = t5.LicensePlate,
+                                  State = t5.State
+
+                              } : null,
+                              ShuttleSessionReturn = t2.Return == true ? new ShuttleSessionDetailsDto
+                              {
+                                  Id = t2.Id,
+                                  CompanyId = t2.CompanyId,
+                                  BusId = t2.BusId,
+                                  PassengerCount = t2.PassengerCount,
+                                  StartTime = t2.StartTime,
+                                  DriverId = t2.DriverId,
+                                  IsActive = t2.IsActive,
+                                  Longitude = t6.Longtitude,
+                                  Latitude = t6.Latitude,
+                                  DestinationName = t2.DestinationName,
+                                  Return = t2.Return,
+                                  SessionDate = t2.SessionDate,
+                                  Capacity = t5.Capacity,
+                                  BusModel = t5.BusModel,
+                                  LicensePlate = t5.LicensePlate,
+                                  State = t5.State
+
+                              } : null,
+
+                          }).ToList();
+
+            var groupedResult = result.GroupBy(x => x.CompanyDetails.Id)
+                                      .Select(g => new ShuttleDetailsGroupDto
+                                      {
+                                          CompanyDetail = g.First().CompanyDetails,
+                                          ShuttleSessionDeparture = g.Where(x => x.ShuttleSessionDeparture != null)
+                                                                      .Select(x => x.ShuttleSessionDeparture)
+                                                                      .ToList(),
+                                          ShuttleSessionReturn = g.Where(x => x.ShuttleSessionReturn != null)
+                                                                   .Select(x => x.ShuttleSessionReturn)
+                                                                   .ToList(),
+
                                       }).ToList();
 
             return groupedResult;
@@ -421,7 +514,47 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             return result;
 
         }
+        public List<PickupArea> ShuttlePickUpAreaInnerJoinTables(List<int> sessionId)
 
+        {
+            var result = (from t1 in ShuttleSessionTable
+                          join t2 in PickupAreaTable on t1.Id equals t2.SessionId
+                          where sessionId.Contains(t1.Id)
+                          select new PickupArea
+                          {
+                              Id = t2.Id,
+                              SessionId = t2.SessionId,
+                              PolygonPoints = t2.PolygonPoints,
+                          }).ToList();
+
+            return result;
+        }
+        //YUKARDIKİNİN FOREACHLİ ÖRNEĞİ
+     /*   public List<PickupArea> ShuttlePickUpAresaInnerJoinTables(List<int> sessionIds)
+
+        {
+
+            var pickupAreas = new List<PickupArea>();
+
+            foreach (int sessionId in sessionIds)
+            {
+                var result = (from t1 in ShuttleSessionTable
+                              join t2 in PickupAreaTable on t1.Id equals t2.SessionId
+                              where t1.Id == sessionId
+                              select new PickupArea
+                              {
+                                  Id = t2.Id,
+                                  SessionId = t2.SessionId,
+                                  PolygonPoints = t2.PolygonPoints,
+                              }).ToList();
+
+                pickupAreas.AddRange(result);
+            }
+
+            return pickupAreas;
+
+        }
+     */
 
 
     }

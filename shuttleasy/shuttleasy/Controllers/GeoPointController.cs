@@ -102,7 +102,7 @@ namespace shuttleasy.Controllers
             }
         }
 
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver}{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<List<GeoPoint>> GetAllGeoPoint()
         {
             try

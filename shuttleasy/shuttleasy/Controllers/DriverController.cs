@@ -192,7 +192,7 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     int driverId = TokenHelper.GetDriverIdFromRequestToken(Request.Headers);
-                    var list = _joinTableLogic.DriverShuttleInnerJoinTables(driverId);
+                    var list = _joinTableLogic.ShuttleDetailsInnerJoinTables(driverId);
                     if(list != null)
                     {
                         return Ok(list);

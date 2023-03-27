@@ -322,7 +322,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public async Task<ActionResult<List<int>>> EnrollMultiplePassenger([FromBody] SessionPassengerMultipleDto sessionPassengerMultipleDto)
+        public async Task<ActionResult<List<int>>> EnrollPassengerMultipleSession([FromBody] SessionPassengerMultipleDto sessionPassengerMultipleDto)
         {
             try
             {
