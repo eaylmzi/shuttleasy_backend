@@ -321,7 +321,57 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<CompanyDetailGroupDto> CompanyDetailsInnerJoinTables(int companyId)
 
         {
+            var result = (from t1 in ShuttleSessionTable
+                          join t2 in PassengerRatingTable on t1.Id equals t2.SessionId into t2Group
+                          from t2 in t2Group.DefaultIfEmpty()
+                          join t3 in CompanyTable on t1.CompanyId equals t3.Id
+                          join t4 in PassengerTable on t2.PassengerIdentity equals t4.Id into t4Group
+                          from t4 in t4Group.DefaultIfEmpty()
 
+                          where t3.Id == companyId
+                          select new CompanyDetailDto
+                          {
+                              Company = t3,
+                              CommentDetails = (t2 == null) ? null : new CommentDetailsDto
+                              {
+                                  PassengerIdentity = t4.Id,
+                                  Rating = t2.Rating,
+                                  SessionId = t2.SessionId,
+                                  Date = t2.Date,
+                                  Comment = t2.Comment,
+                                  CompanyId = t3.Id,
+                                  Name = t4.Name,
+                                  Surname = t4.Surname,
+                                  ProfilePic = t4.ProfilePic
+                              }
+                          }).ToList();
+
+            var groupedResult = result.GroupBy(x => x.Company.Id)
+                                      .Select(g => {
+                                          var commentDetails = g.Where(x => x.CommentDetails != null)
+                                                               .Select(x => x.CommentDetails)
+                                                               .ToList();
+
+                                          if (commentDetails.Count > 0)
+                                          {
+                                              return new CompanyDetailGroupDto
+                                              {
+                                                  Company = g.First().Company,
+                                                  CommentDetails = commentDetails
+                                              };
+                                          }
+                                          else
+                                          {
+                                              return new CompanyDetailGroupDto
+                                              {
+                                                  Company = g.First().Company,
+                                                  CommentDetails = null
+                                              };
+                                          }
+                                      }).ToList();
+
+            return groupedResult;
+            /*
             var result = (from t1 in ShuttleSessionTable
                           join t2 in PassengerRatingTable on t1.Id equals t2.SessionId into t2Group
                           from t2 in t2Group.DefaultIfEmpty()
@@ -357,6 +407,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                                     }).ToList();
 
             return groupedResult;
+            */
 
         }
         public List<PassengerShuttleDetailsDto> PassengerShuttleInnerJoinTables(int userId)
