@@ -230,6 +230,10 @@
               "target": "Package",
               "version": "[6.0.11, )"
             },
+            "Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[6.0.10, )"

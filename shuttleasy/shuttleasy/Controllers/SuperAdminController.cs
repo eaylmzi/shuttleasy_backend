@@ -37,17 +37,11 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                bool isLogin = _userService.LoginCompanyWorker(emailPasswordDto.Email, emailPasswordDto.Password);
-                if (isLogin)
+                CompanyWorker? companyWorker = _userService.LoginCompanyWorker(emailPasswordDto.Email, emailPasswordDto.Password);
+                if (companyWorker != null)
                 {
-                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(emailPasswordDto.Email);
-                    if (companyWorker != null)
-                    {
-                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
-                        return Ok(driverInfoDto);
-                    }
-                    return BadRequest(Error.NotFoundSuperAdmin);
-
+                    CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
+                    return Ok(driverInfoDto);
                 }
                 return BadRequest(Error.NotCorrectEmailAndPassword);
 

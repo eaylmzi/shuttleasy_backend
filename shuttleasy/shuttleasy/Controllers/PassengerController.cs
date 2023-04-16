@@ -91,19 +91,13 @@ namespace shuttleasy.Controllers
         {          
             try
             {
-                bool isLogin = _userService.LoginPassenger(emailPasswordDto.Email, emailPasswordDto.Password);
-                if (isLogin)
+                Passenger? passenger = _userService.LoginPassenger(emailPasswordDto.Email, emailPasswordDto.Password);
+                if (passenger != null)
                 {
-                    Passenger? passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email);
-                    if (passenger != null)
-                    {
-                        PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
-                        return Ok(passengerInfoDto);
-                    }
-                    return BadRequest(Error.NotFoundPassenger);
+                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
+                    return Ok(passengerInfoDto);
                 }
                 return BadRequest(Error.NotCorrectEmailAndPassword);
-
             }         
             catch (Exception ex)
             {

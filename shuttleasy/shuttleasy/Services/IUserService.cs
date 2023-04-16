@@ -9,8 +9,8 @@ namespace shuttleasy.Services
 {
     public interface IUserService
     {
-        public bool LoginCompanyWorker(string email, string password);
-        public bool LoginPassenger(string email, string password);
+        public CompanyWorker? LoginCompanyWorker(string email, string password);
+        public Passenger? LoginPassenger(string email, string password);
         public Passenger? SignUp(PassengerRegisterDto passengerRegisterDto, string role);
         public Passenger? CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role);
         public CompanyWorker? CreateCompanyWorker(CompanyWorkerRegisterDto driverRegisterDto, string role);

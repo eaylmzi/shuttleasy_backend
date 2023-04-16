@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "pRdyk+jObvHer3/rCtdOcWE1AVEN/heniP2obW+HMxEz8h8c/T1rNw18mpfI0IkNWQxjyBygB1tmY6VKb5jT9A==",
+  "dgSpecHash": "2ReOEDpQvZISbM4GKgXAmDw2bUFencpdlFp2YU2voItTABUEi6SxCFKE2dQhXuheU2WpZ/MQtEs+WqyPRfUR2Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\Dell\\source\\repos\\shuttleasy_backend\\shuttleasy\\shuttleasy.unittest\\shuttleasy.unittest.csproj",
   "expectedPackageFiles": [
@@ -15,6 +15,8 @@
     "C:\\Users\\Dell\\.nuget\\packages\\mailkit\\3.4.0\\mailkit.3.4.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.11\\microsoft.aspnetcore.authentication.jwtbearer.6.0.11.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.aspnetcore.http.features\\5.0.17\\microsoft.aspnetcore.http.features.5.0.17.nupkg.sha512",
+    "C:\\Users\\Dell\\.nuget\\packages\\microsoft.aspnetcore.mvc.versioning\\5.0.0\\microsoft.aspnetcore.mvc.versioning.5.0.0.nupkg.sha512",
+    "C:\\Users\\Dell\\.nuget\\packages\\microsoft.aspnetcore.mvc.versioning.apiexplorer\\5.0.0\\microsoft.aspnetcore.mvc.versioning.apiexplorer.5.0.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.codecoverage\\17.1.0\\microsoft.codecoverage.17.1.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",

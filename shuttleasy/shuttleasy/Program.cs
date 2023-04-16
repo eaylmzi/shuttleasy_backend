@@ -1,6 +1,8 @@
 global using shuttleasy.Services.UserServices;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using shuttleasy.Controllers;
@@ -136,6 +138,24 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddApiVersioning(opt =>
+{
+    opt.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    opt.AssumeDefaultVersionWhenUnspecified = true;
+    opt.ReportApiVersions = true;
+    opt.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(),
+                                                    new HeaderApiVersionReader("x-api-version"),
+                                                    new MediaTypeApiVersionReader("x-api-version"));
+});
+builder.Services.AddControllers();
+builder.Services.AddApiVersioning();
+builder.Services.Configure<ApiVersioningOptions>(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+});
+
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -165,6 +185,8 @@ builder.Services.AddHangfireServer();*/
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+
 
 app.UseSwagger();
 app.UseSwaggerUI();

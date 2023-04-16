@@ -69,30 +69,32 @@ namespace shuttleasy.Services
 
       
 
-        public bool LoginPassenger(string email, string password)
+        public Passenger? LoginPassenger(string email, string password)
         {          
-            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
-                    ?? throw new ArgumentNullException();
-
-            bool isMatched = _passwordEncryption.VerifyPasswordHash(passenger.PasswordHash,passenger.PasswordSalt, password);
-            if (isMatched && passenger != null)
+            Passenger? passenger = _passengerLogic.GetPassengerWithEmail(email);
+            if(passenger != null)
             {
-                return true;
+                bool isMatched = _passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, password);
+                if (isMatched && passenger != null)
+                {
+                    return passenger;
+                }
             }
-            return false;
+            return null;
             //"1JCG6eSVTO"
         }
-        public bool LoginCompanyWorker(string email, string password)
+        public CompanyWorker? LoginCompanyWorker(string email, string password)
         {
-            CompanyWorker companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email)
-                    ??throw new ArgumentNullException();
-
-            bool isMatched = _passwordEncryption.VerifyPasswordHash(companyWorker.PasswordHash,companyWorker.PasswordSalt, password);
-            if (isMatched && companyWorker != null)
+            CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(email);
+            if(companyWorker != null)
             {
-                return true;
+                bool isMatched = _passwordEncryption.VerifyPasswordHash(companyWorker.PasswordHash, companyWorker.PasswordSalt, password);
+                if (isMatched && companyWorker != null)
+                {
+                    return companyWorker;
+                }
             }
-            return false;
+            return null;
         }
         public Passenger? SignUp(PassengerRegisterDto passengerRegisterDto,string role)
         {

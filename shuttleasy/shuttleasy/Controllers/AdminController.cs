@@ -50,17 +50,11 @@ namespace shuttleasy.Controllers
         {
             try
             {
-                bool isLogin = _userService.LoginCompanyWorker(emailPasswordDto.Email, emailPasswordDto.Password);
-                if (isLogin)
+                CompanyWorker? companyWorker = _userService.LoginCompanyWorker(emailPasswordDto.Email, emailPasswordDto.Password);
+                if (companyWorker != null)
                 {
-                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithEmail(emailPasswordDto.Email);
-                    if (companyWorker != null)
-                    {
-                        CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
-                        return Ok(driverInfoDto);
-                    }
-                    return BadRequest(Error.NotFoundAdmin);
-                    
+                    CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
+                    return Ok(driverInfoDto);
                 }
                 return BadRequest(Error.NotCorrectEmailAndPassword);
 
@@ -88,11 +82,8 @@ namespace shuttleasy.Controllers
                             return Ok(driverInfoDto);
                         }
                         return BadRequest(Error.NotAdded);
-
                     }
-                    return BadRequest(Error.NotCreatedUser);
-                   
-
+                    return BadRequest(Error.NotCreatedUser);                  
                 }
                 return Unauthorized(Error.NotMatchedToken);
                
