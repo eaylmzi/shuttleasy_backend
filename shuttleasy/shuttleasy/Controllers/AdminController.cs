@@ -128,15 +128,14 @@ namespace shuttleasy.Controllers
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<CommentDetailsDto> GetAllComment()
-        {
-            UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
-            if (_userService.VerifyUser(userInformation))
+        {          
+            try
             {
-               
-                try
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
                 {
                     CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
-                    if(companyWorker != null)
+                    if (companyWorker != null)
                     {
                         var list = _joinTableLogic.CommentDetailsInnerJoinTables(companyWorker.CompanyId);
                         if (list.Count != 0)
@@ -144,29 +143,22 @@ namespace shuttleasy.Controllers
                             return Ok(list);
                         }
                         return Ok(emptyList);
-
                     }
-                    
-
-
-
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-
+                return Unauthorized(Error.NotMatchedToken);
             }
-            return Unauthorized(Error.NotMatchedToken);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
         public ActionResult<EnrolledPassengersGroupDto> GetAllRegisteredPassengers()
-        {
-            UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
-            if (_userService.VerifyUser(userInformation))
+        {           
+            try
             {
-
-                try
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
                 {
                     CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
                     if (companyWorker != null)
@@ -179,43 +171,14 @@ namespace shuttleasy.Controllers
                         return Ok(emptyList);
 
                     }
-
-
-
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-
+                return Unauthorized(Error.NotMatchedToken);
             }
-            return Unauthorized(Error.NotMatchedToken);
-        }
-
-        [HttpPost]
-        public ActionResult Location()
-        {
-            Location loc1 = new Location()
+            catch (Exception ex)
             {
-                Longitude = "0",
-                Latitude = "0"
-            };
-            Location loc2 = new Location()
-            {
-                Longitude = "0",
-                Latitude = "4"
-            };
-
-            Routes route = new Routes();
-            
-
-
-            return Ok(route.calculateDistance(loc1, loc2));
+                return BadRequest(ex.Message);
+            }
         }
-
-
-
-
 
             /*
              * Yedek tokenhelper

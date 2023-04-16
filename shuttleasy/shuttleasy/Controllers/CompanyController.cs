@@ -55,18 +55,8 @@ namespace shuttleasy.Controllers
                     if (isAdded)
                     {
                         return Ok(isAdded);
-                        /*
-                        GeoPoint addedGeoPoint = await _geoPointLogic.GetGeoPointWithLocationName(geoPointDto.LocationName);
-                        int idNumber = addedGeoPoint.Id;
-                        if (idNumber != null)
-                        {
-                            return Ok(idNumber);
-                        }
-                        return BadRequest(Error.EmptyList);
-                        */
                     }
                     return BadRequest(isAdded);
-
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }
@@ -90,8 +80,6 @@ namespace shuttleasy.Controllers
                         return Ok(isAdded);
                     }
                     return BadRequest(isAdded);
-
-
                 }
                 return Unauthorized(Error.NotMatchedToken);
 
@@ -175,8 +163,6 @@ namespace shuttleasy.Controllers
                         return BadRequest(isUpdated);
                     }
                     return BadRequest(Error.NotFoundCompany);
-                   
-
                 }
                 return Unauthorized(Error.NotMatchedToken);
 
@@ -202,9 +188,7 @@ namespace shuttleasy.Controllers
                     }
                     return Ok(emptyList);
                 }
-
                 return Unauthorized(Error.NotMatchedToken);
-
             }
             catch (Exception ex)
             {
