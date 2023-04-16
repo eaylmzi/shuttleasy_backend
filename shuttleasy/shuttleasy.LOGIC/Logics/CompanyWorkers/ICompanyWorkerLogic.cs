@@ -10,6 +10,7 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
     public interface ICompanyWorkerLogic
     {
         public bool Add(CompanyWorker companyWorker);
+        public CompanyWorker? GetSingle(int id);
         public CompanyWorker? GetCompanyWorkerWithId(int id);
         public CompanyWorker? GetCompanyWorkerWithEmail(string email);
         public CompanyWorker? GetCompanyWorkerWithToken(string token);

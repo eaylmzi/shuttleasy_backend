@@ -25,10 +25,21 @@ namespace shuttleasy.LOGIC.Logics
             bool isAdded = _passenger.Add(passenger);
             return isAdded;
         }
+
+        public int AddReturnId(Passenger passenger)
+        {
+            int id = _passenger.AddReturnId(passenger);
+            return id;
+        }
         public List<Passenger>? GetAllPassengers()
         {
             var passengerList = _passenger.Get();
             return passengerList;
+        }
+        public Passenger? GetSingle(int id)
+        {
+            Passenger? passenger = _passenger.GetSingle(id);
+            return passenger;
         }
 
         public Passenger? GetPassengerWithEmail(string email) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom

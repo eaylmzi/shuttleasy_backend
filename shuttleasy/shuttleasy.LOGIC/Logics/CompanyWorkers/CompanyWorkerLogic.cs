@@ -23,6 +23,11 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
             return isAdded;
 
         }
+        public CompanyWorker? GetSingle(int id)
+        {
+            CompanyWorker? companyWorker = _companyWorkerRepository.GetSingle(id);
+            return companyWorker;
+        }
         public CompanyWorker? GetCompanyWorkerWithEmail(string email) // yav buralara try catch yazmak lazım ama ne döndüreceğimi bilmiyom
         {
             Func<CompanyWorker, bool> getCompanyWorker = getCompanyWorker => getCompanyWorker.Email == email;

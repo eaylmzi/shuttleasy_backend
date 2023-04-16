@@ -30,6 +30,7 @@ namespace shuttleasy.Services
     public class UserService : IUserService
     {
         private readonly IPassengerLogic _passengerLogic;
+        private readonly ICompanyWorkerLogic _companyWorkerLogic;
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IPasswordResetLogic _passwordResetLogic;
         private readonly IPasswordResetRepository _passwordResetRepository;
@@ -50,7 +51,7 @@ namespace shuttleasy.Services
             IJwtTokenManager jwtTokenManager, IConfiguration configuration, ICompanyWorkerLogic driverLogic,
             IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
             ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
-            IShuttleSessionLogic shuttleSessionLogic)
+            IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -65,6 +66,7 @@ namespace shuttleasy.Services
             _passengerRepository = passengerRepository;
             _companyLogic = companyLogic;
             _shuttleSessionLogic = shuttleSessionLogic;
+            _companyWorkerLogic = companyWorkerLogic;
         }
 
       
@@ -96,39 +98,97 @@ namespace shuttleasy.Services
             }
             return null;
         }
+
+
+        private Passenger? AssingPassengerToken(int id, string role)
+        {
+            Passenger? passenger = _passengerLogic.GetSingle(id);
+            if (passenger != null)
+            {
+                string token = _jwtTokenManager.CreateToken(passenger, role, _configuration);
+                passenger.Token = token;
+                _passengerLogic.UpdatePassengerWithEmail(passenger, passenger.Email);
+                return passenger;
+            }           
+            return null;
+        }
+        private CompanyWorker? AssingCompanyWorkerToken(int id, string role)
+        {
+            CompanyWorker? companyWorker = _companyWorkerLogic.GetSingle(id);
+            if (companyWorker != null)
+            {
+                string token = _jwtTokenManager.CreateToken(companyWorker, role, _configuration);
+                companyWorker.Token = token;
+                _companyWorkerLogic.UpdateCompanyWorkerWithEmail(companyWorker, companyWorker.Email);
+                return companyWorker;
+            }
+            return null;
+        }    
+        private T? AssignToken<T>(int id, string role) where T : class
+        {
+            if (role == Roles.Passenger)
+            {
+                Passenger? passenger = AssingPassengerToken(id, role);
+                if(passenger != null)
+                {
+                    return passenger as T;
+                }           
+            }
+            else if (role == Roles.Driver)
+            {
+                CompanyWorker? companyWorker = AssingCompanyWorkerToken(id, role);
+                if (companyWorker != null)
+                {
+                    return companyWorker as T;
+                }
+            }
+            else if (role == Roles.Admin)
+            {
+                CompanyWorker? companyWorker = AssingCompanyWorkerToken(id, role);
+                if (companyWorker != null)
+                {
+                    return companyWorker as T;
+                }
+            }
+            else if (role == Roles.SuperAdmin)
+            {
+                CompanyWorker? companyWorker = AssingCompanyWorkerToken(id, role);
+                if (companyWorker != null)
+                {
+                    return companyWorker as T;
+                }
+            }
+            return null;
+
+        }
         public Passenger? SignUp(PassengerRegisterDto passengerRegisterDto,string role)
         {
             Passenger newPassenger = new Passenger();
             newPassenger = _mapper.Map<Passenger>(passengerRegisterDto);
+           
+
+            if (string.IsNullOrEmpty(passengerRegisterDto.Password))
+            {
+                return null;
+            }
+
+            _passwordEncryption.CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            newPassenger.PasswordHash = passwordHash;
+            newPassenger.PasswordSalt = passwordSalt;
             newPassenger.QrString = Guid.NewGuid();
+            newPassenger.Verified = true;
+            int id = _passengerLogic.AddReturnId(newPassenger);
 
-            if (!string.IsNullOrEmpty(passengerRegisterDto.Password))
+            Passenger? passenger = AssignToken<Passenger>(id, role);
+            if(passenger != null)
             {
-                _passwordEncryption.CreatePasswordHash(passengerRegisterDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
-                newPassenger.PasswordHash = passwordHash;
-                newPassenger.PasswordSalt = passwordSalt;
-                newPassenger.Verified = true;
-            }
-            else
-            {
-                newPassenger.Verified = false;
+                return passenger;
             }
 
-            _passengerLogic.Add(newPassenger);
-
-            Passenger? passengerFromDB = _passengerLogic.GetPassengerWithEmail(newPassenger.Email);
-            if(passengerFromDB != null)
-            {
-                string token = _jwtTokenManager.CreateToken(passengerFromDB, role, _configuration);
-                passengerFromDB.Token = token;
-                _passengerLogic.UpdatePassengerWithEmail(passengerFromDB, passengerFromDB.Email);
-                return passengerFromDB;
-            }
-
-            return null;
-            
-
+            return null;           
         }
+
+
         public Passenger? CreatePassenger(PassengerRegisterPanelDto passengerRegisterPanelDto, string role)
         {
             Passenger newPassenger = new Passenger();
@@ -162,9 +222,9 @@ namespace shuttleasy.Services
             newCompanyWorker.PasswordSalt = passwordSalt;
             newCompanyWorker.Verified = true;
             newCompanyWorker.WorkerType = role;
-
-
             _driverLogic.Add(newCompanyWorker);
+
+
             CompanyWorker? companyWorkerFromDB = _driverLogic.GetCompanyWorkerWithEmail(newCompanyWorker.Email);
             if (companyWorkerFromDB != null)
             {

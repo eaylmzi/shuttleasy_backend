@@ -163,6 +163,10 @@ namespace shuttleasy.DAL.Interfaces
                 };
             }
         }
+        public T? GetSingle(int number)
+        {
+            return query.Find(number);
+        }
 
         public T? GetSingle(Func<T, bool> metot)
         {
