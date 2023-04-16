@@ -82,5 +82,11 @@ namespace shuttleasy.LOGIC.Logics
             bool isDeleted = _passenger.Delete(getPassenger);
             return isDeleted;
         }
+        public async Task<bool> IsPhoneNumberAndEmailExist(string email, string phoneNumber)
+        {
+            bool isExist = await _passenger.IsPhoneNumberAndEmailExist(email, phoneNumber);
+            return isExist;
+
+        }
     }
 }

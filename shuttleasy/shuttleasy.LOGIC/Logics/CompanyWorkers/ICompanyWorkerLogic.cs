@@ -10,6 +10,7 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
     public interface ICompanyWorkerLogic
     {
         public bool Add(CompanyWorker companyWorker);
+        public int AddReturnId(CompanyWorker companyWorker);
         public CompanyWorker? GetSingle(int id);
         public CompanyWorker? GetCompanyWorkerWithId(int id);
         public CompanyWorker? GetCompanyWorkerWithEmail(string email);
@@ -17,5 +18,6 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
         public bool UpdateCompanyWorkerWithEmail(CompanyWorker updatedCompanyWorker, string email);
         public List<CompanyWorker>? GetAllDriverWithCompanyId(int companyId);
         public CompanyWorker? GetCompanyWorkerWithPhoneNumber(string phone);
+        public Task<bool> IsPhoneNumberAndEmailExist(string email, string phoneNumber);
     }
 }

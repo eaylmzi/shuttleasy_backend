@@ -10,6 +10,7 @@ namespace shuttleasy.DAL.EFRepositories
 {
     public interface IPassengerRepository : IRepository<Passenger>
     {
+        public Task<bool> IsPhoneNumberAndEmailExist(string email, string phoneNumber);
         public bool isPaid(string id);
     }
 }

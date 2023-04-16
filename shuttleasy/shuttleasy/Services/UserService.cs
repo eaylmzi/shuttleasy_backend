@@ -193,45 +193,39 @@ namespace shuttleasy.Services
         {
             Passenger newPassenger = new Passenger();
             newPassenger = _mapper.Map<Passenger>(passengerRegisterPanelDto);
+
             string randomPassword = GetRandomString(10);
             _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
             newPassenger.PasswordHash = passwordHash;
             newPassenger.PasswordSalt = passwordSalt;
             newPassenger.QrString = Guid.NewGuid();
             newPassenger.Verified = true;
+            int id = _passengerLogic.AddReturnId(newPassenger);
 
-            _passengerLogic.Add(newPassenger);
-            Passenger? passengerFromDB = _passengerLogic.GetPassengerWithEmail(newPassenger.Email);
-            if (passengerFromDB != null)
+            Passenger? passenger = AssignToken<Passenger>(id, role);
+            if (passenger != null)
             {
-                string token = _jwtTokenManager.CreateToken(passengerFromDB, role, _configuration);
-                passengerFromDB.Token = token;
-                _passengerLogic.UpdatePassengerWithEmail(passengerFromDB, passengerFromDB.Email);
-                return passengerFromDB;
+                return passenger;
             }
             return null;
-
         }
         public CompanyWorker? CreateCompanyWorker(CompanyWorkerRegisterDto driverRegisterDto, string role)
         {
             CompanyWorker newCompanyWorker = new CompanyWorker();
             newCompanyWorker = _mapper.Map<CompanyWorker>(driverRegisterDto);
+
             string randomPassword = GetRandomString(10);
             _passwordEncryption.CreatePasswordHash(randomPassword, out byte[] passwordHash, out byte[] passwordSalt);
             newCompanyWorker.PasswordHash = passwordHash;
             newCompanyWorker.PasswordSalt = passwordSalt;
             newCompanyWorker.Verified = true;
             newCompanyWorker.WorkerType = role;
-            _driverLogic.Add(newCompanyWorker);
+           int id = _driverLogic.AddReturnId(newCompanyWorker);
 
-
-            CompanyWorker? companyWorkerFromDB = _driverLogic.GetCompanyWorkerWithEmail(newCompanyWorker.Email);
-            if (companyWorkerFromDB != null)
+            CompanyWorker? companyWorker = AssignToken<CompanyWorker>(id, role);
+            if (companyWorker != null)
             {
-                string token = _jwtTokenManager.CreateToken(companyWorkerFromDB, role, _configuration);
-                companyWorkerFromDB.Token = token;
-                _driverLogic.UpdateCompanyWorkerWithEmail(companyWorkerFromDB, companyWorkerFromDB.Email);
-                return companyWorkerFromDB;
+                return companyWorker;
             }
             return null;
 
@@ -527,8 +521,6 @@ namespace shuttleasy.Services
                 return true;
             }
             return false;
-
-
         }
 
         public bool VerifyUser(UserVerifyingDto userInformation)

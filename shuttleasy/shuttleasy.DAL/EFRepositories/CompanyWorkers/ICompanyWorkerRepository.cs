@@ -10,5 +10,6 @@ namespace shuttleasy.DAL.EFRepositories.CompanyWorkers
 {
     public interface ICompanyWorkerRepository : IRepository<CompanyWorker>
     {
+        public Task<bool> IsPhoneNumberAndEmailExist(string email, string phoneNumber);
     }
 }

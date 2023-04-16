@@ -23,6 +23,11 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
             return isAdded;
 
         }
+        public int AddReturnId(CompanyWorker companyWorker)
+        {
+            int id = _companyWorkerRepository.AddReturnId(companyWorker);
+            return id;
+        }
         public CompanyWorker? GetSingle(int id)
         {
             CompanyWorker? companyWorker = _companyWorkerRepository.GetSingle(id);
@@ -68,6 +73,12 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
             Func<CompanyWorker, bool> getDriver = getDriver => getDriver.CompanyId == companyId;
             List<CompanyWorker>? getDriverList = _companyWorkerRepository.Get(getDriver);
             return getDriverList;
+        }
+
+        public async Task<bool> IsPhoneNumberAndEmailExist(string email, string phoneNumber)
+        {
+            bool isExist = await _companyWorkerRepository.IsPhoneNumberAndEmailExist(email, phoneNumber);
+            return isExist;
         }
     }
 }

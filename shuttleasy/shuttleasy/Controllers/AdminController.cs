@@ -65,14 +65,14 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<CompanyWorkerInfoDto> CreateDriver([FromBody]CompanyWorkerRegisterDto driverRegisterDto)
+        public async Task<ActionResult<CompanyWorkerInfoDto>> CreateDriver([FromBody]CompanyWorkerRegisterDto driverRegisterDto)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isCreated = _userService.CheckEmailandPhoneNumberForCompanyWorker(driverRegisterDto.Email,driverRegisterDto.PhoneNumber);
+                    bool isCreated = await _driverLogic.IsPhoneNumberAndEmailExist(driverRegisterDto.Email, driverRegisterDto.PhoneNumber);
                     if (!isCreated)
                     {
                         CompanyWorker? newCompanyWorker = _userService.CreateCompanyWorker(driverRegisterDto, Roles.Driver);
@@ -96,14 +96,14 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<PassengerInfoDto> CreatePassenger([FromBody] PassengerRegisterPanelDto passengerRegisterPanelDto)
+        public async Task<ActionResult<PassengerInfoDto>> CreatePassenger([FromBody] PassengerRegisterPanelDto passengerRegisterPanelDto)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isCreated = _userService.CheckEmailandPhoneNumberForPassengers(passengerRegisterPanelDto.Email,passengerRegisterPanelDto.PhoneNumber);
+                    bool isCreated = await _passengerLogic.IsPhoneNumberAndEmailExist(passengerRegisterPanelDto.Email, passengerRegisterPanelDto.PhoneNumber);
                     if (!isCreated)
                     {
                         Passenger? newPassenger = _userService.CreatePassenger(passengerRegisterPanelDto, Roles.Passenger);

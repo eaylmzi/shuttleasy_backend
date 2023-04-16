@@ -71,19 +71,14 @@ namespace shuttleasy.Controllers
                     {
                         PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(newPassenger);
                         return Ok(newPassenger);
-
                     }
                     return BadRequest(Error.NotAdded);
-
                 }
-                return BadRequest(Error.FoundEmailOrTelephone);
-            
-               
+                return BadRequest(Error.FoundEmailOrTelephone);                         
             }  
             catch (Exception ex) { 
                 return BadRequest(ex.Message) ; 
-            }
-         
+            }        
         }
        
         [HttpPost]
