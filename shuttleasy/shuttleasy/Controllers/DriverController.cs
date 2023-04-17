@@ -57,13 +57,11 @@ namespace shuttleasy.Controllers
                 }
                 return BadRequest(Error.NotCorrectEmailAndPassword);
             }
-
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-
         [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
         public ActionResult<CompanyWorkerInfoDto> UpdateDriver(DriverProfileDto driverProfileDto)
         {

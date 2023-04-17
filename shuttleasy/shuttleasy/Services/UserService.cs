@@ -237,7 +237,6 @@ namespace shuttleasy.Services
         {
 
              CompanyWorker updatedDriver = companyWorker;
-
              updatedDriver.ProfilePic = setProfilePhoto(driverProfileDto.ProfilePic);
              updatedDriver.Name = driverProfileDto.Name;
              updatedDriver.Surname = driverProfileDto.Surname;
@@ -249,7 +248,6 @@ namespace shuttleasy.Services
             {
                 return updatedDriver;
             }
-
 
             return null;
         }
