@@ -59,11 +59,12 @@ namespace shuttleasy.Controllers
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
         [HttpPost]
-        public ActionResult<PassengerInfoDto> SignUp([FromBody] PassengerRegisterDto passengerRegisterDto)
+        public async Task<ActionResult<PassengerInfoDto>> SignUp([FromBody] PassengerRegisterDto passengerRegisterDto)
         {           
             try
             {
-                bool isCreated = _userService.CheckEmailandPhoneNumberForPassengers(passengerRegisterDto.Email,passengerRegisterDto.PhoneNumber);
+
+                bool isCreated = await _passengerLogic.IsPhoneNumberAndEmailExist(passengerRegisterDto.Email, passengerRegisterDto.PhoneNumber);
                 if (!isCreated)
                 {
                     Passenger? newPassenger = _userService.SignUp(passengerRegisterDto, Roles.Passenger);
@@ -114,10 +115,7 @@ namespace shuttleasy.Controllers
                     {
                         if (passengerFromRequestToken.Id == passengerFromEmail.Id)
                         {
-                            Passenger passenger = _passengerLogic.GetPassengerWithEmail(emailPasswordDto.Email)
-                                ?? throw new ArgumentNullException();
-
-                            if (_passwordEncryption.VerifyPasswordHash(passenger.PasswordHash, passenger.PasswordSalt, emailPasswordDto.Password))
+                            if (_passwordEncryption.VerifyPasswordHash(passengerFromEmail.PasswordHash, passengerFromEmail.PasswordSalt, emailPasswordDto.Password))
                             {
                                 bool isDeleted = _passengerLogic.DeletePassenger(emailPasswordDto.Email);
                                 if (isDeleted)
