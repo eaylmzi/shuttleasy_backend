@@ -101,7 +101,7 @@ builder.Services.AddScoped<IGeoPointLogic, GeoPointLogic>();
 builder.Services.AddScoped<IGeoPointRepository, GeoPointRepository>();
 
 
-
+builder.Services.AddSignalR();
 
 
 

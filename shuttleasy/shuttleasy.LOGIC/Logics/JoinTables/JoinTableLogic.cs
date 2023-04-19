@@ -17,8 +17,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
 
         private DbSet<Company> CompanyTable { get; set; }
         private DbSet<ShuttleSession> ShuttleSessionTable { get; set; }
-        private DbSet<PassengerRating> PassengerRatingTable { get; set; }
-       
+        private DbSet<PassengerRating> PassengerRatingTable { get; set; }    
         private DbSet<Passenger> PassengerTable { get; set; }
         private DbSet<SessionPassenger> SessionPassengerTable { get; set; }
         private DbSet<GeoPoint> GeoPointTable { get; set; }
@@ -26,10 +25,6 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<PickupPoint> PickupPointTable { get; set; }
         private DbSet<CompanyWorker> CompanyWorkerTable { get; set; }
         private DbSet<PickupArea> PickupAreaTable { get; set; }
-
-
-
-
         public JoinTableLogic()
         {
             CompanyTable = _context.Set<Company>();
@@ -128,19 +123,6 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<ShuttleDetailsGroupDto> ShuttleDetailsInnerJoinTables(int driverId)
 
         {
-            if (CompanyTable == null)
-            {
-                // Handle the null tables here or throw an exception
-            }
-            if (ShuttleSessionTable == null)
-            {
-                // Handle the null tables here or throw an exception
-            }
-            if (ShuttleBusTable == null)
-            {
-                // Handle the null tables here or throw an exception
-            }
-
             var result = (from t1 in CompanyTable
                           join t2 in ShuttleSessionTable on t1.Id equals t2.CompanyId
                           join t3 in PassengerRatingTable
@@ -432,8 +414,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             return result;
            
 
-        }
-        
+        }       
         public List<EnrolledPassengersGroupDto> ShuttlePassengersInnerJoinTables(int companyId)
 
         {
@@ -531,8 +512,6 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
 
 
         }
-
-
         public List<SessionGeoPointsDto> SessionGeoPointsInnerJoinTables(int? sessionId)
 
         {
@@ -569,7 +548,6 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
 
             return result;
         }
-
         public List<ShuttleDto> MertimYapmaz(int driverId)
         {
             var result = (from t1 in CompanyTable

@@ -19,6 +19,12 @@ namespace shuttleasy.Services
         public object? resetPassword(string email, string password);
         public Passenger? UpdatePassengerProfile(Passenger passenger, UserProfileDto userProfileDto);
 
+
+        public Task<bool> UploadPhoto(IFormFile file, string f_name);
+
+
+
+
         public CompanyWorker? UpdateDriverProfile(CompanyWorker companyWorker, DriverProfileDto driverProfileDto);
         public bool CheckEmailandPhoneNumberForPassengers(string email, string phoneNumber);
         public bool CheckEmailandPhoneNumberForCompanyWorker(string email,string phoneNumber);

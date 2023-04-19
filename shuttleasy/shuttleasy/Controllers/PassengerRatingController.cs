@@ -96,12 +96,8 @@ namespace shuttleasy.Controllers
                     if(list.Count != 0)
                     {
                         return Ok(list);
-                    }
-                    
+                    }                  
                     return Ok(emptyList);
-
-
-
                 }
                 catch (Exception ex)
                 {

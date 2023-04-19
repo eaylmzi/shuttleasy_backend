@@ -252,7 +252,34 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public async Task<ActionResult<bool>> UploadPhoto(IFormFile file)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    Passenger? passenger = TokenHelper.GetUserFromRequestToken(Request.Headers,_passengerLogic);
+                    if(passenger != null)
+                    {
+                        string fileName = passenger.Id + "Image";
+                        bool isAdded = await _userService.UploadPhoto(file, fileName);
+                        if (isAdded)
+                        {
+                            return isAdded;
+                        }
+                        return isAdded;
+                    }
+                    return BadRequest(Error.NotFoundPassenger);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
 

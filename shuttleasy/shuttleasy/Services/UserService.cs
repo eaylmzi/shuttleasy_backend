@@ -43,6 +43,7 @@ namespace shuttleasy.Services
         private readonly IPassengerRepository _passengerRepository;
         private readonly ICompanyLogic _companyLogic;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
+        private static IWebHostEnvironment _webHostEnvironment;
 
 
 
@@ -51,7 +52,7 @@ namespace shuttleasy.Services
             IJwtTokenManager jwtTokenManager, IConfiguration configuration, ICompanyWorkerLogic driverLogic,
             IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
             ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
-            IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic)
+            IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic, IWebHostEnvironment webHostEnvironment)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -67,6 +68,7 @@ namespace shuttleasy.Services
             _companyLogic = companyLogic;
             _shuttleSessionLogic = shuttleSessionLogic;
             _companyWorkerLogic = companyWorkerLogic;
+            _webHostEnvironment = webHostEnvironment;
         }
 
       
@@ -606,7 +608,31 @@ namespace shuttleasy.Services
         }
 
 
-
+        public async Task<bool> UploadPhoto(IFormFile file, string name)
+        {
+            string fileName = name;
+            try
+            {
+                var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+                fileName = fileName + extension;
+                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+                if (!Directory.Exists(pathBuilt))
+                {
+                    Directory.CreateDirectory(pathBuilt);
+                }
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                   fileName);
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }           
+        }
 
 
 

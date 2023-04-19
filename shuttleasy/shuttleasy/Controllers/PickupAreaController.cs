@@ -102,8 +102,6 @@ namespace shuttleasy.Controllers
                         return Ok(isAdded);
                     }
                     return Ok(isAdded);
-
-
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }
@@ -127,8 +125,6 @@ namespace shuttleasy.Controllers
                         return Ok(list);
                     }
                     return Ok(list);
-
-
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }

@@ -13,6 +13,9 @@
     <PackageReference Include="Hangfire.Core" Version="1.7.32" />
     <PackageReference Include="MailKit" Version="3.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.16" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="6.0.16" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="6.0.16" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10">
       <PrivateAssets>all</PrivateAssets>
@@ -31,6 +34,9 @@
   </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\shuttleasy.LOGIC\shuttleasy.LOGIC.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Upload\files\" />
 	</ItemGroup>
 
 </Project>
