@@ -36,7 +36,7 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<bool> AddShuttleBus([FromBody] ShuttleBusDto shuttleBusDto)
+        public async Task<ActionResult<bool>> AddShuttleBus([FromBody] ShuttleBusDto shuttleBusDto)
         {
             try
             {
@@ -46,14 +46,17 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(TokenHelper.GetUserIdFromRequestToken(Request.Headers));
                     if (companyWorker != null)
                     {
-                        ShuttleBus shuttleBus = _mapper.Map<ShuttleBus>(shuttleBusDto);
-                        bool isAdded = _shuttleBusLogic.Add(shuttleBus);
-                        if (isAdded)
+                        if (await _shuttleBusLogic.CheckAllForeignKeysAndUniqueExistAsync(shuttleBusDto))
                         {
-                            return Ok(isAdded);
+                            ShuttleBus shuttleBus = _mapper.Map<ShuttleBus>(shuttleBusDto);
+                            bool isAdded = _shuttleBusLogic.Add(shuttleBus);
+                            if (isAdded)
+                            {
+                                return Ok(isAdded);
+                            }
+                            return BadRequest(isAdded);
                         }
-                        return BadRequest(isAdded);
-
+                        return BadRequest(Error.NotMatchedForeignKeys);
                     }
                     return BadRequest(Error.NotFoundUser);
                 }

@@ -1,6 +1,8 @@
-﻿using shuttleasy.DAL.EFRepositories.PasswordReset;
+﻿using Microsoft.EntityFrameworkCore;
+using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.ShuttleBuses;
 using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Models.dto.ShuttleBuses.dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +45,11 @@ namespace shuttleasy.LOGIC.Logics.ShuttleBuses
             ShuttleBus shuttle = _shuttleBusRepository.GetSingle(getShuttleBus);
 
             return shuttle.LicensePlate;
+        }
+        public async Task<bool> CheckAllForeignKeysAndUniqueExistAsync(ShuttleBusDto shuttleBusDto)
+        {
+            bool isExist =await  _shuttleBusRepository.CheckAllForeignKeysExistAsync(shuttleBusDto);
+            return isExist;
         }
     }
 }

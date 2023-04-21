@@ -28,5 +28,6 @@ namespace shuttleasy.DAL.Resource.String
         public const string NotMatchedToken = "Mistake about token";
         public const string NotUpdatedInformation = "Not updated information";
         public const string NotVerifiedPassword = "The password not verified";
+        public const string NotMatchedForeignKeys = "Foreign keys are not matched";
     }
 }

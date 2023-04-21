@@ -1,4 +1,5 @@
 ﻿using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Models.dto.ShuttleBuses.dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace shuttleasy.LOGIC.Logics.ShuttleBuses
         public List<ShuttleBus>? GetAllShuttleBusesWithCompanyId(int companyId);
         public bool DeleteShuttleBus(int shuttleBusNumber);
         public string? GetBusLicensePlateWithBusId(int busId);
+        public Task<bool> CheckAllForeignKeysAndUniqueExistAsync(ShuttleBusDto shuttleBusDto);
     }
 }
