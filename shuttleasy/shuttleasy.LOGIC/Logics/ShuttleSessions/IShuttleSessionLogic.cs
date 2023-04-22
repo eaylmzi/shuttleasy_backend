@@ -1,4 +1,5 @@
 ﻿using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
         public ShuttleSession? FindShuttleSessionById(int sessionNumber);
         public Task<bool> UpdateAsync(int id, ShuttleSession updatedShuttleSession);
         public int? AddReturnId(ShuttleSession shuttleSession);
+        public Task<bool> CheckAllForeignKeysAndUniqueExistAsync(ShuttleSessionDto shuttleSessionDto);
     }
 }

@@ -43,6 +43,7 @@ using shuttleasy.LOGIC.Logics.ShuttleBuses;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.Mail;
 using shuttleasy.Services;
+using shuttleasy.Services.ShuttleServices;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -110,6 +111,7 @@ builder.Services.AddScoped<IMailManager, MailManager>();
 builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordEncryption, PasswordEncryption>();
+builder.Services.AddScoped<IShuttleService, ShuttleService>();
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 

@@ -31,6 +31,7 @@ using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.LOGIC.Logics.PickupPoints;
 using Microsoft.EntityFrameworkCore;
 using shuttleasy.LOGIC.Logics.PickupAreas;
+using shuttleasy.Services.ShuttleServices;
 
 namespace shuttleasy.Controllers
 {
@@ -50,12 +51,13 @@ namespace shuttleasy.Controllers
         private readonly IGeoPointLogic _geoPointLogic;
         private readonly IPickupAreaLogic _pickupAreaLogic;
         private readonly IPickupPointLogic _pickupPointLogic;
+        private readonly IShuttleService _shuttleService;
         List<ShuttleSession> emptyList = new List<ShuttleSession>();
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
                     IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper, IJoinTableLogic joinTableLogic,
                     ICompanyLogic companyLogic, ISessionPassengerLogic sessionPassengerLogic, IGeoPointLogic geoPointLogic,
-                    IPickupAreaLogic pickupAreaLogic, IPickupPointLogic pickupPointLogic)
+                    IPickupAreaLogic pickupAreaLogic, IPickupPointLogic pickupPointLogic, IShuttleService shuttleService)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -69,10 +71,11 @@ namespace shuttleasy.Controllers
             _geoPointLogic = geoPointLogic;
             _pickupAreaLogic = pickupAreaLogic;
             _pickupPointLogic = pickupPointLogic;
+            _shuttleService = shuttleService;
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<bool> CreateShuttleSession([FromBody] ShuttleSessionDto shuttleSessionDto)
+        public async Task<ActionResult<bool>> CreateShuttleSession([FromBody] ShuttleSessionDto shuttleSessionDto)
         {
             try
             {
@@ -82,24 +85,20 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(TokenHelper.GetUserIdFromRequestToken(Request.Headers));
                     if (companyWorker != null)
                     {
-                        ShuttleSession shuttleSession = _mapper.Map<ShuttleSession>(shuttleSessionDto);
-                        //string timeStamp = DateTime.Now.ToString("dddd, dd MMMM yyyy");
-                        //{11.12.2022 16:14:12}
-                        // byte[] timeStampBytes = Encoding.ASCII.GetBytes(timeStamp); //STRİNG TO TİMESTAMP YAPÇAN
-                        // shuttleSession.StartTime = DateTime.Now;
-                        //Shuttlesessionda timestamp ve dateyi sor
-                        int? isAdded = _shuttleSessionLogic.AddReturnId(shuttleSession);
-                        if (isAdded != 0)
+                        if (await _shuttleSessionLogic.CheckAllForeignKeysAndUniqueExistAsync(shuttleSessionDto))
                         {
-                            return Ok(isAdded);
-                        }
-                        return BadRequest(Error.NotFound);
+                            ShuttleSession shuttleSession = _mapper.Map<ShuttleSession>(shuttleSessionDto);
+                            int? isAdded = _shuttleSessionLogic.AddReturnId(shuttleSession);
+                            if (isAdded != 0)
+                            {
+                                return Ok(isAdded);
+                            }
+                            return BadRequest(Error.NotFound);
+                        }                   
                     }
                     return BadRequest(Error.NotFoundUser);
-
                 }
                 return Unauthorized(Error.NotMatchedToken);
-
             }
             catch (Exception ex)
             {
@@ -129,18 +128,10 @@ namespace shuttleasy.Controllers
                             return Ok(isDeletedShuttle);
                         }
                         return BadRequest(isDeletedShuttle);
-
-
-
-
-
                     }
                     return BadRequest(Error.NotFoundUser);
                 }
                 return Unauthorized(Error.NotMatchedToken);
-
-
-
             }
             catch (Exception ex)
             {
@@ -258,6 +249,15 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
+                    bool isEnrolled = await _shuttleService.EnrollPassenger(sessionPassengerDto, userId);
+                    if (isEnrolled)
+                    {
+                        return true;
+                    }
+                    return false;
+
+                    /*
                     ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionPassengerDto.SessionId);
                     if(shuttleSession != null)
                     {
@@ -307,7 +307,7 @@ namespace shuttleasy.Controllers
 
                     }
                     return BadRequest(Error.NotFoundShuttleSession);
-
+                    */
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }

@@ -1,5 +1,7 @@
 ﻿using shuttleasy.DAL.EFRepositories.ShuttleSessions;
 using shuttleasy.DAL.Models;
+using shuttleasy.DAL.Models.dto.ShuttleBuses.dto;
+using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,6 +75,7 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
             return shuttleSessions;
 
         }
+
         public async Task<bool> UpdateAsync(int id, ShuttleSession updatedShuttleSession)
         {
             Func<ShuttleSession, bool> getCompanyNumber = getCompanyNumber => getCompanyNumber.Id == id;
@@ -83,6 +86,11 @@ namespace shuttleasy.LOGIC.Logics.ShuttleSessions
         {
             int? shuttleId = _shuttleSessionRepository.AddReturnId(shuttleSession);
             return shuttleId;
+        }
+        public async Task<bool> CheckAllForeignKeysAndUniqueExistAsync(ShuttleSessionDto shuttleSessionDto)
+        {
+            bool isExist = await _shuttleSessionRepository.CheckAllForeignKeysAndUniqueExistAsync(shuttleSessionDto);
+            return isExist;
         }
 
     }

@@ -32,6 +32,19 @@ namespace shuttleasy.LOGIC.Logics.PickupPoints
             bool isDeleted = _pickupPointRepository.Delete(getPickupPointNumber);
             return isDeleted;
         }
-       
+        public List<PickupPoint>? GetListById(int pickupId)
+        {
+            Func<PickupPoint, bool> getSessionNumber = getSessionNumber => getSessionNumber.Id == pickupId;
+            List<PickupPoint>? pickupPointList = _pickupPointRepository.Get(getSessionNumber);
+            return pickupPointList;
+
+        }
+        public PickupPoint? GetSingle(int pickupId)
+        {
+            PickupPoint? pickupPoint = _pickupPointRepository.GetSingle(pickupId);
+            return pickupPoint;
+
+        }
+
     }
 }

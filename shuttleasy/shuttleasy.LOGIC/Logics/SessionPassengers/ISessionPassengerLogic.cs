@@ -12,5 +12,6 @@ namespace shuttleasy.LOGIC.Logics.SessionPassengers
         public bool Add(SessionPassenger sessionPassenger);
         public bool Delete(int sessionPassengerNumber);
         public bool DeleteBySessionId(int sessionID);
+        public List<SessionPassenger>? GetListById(int sessionNumber);
     }
 }

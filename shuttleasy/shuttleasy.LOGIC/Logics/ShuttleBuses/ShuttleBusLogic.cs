@@ -48,7 +48,7 @@ namespace shuttleasy.LOGIC.Logics.ShuttleBuses
         }
         public async Task<bool> CheckAllForeignKeysAndUniqueExistAsync(ShuttleBusDto shuttleBusDto)
         {
-            bool isExist =await  _shuttleBusRepository.CheckAllForeignKeysExistAsync(shuttleBusDto);
+            bool isExist =await  _shuttleBusRepository.CheckAllForeignKeysAndUniqueExistAsync(shuttleBusDto);
             return isExist;
         }
     }
