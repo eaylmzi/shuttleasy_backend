@@ -25,6 +25,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<PickupPoint> PickupPointTable { get; set; }
         private DbSet<CompanyWorker> CompanyWorkerTable { get; set; }
         private DbSet<PickupArea> PickupAreaTable { get; set; }
+
         public JoinTableLogic()
         {
             CompanyTable = _context.Set<Company>();
@@ -546,6 +547,23 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                               PolygonPoints = t2.PolygonPoints,
                           }).ToList();
 
+            return result;
+        }
+        public List<SessionPassengerPickupIdDetailsDto> SessionPassengerPickupPointJoinTables(int sessionId)
+
+        {
+            var result = (from t1 in SessionPassengerTable
+                          join t2 in PickupPointTable on t1.PickupId equals t2.Id
+                          join t3 in GeoPointTable on t2.GeoPointId equals t3.Id
+                          where t1.SessionId == sessionId
+
+                          select new SessionPassengerPickupIdDetailsDto
+                          {
+                              UserId = t2.UserId,
+                              Latitude = t3.Latitude,
+                              Longtitude = t3.Longtitude
+
+                          }).ToList();
             return result;
         }
         public List<ShuttleDto> MertimYapmaz(int driverId)

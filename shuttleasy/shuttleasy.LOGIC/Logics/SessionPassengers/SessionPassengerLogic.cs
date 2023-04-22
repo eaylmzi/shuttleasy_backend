@@ -39,8 +39,8 @@ namespace shuttleasy.LOGIC.Logics.SessionPassengers
             Func<SessionPassenger, bool> getSessionNumber = getSessionNumber => getSessionNumber.SessionId == sessionNumber;
             List<SessionPassenger>? sessionPassenger = _sessionPassengerRepository.Get(getSessionNumber);
             return sessionPassenger;
-
         }
+   
 
     }
 }
