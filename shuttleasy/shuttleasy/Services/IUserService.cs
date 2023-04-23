@@ -30,7 +30,7 @@ namespace shuttleasy.Services
         public bool CheckEmailandPhoneNumberForCompanyWorker(string email,string phoneNumber);
         public bool CheckEmail(string email);
         public bool VerifyUser(UserVerifyingDto userInformation);
-        public bool calculateRating(int sessionId, double rating);
+        public bool UpdateCompanyRating(int sessionId, double rating);
 
     }
 }

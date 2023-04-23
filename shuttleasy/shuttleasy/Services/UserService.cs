@@ -24,6 +24,7 @@ using System;
 using System.Data;
 using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace shuttleasy.Services
 {
@@ -561,8 +562,25 @@ namespace shuttleasy.Services
             }
             return false;
         }
-
-        public bool calculateRating(int sessionId,double rating)
+        private Company CalculateRating(Company company, double rating)
+        {
+            int voteNumber = company.VotesNumber;
+            double? companyRating = company.Rating;
+            if (companyRating != null && companyRating != 0)
+            {
+                double totalRating = (double)(companyRating * voteNumber);
+                double newRating = (totalRating + rating) / (voteNumber + 1);
+                company.Rating = newRating;
+                company.VotesNumber = voteNumber + 1;
+            }
+            else
+            {
+                company.Rating = rating;
+                company.VotesNumber = voteNumber + 1;
+            }
+            return company;
+        }
+        public bool UpdateCompanyRating(int sessionId,double rating)
         {
             ShuttleSession? shuttleSession  = _shuttleSessionLogic.FindShuttleSessionById(sessionId);
             if (shuttleSession != null)
@@ -571,14 +589,7 @@ namespace shuttleasy.Services
                 Company? company = _companyLogic.Find(companyID);
                 if(company != null)
                 {
-                    int voteNumber = company.VotesNumber;
-                    double? companyRating = company.Rating;
-                    if(companyRating != null)
-                    {
-                        double totalRating = (double)(companyRating * voteNumber);
-                        double newRating = (totalRating + rating) / (voteNumber + 1);
-                        company.Rating = newRating;
-                        company.VotesNumber = voteNumber + 1;
+                        company = CalculateRating(company, rating);
                         int companyId = company.Id;
                         bool isUpdated = _companyLogic.Update(companyId, company);
                         if (isUpdated)
@@ -586,26 +597,12 @@ namespace shuttleasy.Services
                             return isUpdated;
                         }
                         return isUpdated;
-                    }
-                    else
-                    {
-                        company.Rating = rating;
-                        company.VotesNumber = voteNumber + 1;
-                        int companyId = company.Id;
-                        bool isUpdated = _companyLogic.Update(companyId, company);
-                        if (isUpdated)
-                        {
-                            return isUpdated;
-                        }
-                        return isUpdated;
-                    }
-                    
-
                 }
                 return false;
             }
             return false;
         }
+
 
 
         public async Task<bool> UploadPhoto(IFormFile file, string name)

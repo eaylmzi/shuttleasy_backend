@@ -62,7 +62,7 @@ namespace shuttleasy.Controllers
                     bool isAdded = _passengerRatingLogic.Add(passengerRating);
                     if (isAdded)
                     {
-                        bool isUpdated = _userService.calculateRating(commentDto.SessionId, commentDto.Rating);
+                        bool isUpdated = _userService.UpdateCompanyRating(commentDto.SessionId, commentDto.Rating);
                         if (isUpdated)
                         {
                             return Ok(isUpdated);
