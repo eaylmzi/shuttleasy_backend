@@ -26,6 +26,7 @@ using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using shuttleasy.LOGIC.Logics.SessionHistories;
+using shuttleasy.LOGIC.Logics.DriversStatistics;
 
 namespace shuttleasy.Services
 {
@@ -46,6 +47,7 @@ namespace shuttleasy.Services
         private readonly ICompanyLogic _companyLogic;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly ISessionHistoryLogic _sessionHistoryLogic;
+        private readonly IDriversStatisticLogic _driversStatisticLogic;
         private static IWebHostEnvironment _webHostEnvironment;
 
 
@@ -56,7 +58,7 @@ namespace shuttleasy.Services
             IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
             ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
             IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic, IWebHostEnvironment webHostEnvironment,
-            ISessionHistoryLogic sessionHistoryLogic)
+            ISessionHistoryLogic sessionHistoryLogic, IDriversStatisticLogic driversStatisticLogic)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -74,6 +76,7 @@ namespace shuttleasy.Services
             _companyWorkerLogic = companyWorkerLogic;
             _webHostEnvironment = webHostEnvironment;
             _sessionHistoryLogic = sessionHistoryLogic;
+            _driversStatisticLogic = driversStatisticLogic;
         }
 
       
@@ -606,7 +609,7 @@ namespace shuttleasy.Services
             }
             return false;
         }
-        public async Task<bool> UpdateShuttleSessionRating(SessionHistory sessionHistory,double rating)
+        public async Task<bool> UpdateSessionHistoryRating(SessionHistory sessionHistory,double rating)
         {          
             sessionHistory.Rate = (sessionHistory.RateCount * sessionHistory.Rate + rating) / (sessionHistory.RateCount + 1);
             sessionHistory.RateCount = sessionHistory.RateCount + 1;
@@ -619,16 +622,17 @@ namespace shuttleasy.Services
         }
 
 
-        public async Task<bool> CreateDriverStatictic(SessionHistory sessionHistory, double rating)
+        public async Task<bool> UpdateDriverStaticticRating(DriversStatistic driverStatictic, double rating, int driverId)
         {
-            sessionHistory.Rate = (sessionHistory.RateCount * sessionHistory.Rate + rating) / (sessionHistory.RateCount + 1);
-            sessionHistory.RateCount = sessionHistory.RateCount + 1;
-            bool isSessionHistoryUpdated = await _sessionHistoryLogic.UpdateAsync(sessionHistory, sessionHistory.SessionId);
-            if (isSessionHistoryUpdated)
+            
+            driverStatictic.RatingAvg = (driverStatictic.RateCount * driverStatictic.RatingAvg + rating) / (driverStatictic.RateCount + 1);
+            driverStatictic.RateCount = driverStatictic.RateCount + 1;
+            bool isDriverStatisticUpdated = await _driversStatisticLogic.UpdateAsync(driverStatictic, driverId);
+            if (isDriverStatisticUpdated)
             {
-                return isSessionHistoryUpdated;
+                return isDriverStatisticUpdated;
             }
-            return isSessionHistoryUpdated;
+            return isDriverStatisticUpdated;
         }
 
 

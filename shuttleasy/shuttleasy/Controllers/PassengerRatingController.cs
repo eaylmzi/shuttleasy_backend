@@ -19,6 +19,7 @@ using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.LOGIC.Logics.SessionHistories;
+using shuttleasy.LOGIC.Logics.DriversStatistics;
 
 namespace shuttleasy.Controllers
 {
@@ -35,10 +36,11 @@ namespace shuttleasy.Controllers
         private readonly ICompanyLogic _companyLogic;
         private readonly IJoinTableLogic _joinTableLogic;
         private readonly ISessionHistoryLogic _sessionHistoryLogic;
+        private readonly IDriversStatisticLogic _driversStatisticLogic;
         List<PassengerRating> emptyList = new List<PassengerRating>();
         public PassengerRatingController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
             IPassengerRatingLogic passengerRatingLogic, IShuttleSessionLogic shuttleSessionLogic, ICompanyLogic companyLogic,
-           IMapper mapper, IJoinTableLogic joinTableLogic, ISessionHistoryLogic sessionHistoryLogic)
+           IMapper mapper, IJoinTableLogic joinTableLogic, ISessionHistoryLogic sessionHistoryLogic, IDriversStatisticLogic driversStatisticLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -49,6 +51,7 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
             _joinTableLogic = joinTableLogic;
             _sessionHistoryLogic = sessionHistoryLogic;
+            _driversStatisticLogic = driversStatisticLogic;
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
@@ -73,12 +76,29 @@ namespace shuttleasy.Controllers
                             {
                                 return BadRequest(false);
                             }
-                            bool isSessionHistoryUpdated = await _userService.UpdateShuttleSessionRating(sessionHistory, commentDto.Rating);
+                            bool isSessionHistoryUpdated = await _userService.UpdateSessionHistoryRating(sessionHistory, commentDto.Rating);
                             if (!isSessionHistoryUpdated)
                             {
                                 return BadRequest(isSessionHistoryUpdated);
                             }
-                            return Ok(isUpdated);
+                            ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(commentDto.SessionId);
+                            if(shuttleSession == null)
+                            {
+                                return false;
+                            }
+                            DriversStatistic? driverStatictic = _driversStatisticLogic.GetSingleDriverId(shuttleSession.DriverId);
+                            if(driverStatictic == null)
+                            {
+                                return false;
+                            }
+                            bool isDriverStatisticUpdated = await _userService.UpdateDriverStaticticRating(driverStatictic, commentDto.Rating, shuttleSession.DriverId);
+
+                            if (!isDriverStatisticUpdated)
+                            {
+                                return false;
+                            }
+
+                            return Ok(isDriverStatisticUpdated);
                         }
                         return BadRequest(isUpdated);
                     }

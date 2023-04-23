@@ -31,7 +31,8 @@ namespace shuttleasy.Services
         public bool CheckEmail(string email);
         public bool VerifyUser(UserVerifyingDto userInformation);
         public bool UpdateCompanyRating(int sessionId, double rating);
-        public Task<bool> UpdateShuttleSessionRating(SessionHistory sessionHistory, double rating);
+        public Task<bool> UpdateSessionHistoryRating(SessionHistory sessionHistory, double rating);
+        public Task<bool> UpdateDriverStaticticRating(DriversStatistic driverStatictic, double rating, int driverId);
 
     }
 }
