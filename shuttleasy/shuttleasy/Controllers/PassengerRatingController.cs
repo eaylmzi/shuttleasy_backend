@@ -61,52 +61,53 @@ namespace shuttleasy.Controllers
             if (_userService.VerifyUser(userInformation))
             {
                 try
-                {
-                    PassengerRating passengerRating = _mapper.Map<PassengerRating>(commentDto);
-                    passengerRating.PassengerIdentity = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
-                    passengerRating.Date = DateTime.Now;
-                    bool isAdded = _passengerRatingLogic.Add(passengerRating);
-                    if (isAdded)
+                {                
+                    if (_passengerRatingLogic.GetSingle(userInformation.Id,commentDto.SessionId) == null)
                     {
-                        bool isUpdated = _userService.UpdateCompanyRating(commentDto.SessionId, commentDto.Rating);
-                        if (isUpdated)
+                        PassengerRating passengerRating = _mapper.Map<PassengerRating>(commentDto);
+                        passengerRating.PassengerIdentity = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
+                        passengerRating.Date = DateTime.Now;
+                        bool isAdded = _passengerRatingLogic.Add(passengerRating);
+                        if (isAdded)
                         {
-                            SessionHistory sessionHistory = _sessionHistoryLogic.GetSingleBySessionId(commentDto.SessionId);
-                            if (sessionHistory == null)
+                            bool isUpdated = _userService.UpdateCompanyRating(commentDto.SessionId, commentDto.Rating);
+                            if (isUpdated)
                             {
-                                return BadRequest(false);
-                            }
-                            bool isSessionHistoryUpdated = await _userService.UpdateSessionHistoryRating(sessionHistory, commentDto.Rating);
-                            if (!isSessionHistoryUpdated)
-                            {
-                                return BadRequest(isSessionHistoryUpdated);
-                            }
-                            ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(commentDto.SessionId);
-                            if(shuttleSession == null)
-                            {
-                                return false;
-                            }
-                            DriversStatistic? driverStatictic = _driversStatisticLogic.GetSingleDriverId(shuttleSession.DriverId);
-                            if(driverStatictic == null)
-                            {
-                                return false;
-                            }
-                            bool isDriverStatisticUpdated = await _userService.UpdateDriverStaticticRating(driverStatictic, commentDto.Rating, shuttleSession.DriverId);
+                                SessionHistory sessionHistory = _sessionHistoryLogic.GetSingleBySessionId(commentDto.SessionId);
+                                if (sessionHistory == null)
+                                {
+                                    return BadRequest(false);
+                                }
+                                bool isSessionHistoryUpdated = await _userService.UpdateSessionHistoryRating(sessionHistory, commentDto.Rating);
+                                if (!isSessionHistoryUpdated)
+                                {
+                                    return BadRequest(false);
+                                }
+                                ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(commentDto.SessionId);
+                                if (shuttleSession == null)
+                                {
+                                    return BadRequest(false);
+                                }
+                                DriversStatistic? driverStatictic = _driversStatisticLogic.GetSingleDriverId(shuttleSession.DriverId);
+                                if (driverStatictic == null)
+                                {
+                                    return BadRequest(false);
+                                }
+                                bool isDriverStatisticUpdated = await _userService.UpdateDriverStaticticRating(driverStatictic, commentDto.Rating, shuttleSession.DriverId);
 
-                            if (!isDriverStatisticUpdated)
-                            {
-                                return false;
-                            }
+                                if (!isDriverStatisticUpdated)
+                                {
+                                    return BadRequest(false);
+                                }
 
-                            return Ok(isDriverStatisticUpdated);
+                                return Ok(isDriverStatisticUpdated);
+                            }
+                            return BadRequest(isUpdated);
                         }
-                        return BadRequest(isUpdated);
+                        return BadRequest(isAdded);
+
                     }
-                    return BadRequest(isAdded);
-
-
-
-
+                    return BadRequest(Error.AlreadyComment);
                 }
                 catch (Exception ex)
                 {

@@ -11,5 +11,6 @@ namespace shuttleasy.LOGIC.Logics.PassengerRatings
     {
         public bool Add(PassengerRating passengerRating);
         public bool Delete(int passengerRatingNumber);
+        public PassengerRating? GetSingle(int passengerId, int shuttleId);
     }
 }

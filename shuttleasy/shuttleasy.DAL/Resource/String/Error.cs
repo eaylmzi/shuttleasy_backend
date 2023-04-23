@@ -10,6 +10,7 @@ namespace shuttleasy.DAL.Resource.String
     {
         public const string AlreadyFound = "The item is already in table";
         public const string AlreadyFinish = "This session is already finished";
+        public const string AlreadyComment = "This user is already comment to this shuttle";
         public const string EmptyList = "The list is empty";
         public const string ForeignRequest = "The user and the person who sent the request are not the same";
         public const string FoundEmailOrTelephone = "Registered with this email or phone";
