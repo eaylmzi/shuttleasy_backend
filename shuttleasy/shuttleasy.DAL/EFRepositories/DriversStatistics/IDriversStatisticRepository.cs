@@ -10,5 +10,6 @@ namespace shuttleasy.DAL.EFRepositories.DriversStatistics
 {
     public interface IDriversStatisticRepository : IRepository<DriversStatistic>
     {
+
     }
 }

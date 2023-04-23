@@ -22,6 +22,9 @@ using System.Security.Authentication;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.Services.ShuttleServices;
+using shuttleasy.LOGIC.Logics.DriversStatistics;
+using shuttleasy.DAL.Models.dto.JoinTables.dto;
+using shuttleasy.LOGIC.Logics.SessionHistories;
 
 namespace shuttleasy.Controllers
 {
@@ -35,11 +38,14 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;       
         private readonly IMapper _mapper;
         private readonly IJoinTableLogic _joinTableLogic;
+        private readonly ISessionHistoryLogic _sessionHistoryLogic;
+        private readonly IDriversStatisticLogic _driversStatisticLogic;
 
         List<ShuttleSession> emptyList = new List<ShuttleSession>();
 
         public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic,
-            IMapper mapper, IJoinTableLogic joinTableLogic, IShuttleService shuttleService)
+            IMapper mapper, IJoinTableLogic joinTableLogic, IShuttleService shuttleService,IDriversStatisticLogic driversStatisticLogic,
+            ISessionHistoryLogic sessionHistoryLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -47,6 +53,8 @@ namespace shuttleasy.Controllers
             _mapper = mapper;
             _joinTableLogic = joinTableLogic;
             _shuttleService = shuttleService;
+            _driversStatisticLogic = driversStatisticLogic;
+            _sessionHistoryLogic = sessionHistoryLogic;
         }
         [HttpPost]
         public ActionResult<CompanyWorkerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
@@ -235,19 +243,48 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public ActionResult<bool> FinishShuttle(IdDto shuttleId)
+        public async Task<ActionResult<bool>> FinishShuttle(IdDto shuttleId)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    bool isSessionHistoryAdded = _shuttleService.FinishShuttle(shuttleId.Id);
-                    if (isSessionHistoryAdded)
+                    if (_sessionHistoryLogic.GetSingleBySessionId(shuttleId.Id) == null)
                     {
-                        return Ok(isSessionHistoryAdded);
+                        bool isSessionHistoryAdded = _shuttleService.FinishShuttle(shuttleId.Id);
+                        if (isSessionHistoryAdded)
+                        {
+                            int driverId = TokenHelper.GetDriverIdFromRequestToken(Request.Headers);
+                            DriversStatistic? driversStatistic = _driversStatisticLogic.GetSingleDriverId(driverId);
+
+                            if (driversStatistic == null)
+                            {
+                                DriversStatistic newDriverStatictic = new DriversStatistic();
+                                newDriverStatictic.DriverId = driverId;
+                                newDriverStatictic.RateCount = 0;
+                                newDriverStatictic.RatingAvg = 0;
+                                bool isAddedDriverStatictic = _driversStatisticLogic.Add(newDriverStatictic);
+                                if (!isAddedDriverStatictic)
+                                {
+                                    return false;
+                                }
+                            }
+                            List<StartFinishTime> startFinishTime = _joinTableLogic.ShuttleSessionDriverStaticticJoinTables(shuttleId.Id);
+                            DriversStatistic statictic = _driversStatisticLogic.GetSingleDriverId(driverId);
+                            double differenceInMinutes = (startFinishTime[0].FinalTime - startFinishTime[0].StartTime).TotalHours;
+                            statictic.WorkingHours = statictic.WorkingHours + differenceInMinutes;
+                            bool isUpdated = await _driversStatisticLogic.UpdateAsync(statictic, driverId);
+                            if (isUpdated)
+                            {
+                                return Ok(isUpdated);
+                            }
+                            return BadRequest(isUpdated);
+                        }
+                        return BadRequest(isSessionHistoryAdded);
+
                     }
-                    return BadRequest(isSessionHistoryAdded);
+                    return BadRequest(Error.AlreadyFinish);
                 }
                 return Unauthorized(Error.NotMatchedToken);
 

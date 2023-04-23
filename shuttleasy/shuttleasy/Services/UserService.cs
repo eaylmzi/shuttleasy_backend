@@ -619,6 +619,19 @@ namespace shuttleasy.Services
         }
 
 
+        public async Task<bool> CreateDriverStatictic(SessionHistory sessionHistory, double rating)
+        {
+            sessionHistory.Rate = (sessionHistory.RateCount * sessionHistory.Rate + rating) / (sessionHistory.RateCount + 1);
+            sessionHistory.RateCount = sessionHistory.RateCount + 1;
+            bool isSessionHistoryUpdated = await _sessionHistoryLogic.UpdateAsync(sessionHistory, sessionHistory.SessionId);
+            if (isSessionHistoryUpdated)
+            {
+                return isSessionHistoryUpdated;
+            }
+            return isSessionHistoryUpdated;
+        }
+
+
 
         public async Task<bool> UploadPhoto(IFormFile file, string name)
         {

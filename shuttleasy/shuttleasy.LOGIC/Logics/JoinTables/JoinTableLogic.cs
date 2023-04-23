@@ -25,6 +25,8 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<PickupPoint> PickupPointTable { get; set; }
         private DbSet<CompanyWorker> CompanyWorkerTable { get; set; }
         private DbSet<PickupArea> PickupAreaTable { get; set; }
+        private DbSet<DriversStatistic> DriverStaticticTable { get; set; }
+        private DbSet<SessionHistory> SessionHistoryTable { get; set; }
 
         public JoinTableLogic()
         {
@@ -38,6 +40,8 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             PickupPointTable = _context.Set<PickupPoint>();
             CompanyWorkerTable = _context.Set<CompanyWorker>();
             PickupAreaTable = _context.Set<PickupArea>();
+            DriverStaticticTable = _context.Set<DriversStatistic>();
+            SessionHistoryTable = _context.Set<SessionHistory>();
         }
 
 
@@ -562,6 +566,21 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                               UserId = t2.UserId,
                               Latitude = t3.Latitude,
                               Longtitude = t3.Longtitude
+
+                          }).ToList();
+            return result;
+        }
+        public List<StartFinishTime> ShuttleSessionDriverStaticticJoinTables(int sessionId)
+
+        {
+            var result = (from t1 in ShuttleSessionTable
+                          join t2 in SessionHistoryTable on t1.Id equals t2.SessionId
+                          where t1.Id == sessionId
+
+                          select new StartFinishTime
+                          {
+                              StartTime = t1.StartTime,
+                              FinalTime = t2.Date,
 
                           }).ToList();
             return result;
