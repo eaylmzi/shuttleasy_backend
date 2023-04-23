@@ -1,4 +1,6 @@
 global using shuttleasy.Services.UserServices;
+using CorePush.Apple;
+using CorePush.Google;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +45,7 @@ using shuttleasy.LOGIC.Logics.ShuttleBuses;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.Mail;
 using shuttleasy.Services;
+using shuttleasy.Services.NotificationServices;
 using shuttleasy.Services.ShuttleServices;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
@@ -112,6 +115,9 @@ builder.Services.AddScoped<IJwtTokenManager, JwtTokenManager>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordEncryption, PasswordEncryption>();
 builder.Services.AddScoped<IShuttleService, ShuttleService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddHttpClient<FcmSender>();
+builder.Services.AddHttpClient<ApnSender>();
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 

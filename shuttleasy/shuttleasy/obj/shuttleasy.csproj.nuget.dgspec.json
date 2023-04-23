@@ -210,6 +210,10 @@
               "target": "Package",
               "version": "[12.0.0, )"
             },
+            "CorePush": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
             "Hangfire": {
               "target": "Package",
               "version": "[1.7.32, )"
@@ -269,6 +273,10 @@
             "Microsoft.IdentityModel.Tokens": {
               "target": "Package",
               "version": "[6.25.0, )"
+            },
+            "PushSharp": {
+              "target": "Package",
+              "version": "[4.0.10, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

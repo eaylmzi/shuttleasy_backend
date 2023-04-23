@@ -111,3 +111,11 @@ C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\ne
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\Microsoft.Extensions.Features.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\System.IO.Pipelines.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\CorePush.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\PushSharp.Amazon.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\PushSharp.Apple.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\PushSharp.Blackberry.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\PushSharp.Core.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\PushSharp.Firefox.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\PushSharp.Google.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Debug\net6.0\PushSharp.Windows.dll
