@@ -19,6 +19,7 @@ using Org.BouncyCastle.Asn1.Ocsp;
 using shuttleasy.Resource;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.DAL.Models.dto.User.dto;
+using shuttleasy.LOGIC.Logics.SessionHistories;
 
 namespace shuttleasy.Services.ShuttleServices
 {
@@ -41,6 +42,7 @@ namespace shuttleasy.Services.ShuttleServices
         private readonly ISessionPassengerLogic _sessionPassengerLogic;
         private readonly IPickupPointLogic _pickupPointLogic;
         private readonly IGeoPointLogic _geoPointLogic;
+        private readonly ISessionHistoryLogic _sessionHistoryLogic;
         private static IWebHostEnvironment _webHostEnvironment;
 
 
@@ -51,7 +53,8 @@ namespace shuttleasy.Services.ShuttleServices
             IMailManager mailManager, IPasswordResetLogic passwordResetLogic, IPasswordResetRepository passwordResetRepository,
             ICompanyWorkerRepository driverRepository, IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
             IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic, IWebHostEnvironment webHostEnvironment,
-            ISessionPassengerLogic sessionPassengerLogic, IPickupPointLogic pickupPointLogic, IGeoPointLogic geoPointLogic)
+            ISessionPassengerLogic sessionPassengerLogic, IPickupPointLogic pickupPointLogic, IGeoPointLogic geoPointLogic,
+            ISessionHistoryLogic sessionHistoryLogic)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -71,6 +74,7 @@ namespace shuttleasy.Services.ShuttleServices
             _sessionPassengerLogic = sessionPassengerLogic;
             _pickupPointLogic = pickupPointLogic;
             _geoPointLogic = geoPointLogic;
+            _sessionHistoryLogic = sessionHistoryLogic;
         }
 
         private bool IsAlreadyRegistered(int sessionId,int passengerId)
@@ -184,6 +188,40 @@ namespace shuttleasy.Services.ShuttleServices
             }
             // return değerleri değiştirilecekse diye böyle yazdım
         }
+
+        private SessionHistory CreateSessionHistory(ShuttleSession shuttleSession)
+        {
+            SessionHistory sessionHistory = new SessionHistory();
+            sessionHistory.DriverId = shuttleSession.DriverId;
+            sessionHistory.SessionId = shuttleSession.Id;
+            sessionHistory.Date = DateTime.Now;
+            sessionHistory.Rate = 0;
+            sessionHistory.RateCount = 0;
+            return sessionHistory;
+        }
+        public bool FinishShuttle(int shuttleId)
+        {
+            ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId);
+            if (shuttleSession == null)
+            {
+                return false;
+            }
+            SessionHistory sessionHistory = CreateSessionHistory(shuttleSession);
+            if (sessionHistory == null)
+            {
+                return false;
+            }
+            bool isSessionHistoryAdded = _sessionHistoryLogic.Add(sessionHistory);
+            if (!isSessionHistoryAdded)
+            {
+                return false;
+            }
+            return true;
+
+        }
+
+
+        
 
 
 

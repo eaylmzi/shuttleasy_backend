@@ -21,6 +21,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Authentication;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.LOGIC.Logics.JoinTables;
+using shuttleasy.Services.ShuttleServices;
 
 namespace shuttleasy.Controllers
 {
@@ -29,20 +30,23 @@ namespace shuttleasy.Controllers
     public class DriverController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IShuttleService _shuttleService;
         private readonly IPassengerLogic _passengerLogic;
         private readonly ICompanyWorkerLogic _driverLogic;       
         private readonly IMapper _mapper;
         private readonly IJoinTableLogic _joinTableLogic;
+
         List<ShuttleSession> emptyList = new List<ShuttleSession>();
 
         public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic,
-            IMapper mapper, IJoinTableLogic joinTableLogic)
+            IMapper mapper, IJoinTableLogic joinTableLogic, IShuttleService shuttleService)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _mapper = mapper;
             _joinTableLogic = joinTableLogic;
+            _shuttleService = shuttleService;
         }
         [HttpPost]
         public ActionResult<CompanyWorkerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
@@ -230,6 +234,31 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
+        public ActionResult<bool> FinishShuttle(IdDto shuttleId)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    bool isSessionHistoryAdded = _shuttleService.FinishShuttle(shuttleId.Id);
+                    if (isSessionHistoryAdded)
+                    {
+                        return Ok(isSessionHistoryAdded);
+                    }
+                    return BadRequest(isSessionHistoryAdded);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
     }
 }

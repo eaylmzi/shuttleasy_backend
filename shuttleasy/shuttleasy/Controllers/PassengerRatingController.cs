@@ -18,6 +18,7 @@ using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.LOGIC.Logics.JoinTables;
+using shuttleasy.LOGIC.Logics.SessionHistories;
 
 namespace shuttleasy.Controllers
 {
@@ -33,10 +34,11 @@ namespace shuttleasy.Controllers
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly ICompanyLogic _companyLogic;
         private readonly IJoinTableLogic _joinTableLogic;
+        private readonly ISessionHistoryLogic _sessionHistoryLogic;
         List<PassengerRating> emptyList = new List<PassengerRating>();
         public PassengerRatingController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
             IPassengerRatingLogic passengerRatingLogic, IShuttleSessionLogic shuttleSessionLogic, ICompanyLogic companyLogic,
-           IMapper mapper, IJoinTableLogic joinTableLogic)
+           IMapper mapper, IJoinTableLogic joinTableLogic, ISessionHistoryLogic sessionHistoryLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -46,10 +48,11 @@ namespace shuttleasy.Controllers
             _companyLogic = companyLogic;
             _mapper = mapper;
             _joinTableLogic = joinTableLogic;
+            _sessionHistoryLogic = sessionHistoryLogic;
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
-        public ActionResult<bool> Comment([FromBody] CommentDto commentDto)
+        public async Task<ActionResult<bool>> Comment([FromBody] CommentDto commentDto)
         {
             UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
             if (_userService.VerifyUser(userInformation))
@@ -65,6 +68,16 @@ namespace shuttleasy.Controllers
                         bool isUpdated = _userService.UpdateCompanyRating(commentDto.SessionId, commentDto.Rating);
                         if (isUpdated)
                         {
+                            SessionHistory sessionHistory = _sessionHistoryLogic.GetSingleBySessionId(commentDto.SessionId);
+                            if (sessionHistory == null)
+                            {
+                                return BadRequest(false);
+                            }
+                            bool isSessionHistoryUpdated = await _userService.UpdateShuttleSessionRating(sessionHistory, commentDto.Rating);
+                            if (!isSessionHistoryUpdated)
+                            {
+                                return BadRequest(isSessionHistoryUpdated);
+                            }
                             return Ok(isUpdated);
                         }
                         return BadRequest(isUpdated);

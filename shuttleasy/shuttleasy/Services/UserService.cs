@@ -25,6 +25,7 @@ using System.Data;
 using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using shuttleasy.LOGIC.Logics.SessionHistories;
 
 namespace shuttleasy.Services
 {
@@ -44,6 +45,7 @@ namespace shuttleasy.Services
         private readonly IPassengerRepository _passengerRepository;
         private readonly ICompanyLogic _companyLogic;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
+        private readonly ISessionHistoryLogic _sessionHistoryLogic;
         private static IWebHostEnvironment _webHostEnvironment;
 
 
@@ -53,7 +55,8 @@ namespace shuttleasy.Services
             IJwtTokenManager jwtTokenManager, IConfiguration configuration, ICompanyWorkerLogic driverLogic,
             IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
             ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
-            IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic, IWebHostEnvironment webHostEnvironment)
+            IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic, IWebHostEnvironment webHostEnvironment,
+            ISessionHistoryLogic sessionHistoryLogic)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -70,6 +73,7 @@ namespace shuttleasy.Services
             _shuttleSessionLogic = shuttleSessionLogic;
             _companyWorkerLogic = companyWorkerLogic;
             _webHostEnvironment = webHostEnvironment;
+            _sessionHistoryLogic = sessionHistoryLogic;
         }
 
       
@@ -601,6 +605,17 @@ namespace shuttleasy.Services
                 return false;
             }
             return false;
+        }
+        public async Task<bool> UpdateShuttleSessionRating(SessionHistory sessionHistory,double rating)
+        {          
+            sessionHistory.Rate = (sessionHistory.RateCount * sessionHistory.Rate + rating) / (sessionHistory.RateCount + 1);
+            sessionHistory.RateCount = sessionHistory.RateCount + 1;
+            bool isSessionHistoryUpdated = await _sessionHistoryLogic.UpdateAsync(sessionHistory, sessionHistory.SessionId);
+            if (isSessionHistoryUpdated)
+            {
+                return isSessionHistoryUpdated;
+            }
+            return isSessionHistoryUpdated;
         }
 
 
