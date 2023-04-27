@@ -9,10 +9,12 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="CorePush" Version="3.1.1" />
+    <PackageReference Include="FirebaseAdmin" Version="2.3.0" />
     <PackageReference Include="Hangfire" Version="1.7.32" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.32" />
     <PackageReference Include="Hangfire.Core" Version="1.7.32" />
     <PackageReference Include="MailKit" Version="3.4.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="6.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="6.0.16" />

@@ -27,6 +27,7 @@ using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using shuttleasy.LOGIC.Logics.SessionHistories;
 using shuttleasy.LOGIC.Logics.DriversStatistics;
+using shuttleasy.Services.NotifService;
 
 namespace shuttleasy.Services
 {
@@ -620,8 +621,6 @@ namespace shuttleasy.Services
             }
             return isSessionHistoryUpdated;
         }
-
-
         public async Task<bool> UpdateDriverStaticticRating(DriversStatistic driverStatictic, double rating, int driverId)
         {
             
@@ -634,6 +633,7 @@ namespace shuttleasy.Services
             }
             return isDriverStatisticUpdated;
         }
+
 
 
 

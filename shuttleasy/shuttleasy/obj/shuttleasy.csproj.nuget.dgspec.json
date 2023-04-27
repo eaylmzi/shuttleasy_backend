@@ -214,6 +214,10 @@
               "target": "Package",
               "version": "[3.1.1, )"
             },
+            "FirebaseAdmin": {
+              "target": "Package",
+              "version": "[2.3.0, )"
+            },
             "Hangfire": {
               "target": "Package",
               "version": "[1.7.32, )"
@@ -229,6 +233,10 @@
             "MailKit": {
               "target": "Package",
               "version": "[3.4.0, )"
+            },
+            "Microsoft.AspNet.SignalR": {
+              "target": "Package",
+              "version": "[2.4.3, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",

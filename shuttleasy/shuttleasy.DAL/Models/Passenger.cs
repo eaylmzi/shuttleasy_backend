@@ -18,5 +18,6 @@ namespace shuttleasy.DAL.Models
         public Guid QrString { get; set; }
         public bool Verified { get; set; }
         public string? Token { get; set; }
+        public string? NotificationToken { get; set; }
     }
 }

@@ -20,6 +20,8 @@ using shuttleasy.Resource;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.DAL.Models.dto.User.dto;
 using shuttleasy.LOGIC.Logics.SessionHistories;
+using PushSharp.Core;
+using shuttleasy.LOGIC.Logics.NotificationPassengers;
 
 namespace shuttleasy.Services.ShuttleServices
 {
@@ -43,6 +45,7 @@ namespace shuttleasy.Services.ShuttleServices
         private readonly IPickupPointLogic _pickupPointLogic;
         private readonly IGeoPointLogic _geoPointLogic;
         private readonly ISessionHistoryLogic _sessionHistoryLogic;
+        private readonly INotificationPassengerLogic _notificationPassengerLogic;
         private static IWebHostEnvironment _webHostEnvironment;
 
 
@@ -54,7 +57,7 @@ namespace shuttleasy.Services.ShuttleServices
             ICompanyWorkerRepository driverRepository, IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
             IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic, IWebHostEnvironment webHostEnvironment,
             ISessionPassengerLogic sessionPassengerLogic, IPickupPointLogic pickupPointLogic, IGeoPointLogic geoPointLogic,
-            ISessionHistoryLogic sessionHistoryLogic)
+            ISessionHistoryLogic sessionHistoryLogic, INotificationPassengerLogic notificationPassengerLogic)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -75,6 +78,7 @@ namespace shuttleasy.Services.ShuttleServices
             _pickupPointLogic = pickupPointLogic;
             _geoPointLogic = geoPointLogic;
             _sessionHistoryLogic = sessionHistoryLogic;
+            _notificationPassengerLogic = notificationPassengerLogic;
         }
 
         private bool IsAlreadyRegistered(int sessionId,int passengerId)
@@ -143,6 +147,15 @@ namespace shuttleasy.Services.ShuttleServices
             return sessionPassenger;
 
         }
+        private NotificationPassenger CreateNotificationPassenger(int sessionId, int userId)
+        {
+            NotificationPassenger notificationPassenger = new NotificationPassenger();
+            notificationPassenger.UserId = userId;
+            notificationPassenger.Date = DateTime.Now;
+            notificationPassenger.NotificationType = "shuttle" + sessionId;
+            return notificationPassenger;
+
+        }
         public async Task<bool> EnrollPassenger(SessionPassengerDto sessionPassengerDto,int userId)
         {
             bool isRegistered = IsAlreadyRegistered(sessionPassengerDto.SessionId, userId);
@@ -173,19 +186,23 @@ namespace shuttleasy.Services.ShuttleServices
             bool isAdded = _sessionPassengerLogic.Add(sessionPassenger);
             if (isAdded)
             {
-                return true;
-
-            }
-            else
-            {
-                shuttleSession.PassengerCount = shuttleSession.PassengerCount - 1;
-                bool isShuttleUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
-                if (isShuttleUpdated)
+                NotificationPassenger notificationPassenger = CreateNotificationPassenger(sessionPassenger.SessionId, userId);
+                bool isNotificationPassengerAdded = _notificationPassengerLogic.Add(notificationPassenger);
+                if (isNotificationPassengerAdded)
                 {
-                    return false;
+                    return true;
                 }
+            }
+            shuttleSession.PassengerCount = shuttleSession.PassengerCount - 1;
+            bool isShuttleUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
+            if (isShuttleUpdated)
+            {
                 return false;
             }
+            return false;
+
+
+
             // return değerleri değiştirilecekse diye böyle yazdım
         }
 
@@ -206,6 +223,7 @@ namespace shuttleasy.Services.ShuttleServices
             {
                 return false;
             }
+
             SessionHistory sessionHistory = CreateSessionHistory(shuttleSession);
             if (sessionHistory == null)
             {

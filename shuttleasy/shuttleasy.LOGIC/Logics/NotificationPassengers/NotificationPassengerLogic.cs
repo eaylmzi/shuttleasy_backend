@@ -1,5 +1,7 @@
 ﻿using shuttleasy.DAL.EFRepositories.GeoPoints;
 using shuttleasy.DAL.EFRepositories.NotificationPassengers;
+using shuttleasy.DAL.EFRepositories.SessionHistories;
+using shuttleasy.DAL.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +17,11 @@ namespace shuttleasy.LOGIC.Logics.NotificationPassengers
         {
             _notificationPassengerRepository = notificationPassengerRepository;
         }
+        public bool Add(NotificationPassenger notificationPassenger)
+        {
+            bool isAdded = _notificationPassengerRepository.Add(notificationPassenger);
+            return isAdded;
+        }
+
     }
 }

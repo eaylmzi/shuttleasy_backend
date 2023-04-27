@@ -1,0 +1,16 @@
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\bin\Debug\net5.0\SocketListener.exe
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\bin\Debug\net5.0\SocketListener.deps.json
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\bin\Debug\net5.0\SocketListener.runtimeconfig.json
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\bin\Debug\net5.0\SocketListener.runtimeconfig.dev.json
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\bin\Debug\net5.0\SocketListener.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\bin\Debug\net5.0\SocketListener.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.csproj.AssemblyReference.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.AssemblyInfoInputs.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.AssemblyInfo.cs
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.csproj.CoreCompileInputs.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\refint\SocketListener.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\SocketListener.genruntimeconfig.cache
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\SocketListener\obj\Debug\net5.0\ref\SocketListener.dll

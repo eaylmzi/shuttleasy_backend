@@ -559,11 +559,13 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             var result = (from t1 in SessionPassengerTable
                           join t2 in PickupPointTable on t1.PickupId equals t2.Id
                           join t3 in GeoPointTable on t2.GeoPointId equals t3.Id
+                          join t4 in PassengerTable on t2.UserId equals t4.Id
                           where t1.SessionId == sessionId
 
                           select new SessionPassengerPickupIdDetailsDto
                           {
                               UserId = t2.UserId,
+                              NotificationToken = t4.NotificationToken,
                               Latitude = t3.Latitude,
                               Longtitude = t3.Longtitude
 

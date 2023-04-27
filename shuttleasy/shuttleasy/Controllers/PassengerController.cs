@@ -205,7 +205,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<PassengerShuttleDetailsDto> GetMyShuttleSessions()
+        public ActionResult<ShuttleDto> GetMyShuttleSessions()
         {
             try
             {

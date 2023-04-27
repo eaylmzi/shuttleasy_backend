@@ -191,9 +191,7 @@ namespace shuttleasy.DAL
                     .HasColumnType("datetime")
                     .HasColumnName("date");
 
-                entity.Property(e => e.Email)
-                    .HasMaxLength(30)
-                    .HasColumnName("email");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.Property(e => e.NotificationType).HasColumnName("notification_type");
 
@@ -268,6 +266,7 @@ namespace shuttleasy.DAL
                     .HasColumnName("surname");
 
                 entity.Property(e => e.Token).HasColumnName("token");
+                entity.Property(e => e.NotificationToken).HasColumnName("notification_token");
 
                 entity.Property(e => e.Verified).HasColumnName("verified");
             });

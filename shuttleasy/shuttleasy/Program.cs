@@ -45,9 +45,11 @@ using shuttleasy.LOGIC.Logics.ShuttleBuses;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.Mail;
 using shuttleasy.Services;
-using shuttleasy.Services.NotificationServices;
+using shuttleasy.Services.NotifService;
 using shuttleasy.Services.ShuttleServices;
+using shuttleasy.Services.SocketServices;
 using Swashbuckle.AspNetCore.Filters;
+using System.Net.WebSockets;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -116,6 +118,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordEncryption, PasswordEncryption>();
 builder.Services.AddScoped<IShuttleService, ShuttleService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddScoped<ISocketService, SocketService>();
 builder.Services.AddHttpClient<FcmSender>();
 builder.Services.AddHttpClient<ApnSender>();
 builder.Services.AddHttpContextAccessor();
@@ -191,9 +194,37 @@ builder.Services.AddHangfireServer();*/
 
 
 var app = builder.Build();
-
+//WEB SOCKET OPTIONS
+/*
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(3)
+};
+app.UseWebSockets(webSocketOptions);
+*/
+/*
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/ws")
+    {
+        if (context.WebSockets.IsWebSocketRequest)
+        {
+            WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
+            await SocketService Echo(context, webSocket);
+        }
+        else
+        {
+            context.Response.StatusCode = 400;
+        }
+    }
+    else
+    {
+        await next();
+    }
+});
+*/
 // Configure the HTTP request pipeline.
-
+app.UseRouting();
 
 
 app.UseSwagger();
