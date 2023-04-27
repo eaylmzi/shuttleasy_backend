@@ -88,5 +88,11 @@ namespace shuttleasy.LOGIC.Logics
             return isExist;
 
         }
+        public async Task<bool> UpdateAsync(int id, Passenger updatedPassenger)
+        {
+            Func<Passenger, bool> getPassenger = getPassenger => getPassenger.Id == id;
+            bool isUpdated = await _passenger.UpdateAsync(getPassenger, updatedPassenger);
+            return isUpdated;
+        }
     }
 }

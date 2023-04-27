@@ -280,6 +280,60 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<bool> IsNotificationTokenEqual(PassengerNotificationTokenDto passengerNotificationTokenDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    Passenger? passenger = _passengerLogic.GetSingle(passengerNotificationTokenDto.Id);
+                    if (passenger != null)
+                    {
+                        if(passengerNotificationTokenDto.NotificationToken == passenger.NotificationToken)
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return BadRequest(Error.NotFoundPassenger);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public async Task<ActionResult<bool>> UpdateNotificationToken(PassengerNotificationTokenDto passengerNotificationTokenDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    Passenger? passenger = _passengerLogic.GetSingle(passengerNotificationTokenDto.Id);
+                    if (passenger != null)
+                    {
+                        passenger.NotificationToken = passengerNotificationTokenDto.NotificationToken;
+                        bool isUpdated = await _passengerLogic.UpdateAsync(passengerNotificationTokenDto.Id, passenger);
+                        if (isUpdated)
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return BadRequest(Error.NotFoundPassenger);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
 

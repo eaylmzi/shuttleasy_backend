@@ -20,5 +20,6 @@ namespace shuttleasy.LOGIC.Logics
         public bool DeletePassenger(string email);
         public Passenger? GetPassengerWithPhoneNumber(string phone);
         public Task<bool> IsPhoneNumberAndEmailExist(string email, string phoneNumber);
+        public Task<bool> UpdateAsync(int id, Passenger updatedPassenger);
     }
 }
