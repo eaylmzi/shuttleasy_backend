@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using shuttleasy.DAL.Models.dto.Passengers.dto;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
+using shuttleasy.DAL.Models.dto.Session.dto;
 
 namespace shuttleasy.LOGIC.Logics.JoinTables
 {
@@ -572,6 +573,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
+
         public List<StartFinishTime> ShuttleSessionDriverStaticticJoinTables(int sessionId)
 
         {
@@ -583,6 +585,25 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           {
                               StartTime = t1.StartTime,
                               FinalTime = t2.Date,
+
+                          }).ToList();
+            return result;
+        }
+        public List<PassengerRouteDto> ShuttleManagerJoinTables(int sessionId)
+
+        {
+            var result = (from t1 in SessionPassengerTable
+                          join t2 in PickupPointTable on t1.PickupId equals t2.Id
+                          join t3 in GeoPointTable on t2.GeoPointId equals t3.Id
+                          join t4 in PassengerTable on t2.UserId equals t4.Id
+                          where t1.SessionId == sessionId
+
+                          select new PassengerRouteDto
+                          {
+                              UserId = t2.UserId,
+                              NotificationToken = t4.NotificationToken,
+                              Latitude = t3.Latitude,
+                              Longtitude = t3.Longtitude
 
                           }).ToList();
             return result;

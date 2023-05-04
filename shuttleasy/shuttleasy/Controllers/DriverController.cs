@@ -28,6 +28,7 @@ using shuttleasy.LOGIC.Logics.SessionHistories;
 using shuttleasy.Services.NotifService;
 using FirebaseAdmin.Messaging;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
+using shuttleasy.DAL.Models.dto.Session.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -249,96 +250,40 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<bool>> ActivateShuttle([FromBody] IdDto sessionDto)
-        {
-            try
-            {
-                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
-                if (_userService.VerifyUser(userInformation))
-                {
-                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionDto.Id);
-                    if (shuttleSession != null)
-                    {
-                        shuttleSession.IsActive = true;
-                        bool isUpdated = await _shuttleSessionLogic.UpdateAsync(sessionDto.Id, shuttleSession);
-                        if (isUpdated)
-                        {
-                            return Ok(isUpdated);
-                        }
-                        return BadRequest(isUpdated);
-                    }
-                    return BadRequest(Error.NotFoundShuttleSession);
-                }
-                return Unauthorized(Error.NotMatchedToken);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<bool>> DeactivateShuttle([FromBody] IdDto sessionDto)
-        {
-            try
-            {
-                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
-                if (_userService.VerifyUser(userInformation))
-                {
-                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionDto.Id);
-                    if (shuttleSession != null)
-                    {
-                        shuttleSession.IsActive = false;
-                        bool isUpdated = await _shuttleSessionLogic.UpdateAsync(sessionDto.Id, shuttleSession);
-                        if (isUpdated)
-                        {
-                            return Ok(isUpdated);
-                        }
-                        return BadRequest(isUpdated);
-                    }
-                    return BadRequest(Error.NotFoundShuttleSession);
-                }
-                return Unauthorized(Error.NotMatchedToken);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<bool>> StartShuttle([FromBody] List<SessionPassengerPickupIdDetailsDto> sessionPassengerPickupIdDetailsListDto)
+        public async Task<ActionResult<BatchResponse>> StartShuttle([FromBody] ShuttleManager shuttleManager)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleManager.ShuttleRouteDto.Id);
+                    if (shuttleSession == null)
+                    {
+                        return BadRequest(Error.NotFoundShuttleSession);
+                    }
+                    shuttleSession.ShuttleState = ShuttleState.ON_ROAD;
+                    bool isUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleManager.ShuttleRouteDto.Id, shuttleSession);
+                    if (!isUpdated)
+                    {
+                        return BadRequest(isUpdated);
+                    }
+
                     NotificationModelToken startingShuttleNotification = new NotificationModelToken();
                     List<string> tokenList = new List<string>();
-                    foreach (SessionPassengerPickupIdDetailsDto item in sessionPassengerPickupIdDetailsListDto)
+                    foreach (PassengerRouteDto item in shuttleManager.PassengerRouteDto)
                     {
                         tokenList.Add(item.NotificationToken);
                     }
                     startingShuttleNotification.Token = tokenList;
                     startingShuttleNotification.Title = NotificationTitle.SERVICE_STARTED;
                     startingShuttleNotification.Body = NotificationBody.SERVICE_STARTED;
-                    await _notificationService.SendNotificationByToken(startingShuttleNotification);
-
-                    NotificationModelToken notificationModelToken = new NotificationModelToken();
-                    List<string> tokenListForFirstPassenger = new List<string>();
-                    tokenListForFirstPassenger.Add(sessionPassengerPickupIdDetailsListDto[0].NotificationToken);
-                    notificationModelToken.Token = tokenList;
-                    notificationModelToken.Title = NotificationTitle.FOR_NEXT_PASSENGER;
-                    notificationModelToken.Body = NotificationBody.FOR_NEXT_PASSENGER;
-                    var notif = await _notificationService.SendNotificationByToken(notificationModelToken);                  
-                    return Ok();
-
-
+                    BatchResponse batchResponse = await _notificationService.SendNotificationByToken(startingShuttleNotification);               
+                    return Ok(batchResponse);
                 }
                 return Unauthorized(Error.NotMatchedToken);
-
-
             }
             catch (Exception ex)
             {
@@ -354,6 +299,18 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
+                    if (shuttleSession == null)
+                    {
+                        return BadRequest(Error.NotFoundShuttleSession);
+                    }
+                    shuttleSession.ShuttleState = ShuttleState.FINISHED;
+                    bool isUpdatedShuttleSession = await _shuttleSessionLogic.UpdateAsync(shuttleId.Id, shuttleSession);
+                    if (!isUpdatedShuttleSession)
+                    {
+                        return BadRequest(isUpdatedShuttleSession);
+                    }
+                                       
                     if (_sessionHistoryLogic.GetSingleBySessionId(shuttleId.Id) == null)
                     {
                         bool isSessionHistoryAdded = _shuttleService.FinishShuttle(shuttleId.Id);
@@ -400,7 +357,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<BatchResponse>> TakeNextPerson([FromBody] SessionPassengerPickupIdDetailsDto sessionPassengerPickupIdDetailsDto)
+        public async Task<ActionResult<BatchResponse>> TakeNextPerson([FromBody] PassengerRouteDto passengerRouteDto)
         {
             try
             {
@@ -409,7 +366,7 @@ namespace shuttleasy.Controllers
                 {
                     NotificationModelToken notificationModelToken = new NotificationModelToken();
                     List<string> tokenList = new List<string>();
-                    tokenList.Add(sessionPassengerPickupIdDetailsDto.NotificationToken);
+                    tokenList.Add(passengerRouteDto.NotificationToken);
                     notificationModelToken.Token = tokenList;
                     notificationModelToken.Title = NotificationTitle.FOR_NEXT_PASSENGER;
                     notificationModelToken.Body = NotificationBody.FOR_NEXT_PASSENGER;

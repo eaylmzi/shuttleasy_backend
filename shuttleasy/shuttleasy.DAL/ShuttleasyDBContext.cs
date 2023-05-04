@@ -453,6 +453,8 @@ namespace shuttleasy.DAL
                 .HasMaxLength(15)
                 .HasColumnName("session_date");
 
+                entity.Property(e => e.ShuttleState).HasColumnName("shuttle_state");
+
 
 
             });

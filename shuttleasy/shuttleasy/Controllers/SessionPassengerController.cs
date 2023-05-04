@@ -14,6 +14,9 @@ using shuttleasy.Resource;
 using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
+using shuttleasy.DAL.Models.dto.Session.dto;
+using shuttleasy.LOGIC.Logics.ShuttleSessions;
+using shuttleasy.LOGIC.Logics.GeoPoints;
 
 namespace shuttleasy.Controllers
 {
@@ -26,10 +29,12 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly ISessionPassengerLogic _sessionPassengerLogic;
         private readonly IJoinTableLogic _joinTableLogic;
+        private readonly IShuttleSessionLogic _shuttleSessionLogic;
+        private readonly IGeoPointLogic _geoPointLogic;
         private readonly IMapper _mapper;
         public SessionPassengerController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
-            ISessionPassengerLogic sessionPassengerLogic, IJoinTableLogic joinTableLogic,
-           IMapper mapper)
+            ISessionPassengerLogic sessionPassengerLogic, IJoinTableLogic joinTableLogic, IShuttleSessionLogic shuttleSessionLogic,
+           IMapper mapper, IGeoPointLogic geoPointLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -37,6 +42,8 @@ namespace shuttleasy.Controllers
             _sessionPassengerLogic = sessionPassengerLogic;
             _mapper = mapper;
             _joinTableLogic = joinTableLogic;
+            _shuttleSessionLogic = shuttleSessionLogic;
+            _geoPointLogic = geoPointLogic;
         }
         
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
@@ -99,12 +106,25 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    var list = _joinTableLogic.SessionPassengerPickupPointJoinTables(idDto.Id);
-                    if (list != null)
+                    List<PassengerRouteDto> passengerRouteDtoList = _joinTableLogic.ShuttleManagerJoinTables(idDto.Id);
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(idDto.Id);
+                    if(shuttleSession == null)
                     {
-                        return Ok(list);
+                        return BadRequest(Error.NotFoundShuttleSession);
                     }
-                    return BadRequest(Error.EmptyList);
+                    ShuttleRouteDto shuttleRouteDto = new ShuttleRouteDto()
+                    {
+                        Id = idDto.Id,
+                        StartGeopoint = _geoPointLogic.Find((int)shuttleSession.StartGeopoint),
+                        FinalGeopoint = _geoPointLogic.Find((int)shuttleSession.FinalGeopoint),
+
+                    };
+                    ShuttleManager shuttleManager = new ShuttleManager()
+                    {
+                        PassengerRouteDto = passengerRouteDtoList,
+                        ShuttleRouteDto = shuttleRouteDto,
+                    };
+                    return Ok(shuttleManager);
 
                 }
                 return Unauthorized(Error.NotMatchedToken);
