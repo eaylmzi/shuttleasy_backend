@@ -134,3 +134,5 @@ C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Release\
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Release\net6.0\PushSharp.Google.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Release\net6.0\PushSharp.Windows.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Release\net6.0\System.IO.Pipelines.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Release\net6.0\ShuttleRoute.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\bin\Release\net6.0\ShuttleRoute.pdb

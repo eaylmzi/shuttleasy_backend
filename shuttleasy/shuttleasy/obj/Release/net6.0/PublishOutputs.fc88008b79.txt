@@ -113,6 +113,8 @@ C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\shuttleasy.DAL.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\shuttleasy.LOGIC.dll
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\ShuttleRoute.dll
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\shuttleasy.LOGIC.pdb
+C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\ShuttleRoute.pdb
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\shuttleasy.DAL.pdb
 C:\Users\Dell\source\repos\shuttleasy_backend\shuttleasy\shuttleasy\obj\Release\net6.0\PubTmp\Out\shuttleasy.deps.json

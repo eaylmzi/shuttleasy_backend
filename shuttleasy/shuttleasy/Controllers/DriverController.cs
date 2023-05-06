@@ -261,6 +261,7 @@ namespace shuttleasy.Controllers
                 if (_userService.VerifyUser(userInformation))
                 {
                     var result = await ShuttleRouteManager.CalculateRouteAsync(shuttleManager);
+                    return Ok(result);
 
 
                 }
