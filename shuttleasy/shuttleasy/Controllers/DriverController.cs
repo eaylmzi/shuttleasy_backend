@@ -29,6 +29,7 @@ using shuttleasy.Services.NotifService;
 using FirebaseAdmin.Messaging;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.DAL.Models.dto.Session.dto;
+using ShuttleRoute;
 
 namespace shuttleasy.Controllers
 {
@@ -250,6 +251,29 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
+        public async Task<ActionResult<ShuttleManager>> CalculateRoute([FromBody] ShuttleManager shuttleManager)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    var result = await ShuttleRouteManager.CalculateRouteAsync(shuttleManager);
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
         public async Task<ActionResult<BatchResponse>> StartShuttle([FromBody] ShuttleManager shuttleManager)

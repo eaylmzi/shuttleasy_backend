@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "MO/NEQQcu4bV+u31gMUcq21SfVKFEVb65jjg9qec28TpsiewzgjeIidsOMMnqM8hfuad4BjwV0j0BMNhs3lenw==",
+  "dgSpecHash": "IuZUtxyUzeUH7WLvOpxMmTKHVX8kFPyfZbPiS6iqWI3umWucg+2MZOY/bPIQRaOInIkTM2rXsaA+T/8Ix8UvaQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Dell\\source\\repos\\shuttleasy_backend\\shuttleasy\\shuttleasy\\shuttleasy.csproj",
   "expectedPackageFiles": [
@@ -78,7 +78,7 @@
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\microsoft.win32.systemevents\\4.7.0\\microsoft.win32.systemevents.4.7.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\mimekit\\3.4.0\\mimekit.3.4.0.nupkg.sha512",
-    "C:\\Users\\Dell\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\Dell\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\owin\\1.0.0\\owin.1.0.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\portable.bouncycastle\\1.9.0\\portable.bouncycastle.1.9.0.nupkg.sha512",
     "C:\\Users\\Dell\\.nuget\\packages\\pushsharp\\4.0.10\\pushsharp.4.0.10.nupkg.sha512",

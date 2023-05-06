@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShuttleRoute", "ShuttleRoute.csproj", "{4955C25A-93FE-4687-BB68-09A087C29CAF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4955C25A-93FE-4687-BB68-09A087C29CAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4955C25A-93FE-4687-BB68-09A087C29CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4955C25A-93FE-4687-BB68-09A087C29CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4955C25A-93FE-4687-BB68-09A087C29CAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C505352B-22BD-43D5-8356-D595328E04C6}
+	EndGlobalSection
+EndGlobal

@@ -38,6 +38,7 @@
   </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\shuttleasy.LOGIC\shuttleasy.LOGIC.csproj" />
+		<ProjectReference Include="..\ShuttleRoute\ShuttleRoute.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Upload\files\" />
