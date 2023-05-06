@@ -208,7 +208,8 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        public ActionResult<EnrolledPassengersGroupDto> GetDriversStatisticByWorkingHours()
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<DriversInfoDto> GetDriversStatisticByWorkingHours()
         {
             try
             {
@@ -219,6 +220,34 @@ namespace shuttleasy.Controllers
                     if (companyWorker != null)
                     {
                         var list = _joinTableLogic.CompanyWorkerDriverStaticticWorkingHoursJoinTables(companyWorker.CompanyId);
+                        if (list.Count != 0)
+                        {
+                            return Ok(list);
+                        }
+                        return Ok(emptyList);
+                    }
+                    return BadRequest(Error.NotFoundDriver);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<DriversInfoDto> GetDriversStatisticByName()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
+                    if (companyWorker != null)
+                    {
+                        var list = _joinTableLogic.CompanyWorkerDriverStaticticByNameJoinTables(companyWorker.CompanyId);
                         if (list.Count != 0)
                         {
                             return Ok(list);
