@@ -181,7 +181,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public ActionResult<EnrolledPassengersGroupDto> GetDriversStatistic()
+        public ActionResult<DriversInfoDto> GetDriversStatisticByRatingAvg()
         {
             try
             {
@@ -191,7 +191,34 @@ namespace shuttleasy.Controllers
                     CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
                     if (companyWorker != null)
                     {
-                        var list = _joinTableLogic.CompanyWorkerDriverStaticticJoinTables(companyWorker.CompanyId);
+                        var list = _joinTableLogic.CompanyWorkerDriverStaticticRatingAvgJoinTables(companyWorker.CompanyId);
+                        if (list.Count != 0)
+                        {
+                            return Ok(list);
+                        }
+                        return Ok(emptyList);
+                    }
+                    return BadRequest(Error.NotFoundDriver);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        public ActionResult<EnrolledPassengersGroupDto> GetDriversStatisticByWorkingHours()
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
+                    if (companyWorker != null)
+                    {
+                        var list = _joinTableLogic.CompanyWorkerDriverStaticticWorkingHoursJoinTables(companyWorker.CompanyId);
                         if (list.Count != 0)
                         {
                             return Ok(list);

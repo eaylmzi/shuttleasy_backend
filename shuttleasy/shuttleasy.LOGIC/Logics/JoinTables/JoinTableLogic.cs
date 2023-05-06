@@ -609,13 +609,33 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
-        public List<DriversInfoDto> CompanyWorkerDriverStaticticJoinTables(int companyId)
+        public List<DriversInfoDto> CompanyWorkerDriverStaticticRatingAvgJoinTables(int companyId)
 
         {
             var result = (from t1 in CompanyWorkerTable
                           join t2 in DriverStaticticTable on t1.Id equals t2.DriverId
                           where t1.CompanyId == companyId
                           orderby t2.RatingAvg descending
+
+                          select new DriversInfoDto
+                          {
+                              Name = t1.Name,
+                              Surname = t1.Surname,
+                              PhoneNumber = t1.PhoneNumber,
+                              RateCount = t2.RateCount,
+                              RatingAvg = t2.RatingAvg,
+                              WorkingHours = t2.WorkingHours,
+
+                          }).ToList();
+            return result;
+        }
+        public List<DriversInfoDto> CompanyWorkerDriverStaticticWorkingHoursJoinTables(int companyId)
+
+        {
+            var result = (from t1 in CompanyWorkerTable
+                          join t2 in DriverStaticticTable on t1.Id equals t2.DriverId
+                          where t1.CompanyId == companyId
+                          orderby t2.WorkingHours descending
 
                           select new DriversInfoDto
                           {
