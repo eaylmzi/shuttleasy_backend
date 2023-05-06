@@ -99,7 +99,7 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<List<SessionPassengerPickupIdDetailsDto>> GetPassengersLocation([FromBody] IdDto idDto)
+        public ActionResult<List<ShuttleManager>> GetPassengersLocation([FromBody] IdDto idDto)
         {
             try
             {

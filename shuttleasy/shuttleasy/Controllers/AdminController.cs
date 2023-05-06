@@ -144,6 +144,7 @@ namespace shuttleasy.Controllers
                         }
                         return Ok(emptyList);
                     }
+                    return BadRequest(Error.NotFoundDriver);
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }
@@ -179,101 +180,129 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-            /*
-             * Yedek tokenhelper
-                    private int GetUserIdFromRequestToken()
-                    {
-                        string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-                        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
-                        string user = jwt.Claims.First(c => c.Type == "id").Value;
-                        int userId = int.Parse(user);
-                        return userId;
-                    }
-                    private string GetUserRoleFromRequestToken()
-                    {
-                        string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-                        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
-                        string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
-                        return userEmail;
-                    }
-                    private string GetUserTokenFromRequestToken()
-                    {
-                        string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-                        return requestToken;
-                    }
-                    private UserVerifyingDto GetUserInformation()
-                    {
-                        UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
-                        userVerifyingDto.Id = Token.GetUserIdFromRequestToken(Request.Headers);
-                        userVerifyingDto.Token = GetUserTokenFromRequestToken();
-                        userVerifyingDto.Role = GetUserRoleFromRequestToken();
-                        return userVerifyingDto;
-                    }
-                    private CompanyWorker? GetAdminFromRequestToken()
-                    {
-                        string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-                        CompanyWorker? adminFromToken = _driverLogic.GetCompanyWorkerWithToken(requestToken);
-                        return adminFromToken;
-                    }
-
-            */
-
-            /*
-
-            [HttpPost]
-            public IActionResult Test1()
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<EnrolledPassengersGroupDto> GetDriversStatistic()
+        {
+            try
             {
-                try
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
                 {
-                    SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-
-                    builder.DataSource = "shuttleasydbserver1.database.windows.net";
-                    builder.UserID = "emreyilmaz";
-                    builder.Password = "Easypeasy1";
-                    builder.InitialCatalog = "ShuttleasyDB";
-
-                    using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                    CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
+                    if (companyWorker != null)
                     {
-
-
-                        connection.Open();
-
-                        string sql = "SELECT name  FROM company_worker";
-
-                        using (SqlCommand command = new SqlCommand(sql, connection))
+                        var list = _joinTableLogic.CompanyWorkerDriverStaticticJoinTables(companyWorker.CompanyId);
+                        if (list.Count != 0)
                         {
-                            using (SqlDataReader reader = command.ExecuteReader())
+                            return Ok(list);
+                        }
+                        return Ok(emptyList);
+                    }
+                    return BadRequest(Error.NotFoundDriver);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /*
+         * Yedek tokenhelper
+                private int GetUserIdFromRequestToken()
+                {
+                    string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+                    var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+                    string user = jwt.Claims.First(c => c.Type == "id").Value;
+                    int userId = int.Parse(user);
+                    return userId;
+                }
+                private string GetUserRoleFromRequestToken()
+                {
+                    string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+                    var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+                    string userEmail = jwt.Claims.First(c => c.Type == "role").Value;
+                    return userEmail;
+                }
+                private string GetUserTokenFromRequestToken()
+                {
+                    string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+                    return requestToken;
+                }
+                private UserVerifyingDto GetUserInformation()
+                {
+                    UserVerifyingDto userVerifyingDto = new UserVerifyingDto();
+                    userVerifyingDto.Id = Token.GetUserIdFromRequestToken(Request.Headers);
+                    userVerifyingDto.Token = GetUserTokenFromRequestToken();
+                    userVerifyingDto.Role = GetUserRoleFromRequestToken();
+                    return userVerifyingDto;
+                }
+                private CompanyWorker? GetAdminFromRequestToken()
+                {
+                    string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+                    CompanyWorker? adminFromToken = _driverLogic.GetCompanyWorkerWithToken(requestToken);
+                    return adminFromToken;
+                }
+
+        */
+
+        /*
+
+        [HttpPost]
+        public IActionResult Test1()
+        {
+            try
+            {
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+
+                builder.DataSource = "shuttleasydbserver1.database.windows.net";
+                builder.UserID = "emreyilmaz";
+                builder.Password = "Easypeasy1";
+                builder.InitialCatalog = "ShuttleasyDB";
+
+                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                {
+
+
+                    connection.Open();
+
+                    string sql = "SELECT name  FROM company_worker";
+
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
                             {
-                                while (reader.Read())
-                                {
-                                    return Ok(reader.GetString(0));
-                                }
+                                return Ok(reader.GetString(0));
                             }
                         }
-
                     }
-                    return Ok();
-                }
-                catch (SqlException e)
-                {
-                    return BadRequest(e.Message);
-                }
 
+                }
+                return Ok();
             }
-            [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-            public IActionResult Test2()
+            catch (SqlException e)
             {
-                try
-                {
-                    return Ok(GetUserRoleFromRequestToken());
-                }
-                catch (SqlException e)
-                {
-                    return BadRequest(e.Message);
-                }
-
+                return BadRequest(e.Message);
             }
-            */
+
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public IActionResult Test2()
+        {
+            try
+            {
+                return Ok(GetUserRoleFromRequestToken());
+            }
+            catch (SqlException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+        */
+    }
 }
