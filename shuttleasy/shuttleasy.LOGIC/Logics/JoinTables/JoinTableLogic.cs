@@ -604,7 +604,8 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                               UserId = t2.UserId,
                               NotificationToken = t4.NotificationToken,
                               Latitude = t3.Latitude,
-                              Longtitude = t3.Longtitude
+                              Longtitude = t3.Longtitude,
+                              EstimatedArriveTime = null,
 
                           }).ToList();
             return result;

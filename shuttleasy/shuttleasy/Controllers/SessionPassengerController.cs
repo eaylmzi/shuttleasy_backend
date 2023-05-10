@@ -115,6 +115,7 @@ namespace shuttleasy.Controllers
                     ShuttleRouteDto shuttleRouteDto = new ShuttleRouteDto()
                     {
                         Id = idDto.Id,
+                        StartTime = _shuttleSessionLogic.FindShuttleSessionById(idDto.Id).StartTime,
                         StartGeopoint = _geoPointLogic.Find((int)shuttleSession.StartGeopoint),
                         FinalGeopoint = _geoPointLogic.Find((int)shuttleSession.FinalGeopoint),
 

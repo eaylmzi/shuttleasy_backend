@@ -9,6 +9,7 @@ namespace shuttleasy.DAL.Models.dto.Session.dto
     public class ShuttleRouteDto
     {
         public int Id { get; set; }
+        public DateTime StartTime { get; set; }
         public GeoPoint StartGeopoint { get; set; } = null!;
         public GeoPoint FinalGeopoint { get; set; } = null!;
     }

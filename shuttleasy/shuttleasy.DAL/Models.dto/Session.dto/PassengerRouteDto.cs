@@ -11,6 +11,7 @@ namespace shuttleasy.DAL.Models.dto.Session.dto
         public int UserId { get; set; }
         public string Latitude { get; set; } = null!;
         public string Longtitude { get; set; } = null!;
+        public DateTime? EstimatedArriveTime { get; set; }
         public string NotificationToken { get; set; } = null!;
     }
 }
