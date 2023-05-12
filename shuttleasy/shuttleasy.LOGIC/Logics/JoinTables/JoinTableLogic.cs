@@ -10,6 +10,7 @@ using shuttleasy.DAL.Models.dto.Passengers.dto;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.DAL.Models.dto.Session.dto;
 using shuttleasy.DAL.Models.dto.Driver.dto;
+using shuttleasy.DAL.Models.dto.PassengerShuttles.dto;
 
 namespace shuttleasy.LOGIC.Logics.JoinTables
 {
@@ -706,6 +707,30 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                               Longtitude = t4.Longtitude,
                               EstimatedArriveTime = t1.EstimatedPickupTime,
                               NotificationToken = t3.NotificationToken,
+
+
+
+                          }).ToList();
+            return result;
+        }
+        public List<PassengerShuttleDto>? GetRouteJoinTables(int sessionId)
+
+        {
+
+            var result = (from t1 in ShuttleSessionTable
+                          join t2 in CompanyTable on t1.CompanyId equals t2.Id
+                          join t3 in CompanyWorkerTable on t1.DriverId equals t3.Id
+                          where t1.Id == sessionId
+
+
+                          select new PassengerShuttleDto
+                          {
+                             PassengerCount = t1.PassengerCount,
+                             StartTime = t1.StartTime,
+                             ShuttleState = t1.ShuttleState,
+                             DriverName = t3.Name,
+                             CompanyName = t2.Name,
+                             RoutePoints = null,
 
 
 

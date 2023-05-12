@@ -32,6 +32,11 @@ using shuttleasy.Resource;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using Microsoft.AspNetCore.Hosting;
+using shuttleasy.DAL.Models.dto.Session.dto;
+using shuttleasy.DAL.Models.dto.PassengerShuttles.dto;
+using shuttleasy.LOGIC.Logics.ShuttleSessions;
+using shuttleasy.LOGIC.Logics.GeoPoints;
+using System.Globalization;
 
 namespace shuttleasy.Controllers
 {
@@ -44,18 +49,23 @@ namespace shuttleasy.Controllers
         private readonly IUserService _userService;
         private readonly IPasswordEncryption _passwordEncryption;
         private readonly IJoinTableLogic _joinTableLogic;
+        private readonly IShuttleSessionLogic _shuttleSessionLogic;
+        private readonly IGeoPointLogic _geoPointLogic;
         PassengerString message = new PassengerString();
         List<PassengerShuttleDetailsDto> emptyList = new List<PassengerShuttleDetailsDto>();
         
 
         public PassengerController(IMapper mapper,IUserService userService,
-            IPasswordEncryption passwordEncryption, IPassengerLogic passengerLogic, IJoinTableLogic joinTableLogic)
+            IPasswordEncryption passwordEncryption, IPassengerLogic passengerLogic, IJoinTableLogic joinTableLogic,
+            IShuttleSessionLogic shuttleSessionLogic, IGeoPointLogic geoPointLogic)
         {
             _passengerLogic = passengerLogic;
             _mapper = mapper;
             _userService = userService;
             _passwordEncryption = passwordEncryption;
             _joinTableLogic = joinTableLogic;
+            _shuttleSessionLogic = shuttleSessionLogic;
+            _geoPointLogic = geoPointLogic;
         }
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
@@ -280,6 +290,84 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public ActionResult<SessionPassenger> GetMySessionPassenger([FromBody] IdDto shuttleId)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
+                    SessionPassenger sessionPassenger = _joinTableLogic.GetSessionPassengerJoinTables(userId, shuttleId.Id)[0];
+                    return Ok(sessionPassenger);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public ActionResult<PassengerShuttleDto> GetRoute([FromBody] IdDto shuttleId)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    PassengerShuttleDto? passengerShuttleDto = _joinTableLogic.GetRouteJoinTables(shuttleId.Id)[0];
+                    if(passengerShuttleDto == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteJoinTables(shuttleId.Id);
+                    if (passengerRouteDto == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
+                    if (shuttleSession == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    double startLong = Double.Parse(_geoPointLogic.Find((int)shuttleSession.StartGeopoint).Longtitude, CultureInfo.InvariantCulture);
+                    double startLat = Double.Parse(_geoPointLogic.Find((int)shuttleSession.StartGeopoint).Latitude, CultureInfo.InvariantCulture);
+                    double finalLong = Double.Parse(_geoPointLogic.Find((int)shuttleSession.FinalGeopoint).Longtitude, CultureInfo.InvariantCulture);
+                    double finalLat = Double.Parse(_geoPointLogic.Find((int)shuttleSession.FinalGeopoint).Latitude, CultureInfo.InvariantCulture);
+
+             
+
+                    List<double[]>? routePoints = new List<double[]>();
+                    double[] startGeoPoint = { startLong, startLat };
+                    routePoints.Add(startGeoPoint);
+                    foreach (PassengerRouteDto passenger in passengerRouteDto)
+                    {
+                        double longitude = Double.Parse(passenger.Longtitude, CultureInfo.InvariantCulture); 
+                        double latitude = Double.Parse(passenger.Latitude, CultureInfo.InvariantCulture);
+                        double[] passengerGeoPoints = { longitude, latitude };
+                        routePoints.Add(passengerGeoPoints);                 
+                    }
+                    double[] finalGeoPoint = { finalLong, finalLat };
+                    routePoints.Add(finalGeoPoint);
+                    passengerShuttleDto.RoutePoints = routePoints;
+
+
+                    return Ok(passengerShuttleDto);
+
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> IsNotificationTokenEqual(PassengerNotificationTokenDto passengerNotificationTokenDto)

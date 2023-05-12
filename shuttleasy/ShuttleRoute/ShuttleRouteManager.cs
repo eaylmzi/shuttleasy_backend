@@ -70,7 +70,7 @@ namespace ShuttleRoute
             var sortedList = new List<PassengerRouteDto>();
             var startIndex = 0;
             var passedSecs = new List<double>();
-            var lastVisitedIndex = 0;
+            var lastVisitedIndex = sortedIndices[sortedIndices.Length - 1];
             double totalSecs = 0;
             for (var i = 0; i < sortedIndices.Length; i++)
             {
@@ -78,12 +78,15 @@ namespace ShuttleRoute
                 {
                     var passenger = inputPassengerList.ElementAt(sortedIndices[i] - 1);
                     sortedList.Add(passenger);
+                }
+            }
+            for (var i = sortedList.Count - 1; i >= 0; i--)
+            {
+                if (sortedIndices[i] != startIndex)
+                {
                     totalSecs += durations[lastVisitedIndex][sortedIndices[i]];
-                    passedSecs.Add(totalSecs);
+                    passedSecs.Insert(0, totalSecs);
                     lastVisitedIndex = sortedIndices[i];
-
-
-
                 }
             }
             for (var i = 0; i < passedSecs.Count; i++)
