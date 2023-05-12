@@ -74,6 +74,22 @@ namespace shuttleasy.DAL.Interfaces
             return false;
 
         }
+        public bool Delete(Func<T, bool> metot, Func<T, bool> metot2)
+        {
+            T? entity = query
+                      .AsEnumerable()
+                      .Where(m => metot(m) && metot2(m))
+                     .Select(m => m)
+                     .SingleOrDefault();
+            if (entity != null)
+            {
+                query.Remove(entity);
+                _context.SaveChanges();
+                return true;
+
+            }
+            return false;
+        }
 
         public bool Delete(Func<T, bool> metot)
         {

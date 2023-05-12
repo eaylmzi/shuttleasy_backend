@@ -11,6 +11,7 @@ using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.DAL.Models.dto.Session.dto;
 using shuttleasy.DAL.Models.dto.Driver.dto;
 using shuttleasy.DAL.Models.dto.PassengerShuttles.dto;
+using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
 
 namespace shuttleasy.LOGIC.Logics.JoinTables
 {
@@ -679,6 +680,27 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           select new SessionPassenger
                           {
                               Id = t1.Id,
+                              SessionId = t1.SessionId,
+                              EstimatedPickupTime = t1.EstimatedPickupTime,
+                              PickupOrderNum = t1.PickupOrderNum,
+                              PickupState = t1.PickupState,
+                              PickupId = t1.PickupId,
+
+                          }).ToList();
+            return result;
+        }
+        public List<SessionPassengerAndPassengerId> GetSessionPassengerAndPassengerIdJoinTables(int sessionId)
+
+        {
+            var result = (from t1 in SessionPassengerTable
+                          join t2 in PickupPointTable on t1.PickupId equals t2.Id
+                          where t1.SessionId == sessionId
+
+
+                          select new SessionPassengerAndPassengerId
+                          {
+                              Id = t1.Id,
+                              UserId = t2.UserId,
                               SessionId = t1.SessionId,
                               EstimatedPickupTime = t1.EstimatedPickupTime,
                               PickupOrderNum = t1.PickupOrderNum,

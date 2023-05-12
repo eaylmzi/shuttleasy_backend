@@ -24,6 +24,7 @@ namespace shuttleasy.DAL.Interfaces
         public bool Delete(Func<T, bool> metot);
         public bool DeleteList(Func<T, bool> metot);
         public int? GetId(Func<T, bool> metot, Func<T, bool> metot2);
+        public bool Delete(Func<T, bool> metot, Func<T, bool> metot2);
 
 
 

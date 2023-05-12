@@ -23,6 +23,8 @@ using shuttleasy.DAL.Models.dto.Companies.dto;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.DAL.Models.dto.PassengerRatingDto;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
+using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
+using shuttleasy.LOGIC.Logics.SessionPassengers;
 
 namespace shuttleasy.Controllers
 {
@@ -35,15 +37,17 @@ namespace shuttleasy.Controllers
         private readonly ICompanyWorkerLogic _driverLogic;
         private readonly IMapper _mapper;
         private readonly IJoinTableLogic _joinTableLogic;
+        private readonly ISessionPassengerLogic _sessionPassengerLogic;
         List<CommentDetailsDto> emptyList = new List<CommentDetailsDto>();
         public AdminController(IUserService userService, IPassengerLogic passengerLogic ,ICompanyWorkerLogic driverLogic,
-            IMapper mapper, IJoinTableLogic joinTableLogic)
+            IMapper mapper, IJoinTableLogic joinTableLogic, ISessionPassengerLogic sessionPassengerLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
             _driverLogic = driverLogic;
             _mapper = mapper;
             _joinTableLogic = joinTableLogic;
+            _sessionPassengerLogic = sessionPassengerLogic;
         }
         [HttpPost]
         public ActionResult<CompanyWorkerInfoDto> Login([FromBody]EmailPasswordDto emailPasswordDto)
@@ -264,7 +268,32 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<bool> DeleteSessionPassenger([FromBody] ShuttleAndPassengerIdDto shuttleAndPassengerIdDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    SessionPassenger sessionPassenger = _joinTableLogic.GetSessionPassengerJoinTables(shuttleAndPassengerIdDto.PassengerId, shuttleAndPassengerIdDto.ShuttleId)[0];
+                    bool isDeleted = _sessionPassengerLogic.Delete(sessionPassenger.Id);
+                    if (isDeleted)
+                    {
+                        return Ok(isDeleted);
+                    }
+                    return BadRequest(isDeleted);
 
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         /*
          * Yedek tokenhelper
                 private int GetUserIdFromRequestToken()

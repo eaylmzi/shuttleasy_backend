@@ -97,7 +97,29 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public ActionResult<SessionPassengerAndPassengerId> GetSessionListByShuttleId([FromBody] IdDto shuttleId)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    var list = _joinTableLogic.GetSessionPassengerAndPassengerIdJoinTables(shuttleId.Id);
+                    if (list.Count == 0)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    return Ok(list);
 
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<ShuttleManager> GetPassengersLocation([FromBody] IdDto idDto)
         {
