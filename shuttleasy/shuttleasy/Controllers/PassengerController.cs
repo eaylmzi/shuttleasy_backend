@@ -31,6 +31,7 @@ using Microsoft.Net.Http.Headers;
 using shuttleasy.Resource;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
+using Microsoft.AspNetCore.Hosting;
 
 namespace shuttleasy.Controllers
 {

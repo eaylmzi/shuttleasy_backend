@@ -40,7 +40,20 @@ namespace shuttleasy.LOGIC.Logics.SessionPassengers
             List<SessionPassenger>? sessionPassenger = _sessionPassengerRepository.Get(getSessionNumber);
             return sessionPassenger;
         }
-   
+        public SessionPassenger? Get(int id, int sessionId)
+        {
+            Func<SessionPassenger, bool> getSessionNumber = getSessionNumber => getSessionNumber.Id == id;
+            Func<SessionPassenger, bool> getShuttle = getShuttle => getShuttle.SessionId == sessionId;
+            SessionPassenger? sessionPassenger = _sessionPassengerRepository.GetSingle(getSessionNumber, getShuttle);
+            return sessionPassenger;
+        }
+        public async Task<bool> UpdateAsync(int id, SessionPassenger updatedSessionPassenger)
+        {
+            Func<SessionPassenger, bool> getSessionPassenger = getSessionPassenger => getSessionPassenger.Id == id;
+            bool isUpdated = await _sessionPassengerRepository.UpdateAsync(getSessionPassenger, updatedSessionPassenger);
+            return isUpdated;
+        }
+
 
     }
 }

@@ -17,7 +17,8 @@ namespace shuttleasy.DAL.Models
         public string? DestinationName { get; set; } 
         public bool Return { get; set; }
         public string SessionDate { get; set; } = null!;
-        public string? ShuttleState { get; set; } 
+        public string? ShuttleState { get; set; }
+        public string? RouteState { get; set; }
 
     }
 }

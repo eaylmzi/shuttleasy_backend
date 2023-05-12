@@ -378,8 +378,6 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.PickupId).HasColumnName("pickup_id");
 
                 entity.Property(e => e.EstimatedPickupTime)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
                     .HasColumnName("estimated_pickup_time");
 
                 
@@ -454,6 +452,7 @@ namespace shuttleasy.DAL
                 .HasColumnName("session_date");
 
                 entity.Property(e => e.ShuttleState).HasColumnName("shuttle_state");
+                entity.Property(e => e.RouteState).HasColumnName("route_state");
 
 
 

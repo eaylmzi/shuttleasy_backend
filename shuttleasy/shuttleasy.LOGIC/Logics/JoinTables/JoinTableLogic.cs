@@ -667,6 +667,51 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
+        public List<SessionPassenger> GetSessionPassengerJoinTables(int userId, int sessionId)
+
+        {
+            var result = (from t1 in SessionPassengerTable
+                          join t2 in PickupPointTable on t1.PickupId equals t2.Id
+                          where t1.SessionId == sessionId && t2.UserId == userId
+
+
+                          select new SessionPassenger
+                          {
+                              Id = t1.Id,
+                              SessionId = t1.SessionId,
+                              EstimatedPickupTime = t1.EstimatedPickupTime,
+                              PickupOrderNum = t1.PickupOrderNum,
+                              PickupState = t1.PickupState,
+                              PickupId = t1.PickupId,
+
+                          }).ToList();
+            return result;
+        }
+        public List<PassengerRouteDto> PassengerRouteJoinTables(int sessionId)
+
+        {
+
+            var result = (from t1 in SessionPassengerTable
+                          join t2 in PickupPointTable on t1.PickupId equals t2.Id
+                          join t3 in PassengerTable on t2.UserId equals t3.Id
+                          join t4 in GeoPointTable on t2.GeoPointId equals t4.Id
+                          where t1.SessionId == sessionId 
+                          orderby t1.PickupOrderNum ascending
+
+
+                          select new PassengerRouteDto
+                          {
+                              UserId = t3.Id,
+                              Latitude = t4.Latitude,
+                              Longtitude = t4.Longtitude,
+                              EstimatedArriveTime = t1.EstimatedPickupTime,
+                              NotificationToken = t3.NotificationToken,
+
+
+
+                          }).ToList();
+            return result;
+        }
         public List<ShuttleDto> MertimYapmaz(int driverId)
         {
             var result = (from t1 in CompanyTable

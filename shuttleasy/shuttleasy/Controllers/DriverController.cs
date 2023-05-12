@@ -30,6 +30,7 @@ using FirebaseAdmin.Messaging;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.DAL.Models.dto.Session.dto;
 using ShuttleRoute;
+using shuttleasy.LOGIC.Logics.SessionPassengers;
 
 namespace shuttleasy.Controllers
 {
@@ -47,12 +48,15 @@ namespace shuttleasy.Controllers
         private readonly IDriversStatisticLogic _driversStatisticLogic;
         private readonly INotificationService _notificationService;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
+        private readonly ISessionPassengerLogic _sessionPassengerLogic;
+        private readonly IGeoPointLogic _geoPointLogic;
 
         List<ShuttleSession> emptyList = new List<ShuttleSession>();
 
-        public DriverController(IUserService userService , IPassengerLogic passengerLogic,ICompanyWorkerLogic driverLogic,
-            IMapper mapper, IJoinTableLogic joinTableLogic, IShuttleService shuttleService,IDriversStatisticLogic driversStatisticLogic,
-            ISessionHistoryLogic sessionHistoryLogic, INotificationService notificationService, IShuttleSessionLogic shuttleSessionLogic)
+        public DriverController(IUserService userService , IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
+            IMapper mapper, IJoinTableLogic joinTableLogic, IShuttleService shuttleService, IDriversStatisticLogic driversStatisticLogic,
+            ISessionHistoryLogic sessionHistoryLogic, INotificationService notificationService, IShuttleSessionLogic shuttleSessionLogic,
+            ISessionPassengerLogic sessionPassengerLogic, IGeoPointLogic geoPointLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -64,6 +68,8 @@ namespace shuttleasy.Controllers
             _sessionHistoryLogic = sessionHistoryLogic;
             _notificationService = notificationService;
             _shuttleSessionLogic = shuttleSessionLogic;
+            _sessionPassengerLogic = sessionPassengerLogic;
+            _geoPointLogic = geoPointLogic;
         }
         [HttpPost]
         public ActionResult<CompanyWorkerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
@@ -260,10 +266,25 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    var result = await ShuttleRouteManager.CalculateRouteAsync(shuttleManager);
-                    return Ok(result);
-
-
+                    ShuttleManager calculatedShuttleManager = await ShuttleRouteManager.CalculateRouteAsync(shuttleManager);
+                    SessionPassenger? sessionPassenger = new SessionPassenger();
+                    for (int i = 0; calculatedShuttleManager.PassengerRouteDto.Count > i; i++)
+                    {
+                        sessionPassenger = _joinTableLogic.GetSessionPassengerJoinTables(calculatedShuttleManager.PassengerRouteDto[i].UserId, calculatedShuttleManager.ShuttleRouteDto.Id)[0];
+                        if(sessionPassenger == null)
+                        {
+                            return BadRequest(Error.NotFoundPassenger);
+                        }
+                        sessionPassenger.PickupOrderNum = i + 1;
+                        sessionPassenger.EstimatedPickupTime = calculatedShuttleManager.PassengerRouteDto[i].EstimatedArriveTime;
+                        bool isUpdated = await _sessionPassengerLogic.UpdateAsync(sessionPassenger.Id, sessionPassenger);
+                        if (!isUpdated)
+                        {
+                            return BadRequest(Error.NotUpdatedInformation);
+                        }
+                        sessionPassenger = null;
+                    }
+                    return Ok(calculatedShuttleManager);
                 }
                 return Unauthorized(Error.NotMatchedToken);
 
@@ -276,14 +297,16 @@ namespace shuttleasy.Controllers
         }
 
 
+
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<BatchResponse>> StartShuttle([FromBody] ShuttleManager shuttleManager)
+        public async Task<ActionResult<BatchResponse>> StartShuttle([FromBody] IdDto shuttleId)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    ShuttleManager shuttleManager = GetShuttleManager(shuttleId.Id);
                     ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleManager.ShuttleRouteDto.Id);
                     if (shuttleSession == null)
                     {
@@ -407,7 +430,30 @@ namespace shuttleasy.Controllers
             }
         }
 
+        private ShuttleManager GetShuttleManager(int shuttleId)
+        {
+            List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteJoinTables(shuttleId);
+            ShuttleSession? shuttle = _shuttleSessionLogic.FindShuttleSessionById(shuttleId);
+            if (shuttle == null)
+            {
+                return null;
+            }
+            ShuttleRouteDto shuttleRouteDto = new ShuttleRouteDto()
+            {
+                Id = shuttle.Id,
+                StartTime = shuttle.StartTime,
+                StartGeopoint = _geoPointLogic.Find((int)shuttle.StartGeopoint),
+                FinalGeopoint = _geoPointLogic.Find((int)shuttle.FinalGeopoint),
 
+
+            };
+            ShuttleManager shuttleManager = new ShuttleManager()
+            {
+                PassengerRouteDto = passengerRouteDto,
+                ShuttleRouteDto = shuttleRouteDto,
+            };
+            return shuttleManager;
+        }
     }
 }
 
