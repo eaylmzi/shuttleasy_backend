@@ -11,5 +11,7 @@ namespace shuttleasy.DAL.Resource.String
         public const string NOT_STARTED = "not_started";
         public const string ON_ROAD = "on_road";
         public const string FINISHED = "finished";
+        public const string CALCULATED = "calculated";
+        public const string NOT_CALCULATED = "not_calculated";
     }
 }

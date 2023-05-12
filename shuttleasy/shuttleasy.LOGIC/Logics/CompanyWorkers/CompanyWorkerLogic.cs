@@ -80,5 +80,11 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
             bool isExist = await _companyWorkerRepository.IsPhoneNumberAndEmailExist(email, phoneNumber);
             return isExist;
         }
+        public async Task<bool> UpdateAsync(int id, CompanyWorker updatedCompanyWorker)
+        {
+            Func<CompanyWorker, bool> getCompanyWorker = getCompanyWorker => getCompanyWorker.Id == id;
+            bool isUpdated = await _companyWorkerRepository.UpdateAsync(getCompanyWorker, updatedCompanyWorker);
+            return isUpdated;
+        }
     }
 }

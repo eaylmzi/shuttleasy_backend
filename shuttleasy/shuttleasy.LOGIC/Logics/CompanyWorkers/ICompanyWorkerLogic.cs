@@ -18,6 +18,7 @@ namespace shuttleasy.LOGIC.Logics.CompanyWorkers
         public bool UpdateCompanyWorkerWithEmail(CompanyWorker updatedCompanyWorker, string email);
         public List<CompanyWorker>? GetAllDriverWithCompanyId(int companyId);
         public CompanyWorker? GetCompanyWorkerWithPhoneNumber(string phone);
+        public Task<bool> UpdateAsync(int id, CompanyWorker updatedCompanyWorker);
         public Task<bool> IsPhoneNumberAndEmailExist(string email, string phoneNumber);
     }
 }

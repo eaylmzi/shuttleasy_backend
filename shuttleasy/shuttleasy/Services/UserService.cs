@@ -28,6 +28,9 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using shuttleasy.LOGIC.Logics.SessionHistories;
 using shuttleasy.LOGIC.Logics.DriversStatistics;
 using shuttleasy.Services.NotifService;
+using shuttleasy.DAL.Models.dto.Session.dto;
+using shuttleasy.LOGIC.Logics.GeoPoints;
+using shuttleasy.LOGIC.Logics.JoinTables;
 
 namespace shuttleasy.Services
 {
@@ -49,6 +52,8 @@ namespace shuttleasy.Services
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly ISessionHistoryLogic _sessionHistoryLogic;
         private readonly IDriversStatisticLogic _driversStatisticLogic;
+        private readonly IGeoPointLogic _geoPointLogic;
+        private readonly IJoinTableLogic _joinTableLogic;
         private static IWebHostEnvironment _webHostEnvironment;
 
 
@@ -59,7 +64,8 @@ namespace shuttleasy.Services
             IMailManager mailManager,IPasswordResetLogic passwordResetLogic,IPasswordResetRepository passwordResetRepository,
             ICompanyWorkerRepository driverRepository,IPassengerRepository passengerRepository, ICompanyLogic companyLogic,
             IShuttleSessionLogic shuttleSessionLogic, ICompanyWorkerLogic companyWorkerLogic, IWebHostEnvironment webHostEnvironment,
-            ISessionHistoryLogic sessionHistoryLogic, IDriversStatisticLogic driversStatisticLogic)
+            ISessionHistoryLogic sessionHistoryLogic, IDriversStatisticLogic driversStatisticLogic, IGeoPointLogic geoPointLogic,
+            IJoinTableLogic joinTableLogic)
         {//mailManager null olabilir diyo amk
             _passengerLogic = passengerLogic;
             _passwordEncryption = passwordEncryption;
@@ -78,6 +84,8 @@ namespace shuttleasy.Services
             _webHostEnvironment = webHostEnvironment;
             _sessionHistoryLogic = sessionHistoryLogic;
             _driversStatisticLogic = driversStatisticLogic;
+            _geoPointLogic = geoPointLogic;
+            _joinTableLogic = joinTableLogic;
         }
 
       
@@ -663,7 +671,29 @@ namespace shuttleasy.Services
             }           
         }
 
+        public ShuttleManager GetPassengersLocation(int sessionId)
+        {
+            List<PassengerRouteDto> passengerRouteDtoList = _joinTableLogic.ShuttleManagerJoinTables(sessionId);
+            ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionId);
+            if (shuttleSession == null)
+            {
+                return null;
+            }
+            ShuttleRouteDto shuttleRouteDto = new ShuttleRouteDto()
+            {
+                Id = sessionId,
+                StartTime = _shuttleSessionLogic.FindShuttleSessionById(sessionId).StartTime,
+                StartGeopoint = _geoPointLogic.Find((int)shuttleSession.StartGeopoint),
+                FinalGeopoint = _geoPointLogic.Find((int)shuttleSession.FinalGeopoint),
 
+            };
+            ShuttleManager shuttleManager = new ShuttleManager()
+            {
+                PassengerRouteDto = passengerRouteDtoList,
+                ShuttleRouteDto = shuttleRouteDto,
+            };
+            return shuttleManager;
+        }
 
 
 

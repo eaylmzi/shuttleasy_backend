@@ -37,6 +37,8 @@ using shuttleasy.DAL.Models.dto.PassengerShuttles.dto;
 using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.LOGIC.Logics.GeoPoints;
 using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
+using System.Collections;
 
 namespace shuttleasy.Controllers
 {
@@ -370,7 +372,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<bool> IsNotificationTokenEqual(PassengerNotificationTokenDto passengerNotificationTokenDto)
+        public ActionResult<bool> IsNotificationTokenEqual([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
         {
             try
             {
@@ -396,7 +398,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public async Task<ActionResult<bool>> UpdateNotificationToken(PassengerNotificationTokenDto passengerNotificationTokenDto)
+        public async Task<ActionResult<bool>> UpdateNotificationToken([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
         {
             try
             {
@@ -425,50 +427,132 @@ namespace shuttleasy.Controllers
         }
 
 
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public async Task<ActionResult<bool>> UploadImage(IFormFile file)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    Passenger? passenger = TokenHelper.GetUserFromRequestToken(Request.Headers,_passengerLogic);
+                    if (passenger == null)
+                    {
+                        return BadRequest(Error.NotFoundPassenger);
+                    }
+
+                    if (file != null && file.Length > 0)
+                    {
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                        var extension = Path.GetExtension(file.FileName);
+                        if (!allowedExtensions.Contains(extension.ToLower()))
+                        {
+                            return BadRequest("Invalid file type. Only JPG, JPEG and PNG files are allowed.");
+                        }
+
+                        try
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                file.CopyTo(ms);
+                                var fileBytes = ms.ToArray();
+                                var base64String = Convert.ToBase64String(fileBytes);
+                                byte[] byteArray = Encoding.UTF8.GetBytes(base64String);
+                                passenger.ProfilePic = byteArray;
+                                bool isPassengerUpdated = await _passengerLogic.UpdateAsync(passenger.Id, passenger);
+                                if (isPassengerUpdated)
+                                {
+                                    return Ok(isPassengerUpdated);
+                                }
+                                return BadRequest(isPassengerUpdated);
+
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                        }
+                    }
+
+                    return BadRequest("Please select a file to upload.");
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+          
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public IActionResult DisplayImage([FromBody] byte[] photo)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    if (photo != null)
+                    {
+                        string str = Encoding.UTF8.GetString(photo);
+                        var imageData = Convert.FromBase64String(str);
+                        return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
+
+                    }
+                    else
+                    {
+                        return BadRequest("There is no pic.");
+                    }
 
 
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        }
 
         /*
-         * 
-         *  private int GetUserIdFromRequestToken()
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
+        public IActionResult DisplayImage()
         {
-            string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
-            string user = jwt.Claims.First(c => c.Type == "id").Value;
-            int userId = int.Parse(user);
-            return userId;
-        }
-        private bool IsSamePerson(string email)
-        {
-            string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
-            Passenger passengerFromToken = _passengerLogic.GetPassengerWithToken(token)
-                ?? throw new AuthenticationException();
-            Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
-                ?? throw new ArgumentNullException();
-
-            if (passengerFromToken.Id == passenger.Id)
+            try
             {
-                return true;
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    Passenger? passenger = TokenHelper.GetUserFromRequestToken(Request.Headers, _passengerLogic);
+                    if (passenger == null)
+                    {
+                        return BadRequest(Error.NotFoundPassenger);
+                    }
+                    if(passenger.ProfilePic != null)
+                    {
+                        string str = Encoding.UTF8.GetString(passenger.ProfilePic);
+                        var imageData = Convert.FromBase64String(str);
+                        return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
+
+                    }
+                    else
+                    {
+                        return BadRequest("There is no pic.");
+                    }
+              
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
             }
-            return false;
-
-        }*/
-
-
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+          
+        }
+        */
     }
 
 
@@ -476,4 +560,48 @@ namespace shuttleasy.Controllers
 
 
 
+
+
+
+
+
+
+
+
+
+
+    /*
+     * 
+     *  private int GetUserIdFromRequestToken()
+    {
+        string requestToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(requestToken);
+        string user = jwt.Claims.First(c => c.Type == "id").Value;
+        int userId = int.Parse(user);
+        return userId;
+    }
+    private bool IsSamePerson(string email)
+    {
+        string token = Request.Headers[HeaderNames.Authorization].ToString().Replace("bearer ", "");
+        Passenger passengerFromToken = _passengerLogic.GetPassengerWithToken(token)
+            ?? throw new AuthenticationException();
+        Passenger passenger = _passengerLogic.GetPassengerWithEmail(email)
+            ?? throw new ArgumentNullException();
+
+        if (passengerFromToken.Id == passenger.Id)
+        {
+            return true;
+        }
+        return false;
+
+    }*/
+
+
 }
+
+
+
+
+
+
+

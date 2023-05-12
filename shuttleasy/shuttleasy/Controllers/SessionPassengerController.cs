@@ -99,32 +99,18 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<List<ShuttleManager>> GetPassengersLocation([FromBody] IdDto idDto)
+        public ActionResult<ShuttleManager> GetPassengersLocation([FromBody] IdDto idDto)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    List<PassengerRouteDto> passengerRouteDtoList = _joinTableLogic.ShuttleManagerJoinTables(idDto.Id);
-                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(idDto.Id);
-                    if(shuttleSession == null)
+                    ShuttleManager? shuttleManager = _userService.GetPassengersLocation(idDto.Id);
+                    if (shuttleManager == null)
                     {
-                        return BadRequest(Error.NotFoundShuttleSession);
+                        return BadRequest(Error.NotFound);
                     }
-                    ShuttleRouteDto shuttleRouteDto = new ShuttleRouteDto()
-                    {
-                        Id = idDto.Id,
-                        StartTime = _shuttleSessionLogic.FindShuttleSessionById(idDto.Id).StartTime,
-                        StartGeopoint = _geoPointLogic.Find((int)shuttleSession.StartGeopoint),
-                        FinalGeopoint = _geoPointLogic.Find((int)shuttleSession.FinalGeopoint),
-
-                    };
-                    ShuttleManager shuttleManager = new ShuttleManager()
-                    {
-                        PassengerRouteDto = passengerRouteDtoList,
-                        ShuttleRouteDto = shuttleRouteDto,
-                    };
                     return Ok(shuttleManager);
 
                 }

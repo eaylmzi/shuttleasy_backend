@@ -3,6 +3,7 @@ using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Models.dto.Credentials.dto;
 using shuttleasy.DAL.Models.dto.Driver.dto;
 using shuttleasy.DAL.Models.dto.Passengers.dto;
+using shuttleasy.DAL.Models.dto.Session.dto;
 using shuttleasy.DAL.Models.dto.User.dto;
 
 namespace shuttleasy.Services
@@ -33,6 +34,8 @@ namespace shuttleasy.Services
         public bool UpdateCompanyRating(int sessionId, double rating);
         public Task<bool> UpdateSessionHistoryRating(SessionHistory sessionHistory, double rating);
         public Task<bool> UpdateDriverStaticticRating(DriversStatistic driverStatictic, double rating, int driverId);
+
+        public ShuttleManager GetPassengersLocation(int sessionId);
 
     }
 }

@@ -31,6 +31,7 @@ using shuttleasy.LOGIC.Logics.ShuttleSessions;
 using shuttleasy.DAL.Models.dto.Session.dto;
 using ShuttleRoute;
 using shuttleasy.LOGIC.Logics.SessionPassengers;
+using System.Text;
 
 namespace shuttleasy.Controllers
 {
@@ -266,23 +267,10 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    ShuttleManager calculatedShuttleManager = await ShuttleRouteManager.CalculateRouteAsync(shuttleManager);
-                    SessionPassenger? sessionPassenger = new SessionPassenger();
-                    for (int i = 0; calculatedShuttleManager.PassengerRouteDto.Count > i; i++)
+                    ShuttleManager? calculatedShuttleManager = await calculateRoute(shuttleManager);
+                    if(calculatedShuttleManager == null)
                     {
-                        sessionPassenger = _joinTableLogic.GetSessionPassengerJoinTables(calculatedShuttleManager.PassengerRouteDto[i].UserId, calculatedShuttleManager.ShuttleRouteDto.Id)[0];
-                        if(sessionPassenger == null)
-                        {
-                            return BadRequest(Error.NotFoundPassenger);
-                        }
-                        sessionPassenger.PickupOrderNum = i + 1;
-                        sessionPassenger.EstimatedPickupTime = calculatedShuttleManager.PassengerRouteDto[i].EstimatedArriveTime;
-                        bool isUpdated = await _sessionPassengerLogic.UpdateAsync(sessionPassenger.Id, sessionPassenger);
-                        if (!isUpdated)
-                        {
-                            return BadRequest(Error.NotUpdatedInformation);
-                        }
-                        sessionPassenger = null;
+                        return BadRequest(Error.NotFound);
                     }
                     return Ok(calculatedShuttleManager);
                 }
@@ -306,12 +294,31 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    ShuttleManager shuttleManager = GetShuttleManager(shuttleId.Id);
-                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleManager.ShuttleRouteDto.Id);
+                    ShuttleManager shuttleManager = new ShuttleManager();
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
                     if (shuttleSession == null)
                     {
                         return BadRequest(Error.NotFoundShuttleSession);
                     }
+                    if (shuttleSession.RouteState == ShuttleState.NOT_CALCULATED)
+                    {
+                        ShuttleManager? newShuttleManager = _userService.GetPassengersLocation(shuttleId.Id);
+                        if (newShuttleManager == null)
+                        {
+                            return BadRequest(Error.NotFound);
+                        }
+                        ShuttleManager? calculatedShuttleManager = await calculateRoute(newShuttleManager);
+                        if (calculatedShuttleManager == null)
+                        {
+                            return BadRequest(Error.NotFound);
+                        }
+                        shuttleManager = calculatedShuttleManager;
+                    }
+                    else
+                    {
+                        shuttleManager = GetShuttleManager(shuttleId.Id);
+                    }
+                    
                     shuttleSession.ShuttleState = ShuttleState.ON_ROAD;
                     bool isUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleManager.ShuttleRouteDto.Id, shuttleSession);
                     if (!isUpdated)
@@ -453,6 +460,129 @@ namespace shuttleasy.Controllers
                 ShuttleRouteDto = shuttleRouteDto,
             };
             return shuttleManager;
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        public async Task<ActionResult<bool>> UploadImage(IFormFile file)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = TokenHelper.GetCompanyWorkerFromRequestToken(Request.Headers, _driverLogic);
+                    if (companyWorker == null)
+                    {
+                        return BadRequest(Error.NotFoundPassenger);
+                    }
+
+                    if (file != null && file.Length > 0)
+                    {
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                        var extension = Path.GetExtension(file.FileName);
+                        if (!allowedExtensions.Contains(extension.ToLower()))
+                        {
+                            return BadRequest("Invalid file type. Only JPG, JPEG and PNG files are allowed.");
+                        }
+
+                        try
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                file.CopyTo(ms);
+                                var fileBytes = ms.ToArray();
+                                var base64String = Convert.ToBase64String(fileBytes);
+                                byte[] byteArray = Encoding.UTF8.GetBytes(base64String);
+                                companyWorker.ProfilePic = byteArray;
+                                bool isPassengerUpdated = await _driverLogic.UpdateAsync(companyWorker.Id, companyWorker);
+                                if (isPassengerUpdated)
+                                {
+                                    return Ok(isPassengerUpdated);
+                                }
+                                return BadRequest(isPassengerUpdated);
+
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                        }
+                    }
+
+                    return BadRequest("Please select a file to upload.");
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        public IActionResult DisplayImage([FromBody] byte[] photo)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    if (photo != null)
+                    {
+                        string str = Encoding.UTF8.GetString(photo);
+                        var imageData = Convert.FromBase64String(str);
+                        return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
+
+                    }
+                    else
+                    {
+                        return BadRequest("There is no pic.");
+                    }
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        private async Task<ShuttleManager> calculateRoute(ShuttleManager shuttleManager)
+        {
+            ShuttleManager calculatedShuttleManager = await ShuttleRouteManager.CalculateRouteAsync(shuttleManager);
+            SessionPassenger? sessionPassenger = new SessionPassenger();
+            for (int i = 0; calculatedShuttleManager.PassengerRouteDto.Count > i; i++)
+            {
+               
+                sessionPassenger = _joinTableLogic.GetSessionPassengerJoinTables(calculatedShuttleManager.PassengerRouteDto[i].UserId, calculatedShuttleManager.ShuttleRouteDto.Id)[0];
+                if (sessionPassenger == null)
+                {
+                    return null;
+                }
+                sessionPassenger.PickupOrderNum = i + 1;
+                sessionPassenger.EstimatedPickupTime = calculatedShuttleManager.PassengerRouteDto[i].EstimatedArriveTime;
+                bool isSessionPassengerUpdated = await _sessionPassengerLogic.UpdateAsync(sessionPassenger.Id, sessionPassenger);
+                if (!isSessionPassengerUpdated)
+                {
+                    return null;
+                }
+                sessionPassenger = null;
+            }
+            ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleManager.ShuttleRouteDto.Id);
+            if (shuttleSession == null)
+            {
+                return null;
+            }
+            shuttleSession.RouteState = ShuttleState.CALCULATED;
+            bool isShuttleUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleManager.ShuttleRouteDto.Id, shuttleSession);
+            if (!isShuttleUpdated)
+            {
+                return null;
+            }
+            return calculatedShuttleManager;
+
         }
     }
 }
