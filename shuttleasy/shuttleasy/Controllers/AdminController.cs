@@ -297,7 +297,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public async Task<ActionResult<bool>> UploadDriverImage(ImageIdDto file)
+        public async Task<ActionResult<bool>> UploadCompanyWorkerImage(ImageIdDto file)
         {
             try
             {
@@ -355,7 +355,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public IActionResult DisplayDriverImage([FromBody] IdDto idDto)
+        public IActionResult DisplayCompanyWorkerImage([FromBody] IdDto idDto)
         {
             try
             {
