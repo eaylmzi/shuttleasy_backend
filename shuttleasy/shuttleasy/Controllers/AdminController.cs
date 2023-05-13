@@ -25,6 +25,8 @@ using shuttleasy.DAL.Models.dto.PassengerRatingDto;
 using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
 using shuttleasy.LOGIC.Logics.SessionPassengers;
+using System.Text;
+using shuttleasy.DAL.Models.dto.Image.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -293,6 +295,99 @@ namespace shuttleasy.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public async Task<ActionResult<bool>> UploadDriverImage(ImageIdDto file)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(file.Id);
+                    if (companyWorker == null)
+                    {
+                        return BadRequest(Error.NotFoundPassenger);
+                    }
+
+                    if (file != null && file.File.Length > 0)
+                    {
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                        var extension = Path.GetExtension(file.File.FileName);
+                        if (!allowedExtensions.Contains(extension.ToLower()))
+                        {
+                            return BadRequest("Invalid file type. Only JPG, JPEG and PNG files are allowed.");
+                        }
+
+                        try
+                        {
+                            using (var ms = new MemoryStream())
+                            {
+                                file.File.CopyTo(ms);
+                                var fileBytes = ms.ToArray();
+                                var base64String = Convert.ToBase64String(fileBytes);
+                                byte[] byteArray = Encoding.UTF8.GetBytes(base64String);
+                                companyWorker.ProfilePic = byteArray;
+                                bool isPassengerUpdated = await _driverLogic.UpdateAsync(companyWorker.Id, companyWorker);
+                                if (isPassengerUpdated)
+                                {
+                                    return Ok(isPassengerUpdated);
+                                }
+                                return BadRequest(isPassengerUpdated);
+
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                        }
+                    }
+
+                    return BadRequest("Please select a file to upload.");
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public IActionResult DisplayDriverImage([FromBody] IdDto idDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(idDto.Id);
+                    if (companyWorker == null)
+                    {
+                        return BadRequest(Error.NotFoundPassenger);
+                    }
+                    if (companyWorker.ProfilePic != null)
+                    {
+                        string str = Encoding.UTF8.GetString(companyWorker.ProfilePic);
+                        var imageData = Convert.FromBase64String(str);
+                        return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
+
+                    }
+                    else
+                    {
+                        return BadRequest("There is no pic.");
+                    }
+
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
         /*
          * Yedek tokenhelper
