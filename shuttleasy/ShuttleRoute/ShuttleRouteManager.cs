@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using shuttleasy.DAL.Models;
 using shuttleasy.DAL.Models.dto.Session.dto;
 
 namespace ShuttleRoute
@@ -9,6 +10,7 @@ namespace ShuttleRoute
         private static string accessToken = "pk.eyJ1IjoiY2VtcmViaXRnZW4iLCJhIjoiY2xlaW9sajJ4MDNpZjNxazU4bDljYmYyeCJ9.9Ue3eCQ1QJPIrKxGqQOY-A";
         private static string matrixApiUrl = "https://api.mapbox.com/directions-matrix/v1/mapbox/driving/";
         private static HttpClient client = new HttpClient();
+
         static async Task<DistanceMatrix?> CreateMatrix(string[] coordinates)
         {
             var req = $"{matrixApiUrl}{string.Join(";", coordinates)}?annotations=distance,duration&access_token={accessToken}";
@@ -16,6 +18,7 @@ namespace ShuttleRoute
             if (response.IsSuccessStatusCode)
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(responseBody);
                 try
                 {
                     var distanceMatrix = JsonConvert.DeserializeObject<DistanceMatrix>(responseBody);
@@ -26,11 +29,9 @@ namespace ShuttleRoute
                     return new DistanceMatrix();
                 }
             }
-            Console.WriteLine($"Error: {response.StatusCode}");
             return null;
+
         }
-
-
 
         static string StringfyGeoLocations(string latitude, string longitude)
         {
@@ -38,22 +39,14 @@ namespace ShuttleRoute
             return (geoLocation);
         }
 
-
-
         static string[] GetGeoPointList(ShuttleManager shuttleManager)
         {
             var geoPointList = new string[shuttleManager.PassengerRouteDto.Count + 1];
 
-
-
             geoPointList[0] = (StringfyGeoLocations(shuttleManager.ShuttleRouteDto.StartGeopoint.Latitude,
-            shuttleManager.ShuttleRouteDto.StartGeopoint.Longtitude));
-
-
+                shuttleManager.ShuttleRouteDto.StartGeopoint.Longtitude));
 
             int cnt = 1;
-
-
 
             shuttleManager.PassengerRouteDto.ForEach(passenger =>
             {
@@ -63,9 +56,7 @@ namespace ShuttleRoute
             return geoPointList;
         }
 
-
-
-        static List<PassengerRouteDto> SetSortedPassengerList(int[] sortedIndices, List<PassengerRouteDto> inputPassengerList, DateTime date, double[][] durations)
+        static async Task<List<PassengerRouteDto>> SetSortedPassengerList(int[] sortedIndices, List<PassengerRouteDto> inputPassengerList, DateTime date, double[][] durations, GeoPoint final)
         {
             var sortedList = new List<PassengerRouteDto>();
             var startIndex = 0;
@@ -80,18 +71,23 @@ namespace ShuttleRoute
                     sortedList.Add(passenger);
                 }
             }
-            for (var i = sortedList.Count - 1; i >= 0; i--)
+            for (var i = sortedList.Count - 1; i > -1; i--)
             {
-                if (sortedIndices[i] != startIndex)
-                {
-                    totalSecs += durations[lastVisitedIndex][sortedIndices[i]];
-                    passedSecs.Insert(0, totalSecs);
-                    lastVisitedIndex = sortedIndices[i];
-                }
+                totalSecs += durations[lastVisitedIndex][sortedIndices[i]];
+                passedSecs.Insert(0, totalSecs);
+                lastVisitedIndex = sortedIndices[i];
             }
+
+            //get final duration
+            var finalPointMatrix = await CreateMatrix(new string[]
+            {
+                $"{sortedList.ElementAt(sortedList.Count-1).Longtitude},{sortedList.ElementAt(sortedList.Count-1).Latitude}",
+                $"{final.Longtitude},{final.Latitude}"
+            });
+            var lastDuration = finalPointMatrix != null ? finalPointMatrix.Durations[0][1] : 0;
             for (var i = 0; i < passedSecs.Count; i++)
             {
-                sortedList.ElementAt(i).EstimatedArriveTime = date.AddSeconds(-(passedSecs.ElementAt(i)));
+                sortedList.ElementAt(i).EstimatedArriveTime = date.AddSeconds(-(passedSecs.ElementAt(i) + lastDuration));
             }
             return sortedList;
         }
@@ -99,29 +95,24 @@ namespace ShuttleRoute
         {
             var geoPointList = GetGeoPointList(input);
 
-
-
             var matrix = await CreateMatrix(geoPointList);
-
-
 
             if (matrix != null)
             {
                 var graph = new Graph();
                 var l = graph.DijkstraAlgorithm(matrix.Distances);
-                var sortedList = SetSortedPassengerList(l, input.PassengerRouteDto, input.ShuttleRouteDto.StartTime, matrix.Durations);
-                var shuttleManager = new ShuttleManager();
-                shuttleManager.PassengerRouteDto = sortedList;
-                shuttleManager.ShuttleRouteDto = input.ShuttleRouteDto;
-
-
+                var sortedList =
+                   await SetSortedPassengerList(l, input.PassengerRouteDto, input.ShuttleRouteDto.StartTime, matrix.Durations, input.ShuttleRouteDto.FinalGeopoint);
+                var shuttleManager = new ShuttleManager
+                {
+                    PassengerRouteDto = sortedList,
+                    ShuttleRouteDto = input.ShuttleRouteDto
+                };
 
                 return shuttleManager;
             }
             return new ShuttleManager();
         }
-
-
 
     }
 }
