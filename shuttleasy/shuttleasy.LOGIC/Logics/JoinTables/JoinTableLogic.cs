@@ -440,6 +440,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                               ShuttleSession = t2,
                               PassengerDetailsDto = new PassengerDetailsDto
                               {
+                                  Id = t5.Id,
                                   ProfilePic = t5.ProfilePic,
                                   Name = t5.Name,
                                   Surname =t5.Surname,

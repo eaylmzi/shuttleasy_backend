@@ -313,7 +313,7 @@ namespace shuttleasy.Controllers
             }
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<PassengerShuttleDto> GetRoute([FromBody] IdDto shuttleId)
         {
             try

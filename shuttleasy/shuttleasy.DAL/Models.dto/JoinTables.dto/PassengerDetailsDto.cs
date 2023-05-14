@@ -8,6 +8,7 @@ namespace shuttleasy.DAL.Models.dto.JoinTables.dto
 {
     public class PassengerDetailsDto
     {
+        public int Id { get; set; }
         public byte[]? ProfilePic { get; set; }
         public string Name { get; set; } = null!;
         public string Surname { get; set; } = null!;
