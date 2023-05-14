@@ -743,12 +743,14 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             var result = (from t1 in ShuttleSessionTable
                           join t2 in CompanyTable on t1.CompanyId equals t2.Id
                           join t3 in CompanyWorkerTable on t1.DriverId equals t3.Id
+                          join t4 in ShuttleBusTable on t1.BusId equals t4.Id
                           where t1.Id == sessionId
 
 
                           select new PassengerShuttleDto
                           {
                              PassengerCount = t1.PassengerCount,
+                             LicensePlate = t4.LicensePlate,
                              StartTime = t1.StartTime,
                              ShuttleState = t1.ShuttleState,
                              DriverName = t3.Name,

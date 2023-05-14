@@ -412,16 +412,41 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<BatchResponse>> TakeNextPerson([FromBody] PassengerRouteDto passengerRouteDto)
+        public async Task<ActionResult<BatchResponse>> TakeNextPerson([FromBody] IdDto shuttleId)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    ShuttleManager? shuttleManager = GetShuttleManager(shuttleId.Id);
+                    if (shuttleManager == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
+                    if (shuttleSession == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    int? lastPerson = shuttleSession.LastPickupIndex;
+                    if(lastPerson == null)
+                    {
+                        lastPerson = 1;
+                    }
+                    else
+                    {
+                        lastPerson = lastPerson + 1;
+                    }
+                    bool isShuttleSessionUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleId.Id, shuttleSession);
+                    if (!isShuttleSessionUpdated)
+                    {
+                        return BadRequest(Error.NotUpdatedInformation);
+                    }
+
                     NotificationModelToken notificationModelToken = new NotificationModelToken();
                     List<string> tokenList = new List<string>();
-                    tokenList.Add(passengerRouteDto.NotificationToken);
+                    tokenList.Add(shuttleManager.PassengerRouteDto[(int)lastPerson].NotificationToken);
                     notificationModelToken.Token = tokenList;
                     notificationModelToken.Title = NotificationTitle.FOR_NEXT_PASSENGER;
                     notificationModelToken.Body = NotificationBody.FOR_NEXT_PASSENGER;

@@ -453,6 +453,8 @@ namespace shuttleasy.DAL
 
                 entity.Property(e => e.ShuttleState).HasColumnName("shuttle_state");
                 entity.Property(e => e.RouteState).HasColumnName("route_state");
+                entity.Property(e => e.LastPickupIndex).HasColumnName("last_pickup_index");
+                entity.Property(e => e.Price).HasColumnName("price");
 
 
 

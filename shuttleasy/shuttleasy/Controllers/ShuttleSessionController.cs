@@ -88,6 +88,8 @@ namespace shuttleasy.Controllers
                         if (await _shuttleSessionLogic.CheckAllForeignKeysAndUniqueExistAsync(shuttleSessionDto))
                         {
                             ShuttleSession shuttleSession = _mapper.Map<ShuttleSession>(shuttleSessionDto);
+                            shuttleSession.ShuttleState = ShuttleState.NOT_STARTED;
+                            shuttleSession.RouteState = ShuttleState.NOT_CALCULATED;
                             int? isAdded = _shuttleSessionLogic.AddReturnId(shuttleSession);
                             if (isAdded != 0)
                             {

@@ -19,6 +19,8 @@ namespace shuttleasy.DAL.Models
         public string SessionDate { get; set; } = null!;
         public string? ShuttleState { get; set; }
         public string? RouteState { get; set; }
+        public int? LastPickupIndex { get; set; }
+        public double? Price { get; set; }
 
     }
 }
