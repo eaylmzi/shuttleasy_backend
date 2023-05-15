@@ -341,6 +341,15 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
+                    if (shuttleSession == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    if (shuttleSession.RouteState == ShuttleState.NOT_CALCULATED)
+                    {
+                        return BadRequest(Error.NOTCALCULATED);
+                    }
                     PassengerShuttleDto? passengerShuttleDto = _joinTableLogic.GetRouteJoinTables(shuttleId.Id)[0];
                     if(passengerShuttleDto == null)
                     {
@@ -351,11 +360,7 @@ namespace shuttleasy.Controllers
                     {
                         return BadRequest(Error.NotFound);
                     }
-                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
-                    if (shuttleSession == null)
-                    {
-                        return BadRequest(Error.NotFound);
-                    }
+                  
                     double startLong = Double.Parse(_geoPointLogic.Find((int)shuttleSession.StartGeopoint).Longtitude, CultureInfo.InvariantCulture);
                     double startLat = Double.Parse(_geoPointLogic.Find((int)shuttleSession.StartGeopoint).Latitude, CultureInfo.InvariantCulture);
                     double finalLong = Double.Parse(_geoPointLogic.Find((int)shuttleSession.FinalGeopoint).Longtitude, CultureInfo.InvariantCulture);
@@ -541,7 +546,7 @@ namespace shuttleasy.Controllers
           
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
-        public IActionResult DisplayImage([FromBody] byte[] photo)
+        public ActionResult<byte[]> DisplayImage([FromBody] byte[] photo)
         {
             try
             {
@@ -552,7 +557,8 @@ namespace shuttleasy.Controllers
                     {
                         string str = Encoding.UTF8.GetString(photo);
                         var imageData = Convert.FromBase64String(str);
-                        return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
+                        return Ok(imageData);
+                        //return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
 
                     }
                     else

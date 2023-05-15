@@ -32,6 +32,7 @@ using shuttleasy.LOGIC.Logics.PickupPoints;
 using Microsoft.EntityFrameworkCore;
 using shuttleasy.LOGIC.Logics.PickupAreas;
 using shuttleasy.Services.ShuttleServices;
+using shuttleasy.LOGIC.Logics.PassengerPayments;
 
 namespace shuttleasy.Controllers
 {
@@ -52,12 +53,14 @@ namespace shuttleasy.Controllers
         private readonly IPickupAreaLogic _pickupAreaLogic;
         private readonly IPickupPointLogic _pickupPointLogic;
         private readonly IShuttleService _shuttleService;
+        private readonly IPassengerPaymentLogic _passengerPaymentLogic;
         List<ShuttleSession> emptyList = new List<ShuttleSession>();
 
         public ShuttleSessionController(IUserService userService, IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
                     IShuttleBusLogic shuttleBusLogic,IShuttleSessionLogic shuttleSessionLogic, IMapper mapper, IJoinTableLogic joinTableLogic,
                     ICompanyLogic companyLogic, ISessionPassengerLogic sessionPassengerLogic, IGeoPointLogic geoPointLogic,
-                    IPickupAreaLogic pickupAreaLogic, IPickupPointLogic pickupPointLogic, IShuttleService shuttleService)
+                    IPickupAreaLogic pickupAreaLogic, IPickupPointLogic pickupPointLogic, IShuttleService shuttleService,
+                    IPassengerPaymentLogic passengerPaymentLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -72,6 +75,7 @@ namespace shuttleasy.Controllers
             _pickupAreaLogic = pickupAreaLogic;
             _pickupPointLogic = pickupPointLogic;
             _shuttleService = shuttleService;
+            _passengerPaymentLogic = passengerPaymentLogic;
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
@@ -280,18 +284,26 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    PassengerPayment passengerPayment = new PassengerPayment()
+                    {
+                        PassengerIdentity = userInformation.Id,
+                        ShuttleSessionId = sessionPassengerDto.SessionId,
+                        IsPaymentVerified = false,
+                    };
 
-
-
-
-
+                    bool isPassengerPaymentAdded = _passengerPaymentLogic.Add(passengerPayment);
+                    if (!isPassengerPaymentAdded)
+                    {
+                        return BadRequest(Error.NotAdded);
+                    }
+               
                     int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
                     bool isEnrolled = await _shuttleService.EnrollPassenger(sessionPassengerDto, userId);
                     if (isEnrolled)
                     {
-                        return true;
+                        return Ok(isEnrolled);
                     }
-                    return false;
+                    return BadRequest(isEnrolled);
 
                     /*
                     ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(sessionPassengerDto.SessionId);

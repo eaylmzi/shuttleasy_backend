@@ -355,7 +355,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
-        public IActionResult DisplayCompanyWorkerImage([FromBody] IdDto idDto)
+        public ActionResult<byte[]> DisplayCompanyWorkerImage([FromBody] IdDto idDto)
         {
             try
             {
@@ -371,7 +371,8 @@ namespace shuttleasy.Controllers
                     {
                         string str = Encoding.UTF8.GetString(companyWorker.ProfilePic);
                         var imageData = Convert.FromBase64String(str);
-                        return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
+                        return Ok(imageData);
+                        //return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
 
                     }
                     else

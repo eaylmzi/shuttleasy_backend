@@ -493,7 +493,40 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<bool> GetPaymentInfo([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                   
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<bool> ConfirmPayment([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
 
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         private ShuttleManager GetShuttleManagerByPickupOrder(int shuttleId)
         {
             List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteByPickupOrderJoinTables(shuttleId);
@@ -613,7 +646,8 @@ namespace shuttleasy.Controllers
                     {
                         string str = Encoding.UTF8.GetString(photo);
                         var imageData = Convert.FromBase64String(str);
-                        return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
+                        return Ok(imageData);
+                        //return File(imageData, "image/jpg"); // veya "image/png" veya "image/gif" gibi uygun MIME türünü belirtebilirsiniz
 
                     }
                     else

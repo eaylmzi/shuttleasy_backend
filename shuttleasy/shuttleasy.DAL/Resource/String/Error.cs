@@ -8,6 +8,7 @@ namespace shuttleasy.DAL.Resource.String
 {
     public static class Error
     {
+        public const string NOTCALCULATED = "The route is not calculated";
         public const string AlreadyFound = "The item is already in table";
         public const string AlreadyFinish = "This session is already finished";
         public const string AlreadyComment = "This user is already comment to this shuttle";
