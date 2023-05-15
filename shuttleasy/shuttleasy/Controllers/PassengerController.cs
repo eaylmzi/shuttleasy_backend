@@ -42,6 +42,7 @@ using System.Collections;
 using shuttleasy.LOGIC.Logics.Companies;
 using shuttleasy.LOGIC.Logics.CompanyWorkers;
 using shuttleasy.Services.NotifService;
+using shuttleasy.DAL.Models.dto.Driver.dto;
 
 namespace shuttleasy.Controllers
 {
@@ -104,17 +105,28 @@ namespace shuttleasy.Controllers
         }
        
         [HttpPost]
-        public ActionResult<PassengerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
+        public async Task<ActionResult<PassengerInfoDto>> Login([FromBody] EmailPasswordNotifDto emailPasswordNotifDto)
         {          
             try
             {
-                Passenger? passenger = _userService.LoginPassenger(emailPasswordDto.Email, emailPasswordDto.Password);
-                if (passenger != null)
+                Passenger? passenger = _userService.LoginPassenger(emailPasswordNotifDto.Email, emailPasswordNotifDto.Password);
+                if (passenger == null)
                 {
-                    PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
-                    return Ok(passengerInfoDto);
+                    return BadRequest(Error.NotCorrectEmailAndPassword);               
                 }
-                return BadRequest(Error.NotCorrectEmailAndPassword);
+
+                if (emailPasswordNotifDto.NotificationToken != null)
+                {
+                    passenger.NotificationToken = emailPasswordNotifDto.NotificationToken;
+                    bool isPassengerUpdated = await _passengerLogic.UpdateAsync(passenger.Id, passenger);
+                    if (!isPassengerUpdated)
+                    {
+                        return BadRequest(Error.NotUpdatedInformation);
+                    }
+                }
+                PassengerInfoDto passengerInfoDto = _mapper.Map<PassengerInfoDto>(passenger);
+                return Ok(passengerInfoDto);
+
             }         
             catch (Exception ex)
             {

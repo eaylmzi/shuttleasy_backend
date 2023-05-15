@@ -73,17 +73,28 @@ namespace shuttleasy.Controllers
             _geoPointLogic = geoPointLogic;
         }
         [HttpPost]
-        public ActionResult<CompanyWorkerInfoDto> Login([FromBody] EmailPasswordDto emailPasswordDto)
+        public async Task<ActionResult<CompanyWorkerInfoDto>> Login([FromBody] EmailPasswordNotifDto emailPasswordNotifDto)
         {
             try
             {
-                CompanyWorker? companyWorker = _userService.LoginCompanyWorker(emailPasswordDto.Email, emailPasswordDto.Password);
-                if (companyWorker != null)
+                CompanyWorker? companyWorker = _userService.LoginCompanyWorker(emailPasswordNotifDto.Email, emailPasswordNotifDto.Password);
+                if (companyWorker == null)
                 {
-                    CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
-                    return Ok(driverInfoDto);
+                    return BadRequest(Error.NotCorrectEmailAndPassword);               
                 }
-                return BadRequest(Error.NotCorrectEmailAndPassword);
+                if(emailPasswordNotifDto.NotificationToken != null)
+                {
+                    companyWorker.NotificationToken = emailPasswordNotifDto.NotificationToken;
+                    bool isCompanyWorkerUpdated = await _driverLogic.UpdateAsync(companyWorker.Id,companyWorker);
+                    if (!isCompanyWorkerUpdated)
+                    {
+                        return BadRequest(Error.NotUpdatedInformation);
+                    }
+                }
+
+                CompanyWorkerInfoDto driverInfoDto = _mapper.Map<CompanyWorkerInfoDto>(companyWorker);
+                return Ok(driverInfoDto);
+
             }
             catch (Exception ex)
             {
@@ -624,6 +635,60 @@ namespace shuttleasy.Controllers
             }
             return calculatedShuttleManager;
 
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public ActionResult<bool> IsNotificationTokenEqual([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = _driverLogic.GetSingle(passengerNotificationTokenDto.Id);
+                    if (companyWorker != null)
+                    {
+                        if (passengerNotificationTokenDto.NotificationToken == companyWorker.NotificationToken)
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return BadRequest(Error.NotFoundPassenger);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        public async Task<ActionResult<bool>> UpdateNotificationToken([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    CompanyWorker? companyWorker = _driverLogic.GetSingle(passengerNotificationTokenDto.Id);
+                    if (companyWorker != null)
+                    {
+                        companyWorker.NotificationToken = passengerNotificationTokenDto.NotificationToken;
+                        bool isUpdated = await _driverLogic.UpdateAsync(passengerNotificationTokenDto.Id, companyWorker);
+                        if (isUpdated)
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return BadRequest(Error.NotFoundPassenger);
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
