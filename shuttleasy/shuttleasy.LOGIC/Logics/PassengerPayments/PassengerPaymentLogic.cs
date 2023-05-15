@@ -37,7 +37,7 @@ namespace shuttleasy.LOGIC.Logics.PassengerPayments
         }
         public async Task<bool> UpdateAsync(int id, PassengerPayment passengerPayment)
         {
-            Func<PassengerPayment, bool> getPassengerPayment = getPassengerPayment => getPassengerPayment.Id == id;
+            Func<PassengerPayment, bool> getPassengerPayment = getPassengerPayment => getPassengerPayment.ShuttleSessionId == id;
             bool isUpdated = await _passengerPaymentRepository.UpdateAsync(getPassengerPayment, passengerPayment);
             return isUpdated;
         }

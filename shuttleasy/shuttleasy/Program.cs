@@ -15,6 +15,7 @@ using shuttleasy.DAL.EFRepositories.DriversStatistics;
 using shuttleasy.DAL.EFRepositories.GeoPoints;
 using shuttleasy.DAL.EFRepositories.NotificationPassengers;
 using shuttleasy.DAL.EFRepositories.NotificationWorkers;
+using shuttleasy.DAL.EFRepositories.PassengerPayments;
 using shuttleasy.DAL.EFRepositories.PassengerRatings;
 using shuttleasy.DAL.EFRepositories.PasswordReset;
 using shuttleasy.DAL.EFRepositories.PickupAreas;
@@ -34,6 +35,7 @@ using shuttleasy.LOGIC.Logics.GeoPoints;
 using shuttleasy.LOGIC.Logics.JoinTables;
 using shuttleasy.LOGIC.Logics.NotificationPassengers;
 using shuttleasy.LOGIC.Logics.NotificationWorkers;
+using shuttleasy.LOGIC.Logics.PassengerPayments;
 using shuttleasy.LOGIC.Logics.PassengerRatings;
 using shuttleasy.LOGIC.Logics.PasswordReset;
 using shuttleasy.LOGIC.Logics.PickupAreas;
@@ -82,6 +84,9 @@ builder.Services.AddScoped<INotificationWorkerLogic, NotificationWorkerLogic>();
 
 builder.Services.AddScoped<IPassengerRepository, PassengerRepository>();
 builder.Services.AddScoped<IPassengerLogic, PassengerLogic>();
+
+builder.Services.AddScoped<IPassengerPaymentRepository, PassengerPaymentRepository>();
+builder.Services.AddScoped<IPassengerPaymentLogic, PassengerPaymentLogic>();
 
 builder.Services.AddScoped<IPassengerRatingRepository, PassengerRatingRepository>();
 builder.Services.AddScoped<IPassengerRatingLogic, PassengerRatingLogic>();

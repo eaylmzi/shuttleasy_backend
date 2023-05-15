@@ -69,6 +69,13 @@ namespace shuttleasy.LOGIC.Logics
             return passenger;
 
         }
+        public Passenger? GetPassengerQr(Guid Qr)
+        {
+            Func<Passenger, bool> getPassenger = getPassenger => getPassenger.QrString == Qr;
+            Passenger? passenger = _passenger.GetSingle(getPassenger);
+            return passenger;
+
+        }
         public Passenger? GetPassengerWithPhoneNumber(string phone)
         {
             Func<Passenger, bool> getPassenger = getPassenger => getPassenger.PhoneNumber == phone;

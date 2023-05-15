@@ -32,6 +32,8 @@ using shuttleasy.DAL.Models.dto.Session.dto;
 using ShuttleRoute;
 using shuttleasy.LOGIC.Logics.SessionPassengers;
 using System.Text;
+using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
+using shuttleasy.LOGIC.Logics.PassengerPayments;
 
 namespace shuttleasy.Controllers
 {
@@ -51,13 +53,14 @@ namespace shuttleasy.Controllers
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly ISessionPassengerLogic _sessionPassengerLogic;
         private readonly IGeoPointLogic _geoPointLogic;
+        private readonly IPassengerPaymentLogic _passengerPaymentLogic;
 
         List<ShuttleSession> emptyList = new List<ShuttleSession>();
 
         public DriverController(IUserService userService , IPassengerLogic passengerLogic, ICompanyWorkerLogic driverLogic,
             IMapper mapper, IJoinTableLogic joinTableLogic, IShuttleService shuttleService, IDriversStatisticLogic driversStatisticLogic,
             ISessionHistoryLogic sessionHistoryLogic, INotificationService notificationService, IShuttleSessionLogic shuttleSessionLogic,
-            ISessionPassengerLogic sessionPassengerLogic, IGeoPointLogic geoPointLogic)
+            ISessionPassengerLogic sessionPassengerLogic, IGeoPointLogic geoPointLogic, IPassengerPaymentLogic passengerPaymentLogic)
         {
             _userService = userService;
             _passengerLogic = passengerLogic;
@@ -71,6 +74,7 @@ namespace shuttleasy.Controllers
             _shuttleSessionLogic = shuttleSessionLogic;
             _sessionPassengerLogic = sessionPassengerLogic;
             _geoPointLogic = geoPointLogic;
+            _passengerPaymentLogic = passengerPaymentLogic;
         }
         [HttpPost]
         public async Task<ActionResult<CompanyWorkerInfoDto>> Login([FromBody] EmailPasswordNotifDto emailPasswordNotifDto)
@@ -493,15 +497,35 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<bool> GetPaymentInfo([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
+        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        public ActionResult<double> GetPaymentInfo([FromBody] PassengerQrStringDto passengerQrStringDto)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                   
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(userInformation.Id);
+                    if (companyWorker == null)
+                    {
+                        return BadRequest(Error.NotFoundDriver);
+                    }
+                    Passenger? passenger = _passengerLogic.GetPassengerQr(passengerQrStringDto.QrString);
+                    if(passenger == null)
+                    {
+                        return BadRequest(Error.NotFoundPassenger);
+                    }
+                    List<ShuttleIdPrıce> shuttleIdPrıceList = _joinTableLogic.PassengerPaymentJoinTables(passenger.Id,companyWorker.CompanyId);
+                    if (shuttleIdPrıceList == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    double priceOfShuttles = 0;
+                    foreach (ShuttleIdPrıce shuttleIdPrıce in shuttleIdPrıceList)
+                    {
+                        priceOfShuttles = priceOfShuttles + shuttleIdPrıce.Price;
+                    }
+                    return Ok(priceOfShuttles);
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }
@@ -510,15 +534,48 @@ namespace shuttleasy.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
-        public ActionResult<bool> ConfirmPayment([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
+        [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
+        public async Task<ActionResult<bool>> ConfirmPayment([FromBody] ShuttleIdPrıce shuttleIdPrice)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    CompanyWorker? companyWorker = _driverLogic.GetCompanyWorkerWithId(userInformation.Id);
+                    if (companyWorker == null)
+                    {
+                        return BadRequest(Error.NotFoundDriver);
+                    }
+                    List<PassengerPayment> passengerPaymentList = _joinTableLogic.GetSessionPassengerListJoinTables(shuttleIdPrice.Id,companyWorker.CompanyId);
+                    if (passengerPaymentList == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    foreach (PassengerPayment passengerPayment in passengerPaymentList)
+                    {
+                        passengerPayment.IsPaymentVerified = true;
+                        passengerPayment.PaymentDate = DateTime.Now;
+                        bool isPassengerPaymentUpdated = await _passengerPaymentLogic.UpdateAsync(passengerPayment.ShuttleSessionId, passengerPayment);
+                        if (!isPassengerPaymentUpdated)
+                        {
+                            return BadRequest(isPassengerPaymentUpdated);
+                        }
+                    }
+                    Passenger? passenger = _passengerLogic.GetPassengerWithId(shuttleIdPrice.Id);
+                    if (passenger == null)
+                    {
+                        return BadRequest(Error.NotFoundPassenger);
+                    }
+                    NotificationModelToken notificationModelToken = new NotificationModelToken();
+                    List<string> tokenList = new List<string>();
+                    tokenList.Add(passenger.NotificationToken);
+                    notificationModelToken.Token = tokenList;
+                    notificationModelToken.Title = NotificationTitle.PAYMENT_VERIFIED;
+                    notificationModelToken.Body = $"Your payment of {shuttleIdPrice.Price} TL has been successfully processed. We wish you a pleasant journey.";
 
+                    var notif = await _notificationService.SendNotificationByToken(notificationModelToken);
+                    return Ok(true);
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }

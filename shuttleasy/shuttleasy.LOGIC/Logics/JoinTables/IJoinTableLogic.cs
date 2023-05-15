@@ -5,6 +5,7 @@ using shuttleasy.DAL.Models.dto.JoinTables.dto;
 using shuttleasy.DAL.Models.dto.PassengerShuttles.dto;
 using shuttleasy.DAL.Models.dto.Session.dto;
 using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
+using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,8 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         public List<DriversInfoDto> CompanyWorkerDriverStaticticByNameJoinTables(int companyId);
         public List<SessionPassenger> GetSessionPassengerJoinTables(int userId, int sessionId);
         public List<SessionPassengerAndPassengerId> GetSessionPassengerAndPassengerIdJoinTables(int sessionId);
-        public List<SessionPassenger> GetSessionPassengerListJoinTables(int sessionId);
+        public List<ShuttleIdPrıce> PassengerPaymentJoinTables(int userId, int companyId);
+        public List<PassengerPayment> GetSessionPassengerListJoinTables(int userId, int companyId);
         public List<PassengerRouteDto> PassengerRouteByPickupOrderJoinTables(int sessionId);
         public List<PassengerRouteDto> PassengerRouteJoinTables(int sessionId);
         public List<PassengerShuttleDto>? GetRouteJoinTables(int sessionId);

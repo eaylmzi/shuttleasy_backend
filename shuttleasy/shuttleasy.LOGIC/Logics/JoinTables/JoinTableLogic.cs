@@ -12,6 +12,7 @@ using shuttleasy.DAL.Models.dto.Session.dto;
 using shuttleasy.DAL.Models.dto.Driver.dto;
 using shuttleasy.DAL.Models.dto.PassengerShuttles.dto;
 using shuttleasy.DAL.Models.dto.SessionPassengers.dto;
+using shuttleasy.DAL.Models.dto.ShuttleSessions.dto;
 
 namespace shuttleasy.LOGIC.Logics.JoinTables
 {
@@ -31,6 +32,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
         private DbSet<PickupArea> PickupAreaTable { get; set; }
         private DbSet<DriversStatistic> DriverStaticticTable { get; set; }
         private DbSet<SessionHistory> SessionHistoryTable { get; set; }
+        private DbSet<PassengerPayment> PassengerPaymentTable { get; set; }
 
         public JoinTableLogic()
         {
@@ -46,6 +48,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
             PickupAreaTable = _context.Set<PickupArea>();
             DriverStaticticTable = _context.Set<DriversStatistic>();
             SessionHistoryTable = _context.Set<SessionHistory>();
+            PassengerPaymentTable = _context.Set<PassengerPayment>();
         }
 
 
@@ -690,22 +693,20 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
-        public List<SessionPassenger> GetSessionPassengerListJoinTables(int sessionId)
+        public List<PassengerPayment> GetSessionPassengerListJoinTables(int userId, int companyId)
 
         {
-            var result = (from t1 in SessionPassengerTable
-                          where t1.SessionId == sessionId
+            var result = (from t1 in ShuttleSessionTable
+                          join t2 in PassengerPaymentTable on t1.Id equals t2.ShuttleSessionId
+                          where t1.CompanyId == companyId && t2.PassengerIdentity == userId
 
-
-                          select new SessionPassenger
+                          select new PassengerPayment
                           {
-                              Id = t1.Id,
-                              SessionId = t1.SessionId,
-                              EstimatedPickupTime = t1.EstimatedPickupTime,
-                              PickupOrderNum = t1.PickupOrderNum,
-                              PickupState = t1.PickupState,
-                              PickupId = t1.PickupId,
-
+                              Id = t2.Id,
+                              PassengerIdentity = t2.PassengerIdentity,
+                              ShuttleSessionId = t2.ShuttleSessionId,
+                              IsPaymentVerified = t2.IsPaymentVerified,
+                              PaymentDate = t2.PaymentDate,
                           }).ToList();
             return result;
         }
@@ -752,6 +753,20 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
 
 
 
+                          }).ToList();
+            return result;
+        }
+        public List<ShuttleIdPrıce> PassengerPaymentJoinTables(int userId,int companyId)
+
+        {
+
+            var result = (from t1 in ShuttleSessionTable
+                          join t2 in PassengerPaymentTable on t1.Id equals t2.ShuttleSessionId
+                          where t1.CompanyId == companyId && t2.IsPaymentVerified == false && t2.PassengerIdentity == userId
+                          select new ShuttleIdPrıce
+                          {
+                              Id = t2.Id,
+                              Price = (double)t1.Price,
                           }).ToList();
             return result;
         }

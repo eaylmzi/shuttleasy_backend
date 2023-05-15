@@ -11,6 +11,7 @@ namespace shuttleasy.DAL.Resource.String
         public const string SERVICE_STARTED = "Bus Service Started!";
         public const string FOR_NEXT_PASSENGER = "Bus Service is Coming!";
         public const string WAIT_ME = "Hi Driver!";
+        public const string PAYMENT_VERIFIED = "Dear passenger;";
 
     }
 }
