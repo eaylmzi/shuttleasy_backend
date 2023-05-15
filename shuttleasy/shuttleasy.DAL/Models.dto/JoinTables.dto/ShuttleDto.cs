@@ -9,6 +9,7 @@ namespace shuttleasy.DAL.Models.dto.JoinTables.dto
     public class ShuttleDto
     {     
             public int Id { get; set; }
+            public int SessionId { get; set; }
             public int CompanyId { get; set; }
             public int BusId { get; set; }
             public int PassengerCount { get; set; }
@@ -27,6 +28,7 @@ namespace shuttleasy.DAL.Models.dto.JoinTables.dto
             public string BusModel { get; set; } = null!;
             public string LicensePlate { get; set; } = null!;
             public bool? State { get; set; }
-        
+            public string ShuttleState { get; set; } = null!;
+
     }
 }

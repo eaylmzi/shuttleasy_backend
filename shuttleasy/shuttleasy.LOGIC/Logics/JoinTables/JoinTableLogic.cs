@@ -798,7 +798,9 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                                   Capacity = t5.Capacity,
                                   BusModel = t5.BusModel,
                                   LicensePlate = t5.LicensePlate,
-                                  State = t5.State
+                                  State = t5.State,
+                                  ShuttleState =t2.ShuttleState,
+                                  SessionId = t2.Id,
 
 
                           }).ToList();
@@ -836,7 +838,9 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                               Capacity = t7.Capacity,
                               BusModel = t7.BusModel,
                               LicensePlate = t7.LicensePlate,
-                              State = t7.State
+                              State = t7.State,
+                              ShuttleState = t3.ShuttleState,
+                              SessionId = t3.Id,
 
 
                           }).ToList();

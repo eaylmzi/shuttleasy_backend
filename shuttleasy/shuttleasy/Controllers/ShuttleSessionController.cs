@@ -110,7 +110,36 @@ namespace shuttleasy.Controllers
 
 
         }
+        [HttpPost, Authorize(Roles = $"{Roles.Admin}")]
+        public async Task<ActionResult<ShuttleSession>> ChangeShuttlePrice([FromBody] ShuttleIdPrıce shuttleIdPrice)
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleIdPrice.Id);
+                    if(shuttleSession == null)
+                    {
+                        return BadRequest(Error.NotFoundShuttleSession);
+                    }
+                    shuttleSession.Price = shuttleIdPrice.Price;
+                    bool isShuttleSessionUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleSession.Id, shuttleSession);
+                    if (!isShuttleSessionUpdated)
+                    {
+                        return BadRequest(isShuttleSessionUpdated);
+                    }
+                    return Ok(shuttleSession);
 
+                }
+                return Unauthorized(Error.NotMatchedToken);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> DeleteShuttleSession([FromBody] IdDto idDto)
         {
@@ -251,6 +280,11 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+
+
+
+
+
                     int userId = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
                     bool isEnrolled = await _shuttleService.EnrollPassenger(sessionPassengerDto, userId);
                     if (isEnrolled)
