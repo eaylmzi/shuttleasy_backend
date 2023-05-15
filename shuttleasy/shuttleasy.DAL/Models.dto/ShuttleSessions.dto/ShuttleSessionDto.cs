@@ -13,5 +13,6 @@
         public string DestinationName { get; set; } = null!;
         public bool Return { get; set; }
         public string SessionDate { get; set; } = null!;
+        public double Price { get; set; } 
     }
 }
