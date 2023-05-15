@@ -690,6 +690,25 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
+        public List<SessionPassenger> GetSessionPassengerListJoinTables(int sessionId)
+
+        {
+            var result = (from t1 in SessionPassengerTable
+                          where t1.SessionId == sessionId
+
+
+                          select new SessionPassenger
+                          {
+                              Id = t1.Id,
+                              SessionId = t1.SessionId,
+                              EstimatedPickupTime = t1.EstimatedPickupTime,
+                              PickupOrderNum = t1.PickupOrderNum,
+                              PickupState = t1.PickupState,
+                              PickupId = t1.PickupId,
+
+                          }).ToList();
+            return result;
+        }
         public List<SessionPassengerAndPassengerId> GetSessionPassengerAndPassengerIdJoinTables(int sessionId)
 
         {
@@ -711,7 +730,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
-        public List<PassengerRouteDto> PassengerRouteJoinTables(int sessionId)
+        public List<PassengerRouteDto> PassengerRouteByPickupOrderJoinTables(int sessionId)
 
         {
 
@@ -736,6 +755,32 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                           }).ToList();
             return result;
         }
+        public List<PassengerRouteDto> PassengerRouteJoinTables(int sessionId)
+
+        {
+
+            var result = (from t1 in SessionPassengerTable
+                          join t2 in PickupPointTable on t1.PickupId equals t2.Id
+                          join t3 in PassengerTable on t2.UserId equals t3.Id
+                          join t4 in GeoPointTable on t2.GeoPointId equals t4.Id
+                          where t1.SessionId == sessionId
+                          
+
+
+                          select new PassengerRouteDto
+                          {
+                              UserId = t3.Id,
+                              Latitude = t4.Latitude,
+                              Longtitude = t4.Longtitude,
+                              EstimatedArriveTime = t1.EstimatedPickupTime,
+                              NotificationToken = t3.NotificationToken,
+
+
+
+                          }).ToList();
+            return result;
+        }
+
         public List<PassengerShuttleDto>? GetRouteJoinTables(int sessionId)
 
         {
@@ -755,6 +800,7 @@ namespace shuttleasy.LOGIC.Logics.JoinTables
                              ShuttleState = t1.ShuttleState,
                              DriverName = t3.Name,
                              CompanyName = t2.Name,
+                             LastPickupIndex = t1.LastPickupIndex,
                              RoutePoints = null,
 
 

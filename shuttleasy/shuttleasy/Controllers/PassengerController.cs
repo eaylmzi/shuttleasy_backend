@@ -346,7 +346,7 @@ namespace shuttleasy.Controllers
                     {
                         return BadRequest(Error.NotFound);
                     }
-                    List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteJoinTables(shuttleId.Id);
+                    List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteByPickupOrderJoinTables(shuttleId.Id);
                     if (passengerRouteDto == null)
                     {
                         return BadRequest(Error.NotFound);

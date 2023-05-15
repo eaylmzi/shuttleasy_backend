@@ -271,13 +271,18 @@ namespace shuttleasy.Controllers
         }
 
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<ShuttleManager>> CalculateRoute([FromBody] ShuttleManager shuttleManager)
+        public async Task<ActionResult<ShuttleManager>> CalculateRoute([FromBody] IdDto shuttleId)
         {
             try
             {
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    ShuttleManager shuttleManager = GetShuttleManager(shuttleId.Id);
+                    if(shuttleManager == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
                     ShuttleManager? calculatedShuttleManager = await calculateRoute(shuttleManager);
                     if(calculatedShuttleManager == null)
                     {
@@ -327,7 +332,7 @@ namespace shuttleasy.Controllers
                     }
                     else
                     {
-                        shuttleManager = GetShuttleManager(shuttleId.Id);
+                        shuttleManager = GetShuttleManagerByPickupOrder(shuttleId.Id);
                     }
                     
                     shuttleSession.ShuttleState = ShuttleState.ON_ROAD;
@@ -430,7 +435,7 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
-                    ShuttleManager? shuttleManager = GetShuttleManager(shuttleId.Id);
+                    ShuttleManager? shuttleManager = GetShuttleManagerByPickupOrder(shuttleId.Id);
                     if (shuttleManager == null)
                     {
                         return BadRequest(Error.NotFound);
@@ -489,6 +494,30 @@ namespace shuttleasy.Controllers
             }
         }
 
+        private ShuttleManager GetShuttleManagerByPickupOrder(int shuttleId)
+        {
+            List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteByPickupOrderJoinTables(shuttleId);
+            ShuttleSession? shuttle = _shuttleSessionLogic.FindShuttleSessionById(shuttleId);
+            if (shuttle == null)
+            {
+                return null;
+            }
+            ShuttleRouteDto shuttleRouteDto = new ShuttleRouteDto()
+            {
+                Id = shuttle.Id,
+                StartTime = shuttle.StartTime,
+                StartGeopoint = _geoPointLogic.Find((int)shuttle.StartGeopoint),
+                FinalGeopoint = _geoPointLogic.Find((int)shuttle.FinalGeopoint),
+
+
+            };
+            ShuttleManager shuttleManager = new ShuttleManager()
+            {
+                PassengerRouteDto = passengerRouteDto,
+                ShuttleRouteDto = shuttleRouteDto,
+            };
+            return shuttleManager;
+        }
         private ShuttleManager GetShuttleManager(int shuttleId)
         {
             List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteJoinTables(shuttleId);
@@ -513,6 +542,7 @@ namespace shuttleasy.Controllers
             };
             return shuttleManager;
         }
+
         [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
         public async Task<ActionResult<CompanyWorker>> UploadImage(IFormFile file)
         {

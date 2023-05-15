@@ -15,6 +15,7 @@ namespace shuttleasy.DAL.Models.dto.PassengerShuttles.dto
         public string ShuttleState { get; set; }
         public string CompanyName { get; set; } = null!;
         public string DriverName { get; set; }
+        public int? LastPickupIndex { get; set; }
         public List<double[]>? RoutePoints { get; set; }   
     }
 }
