@@ -412,7 +412,7 @@ namespace shuttleasy.Controllers
             }
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
-        public async Task<ActionResult<BatchResponse>> TakeNextPerson([FromBody] IdDto shuttleId)
+        public async Task<ActionResult<List<DateTime?>>> TakeNextPerson([FromBody] IdDto shuttleId)
         {
             try
             {
@@ -438,11 +438,27 @@ namespace shuttleasy.Controllers
                     {
                         lastPerson = lastPerson + 1;
                     }
+                    shuttleSession.LastPickupIndex = lastPerson;
                     bool isShuttleSessionUpdated = await _shuttleSessionLogic.UpdateAsync(shuttleId.Id, shuttleSession);
                     if (!isShuttleSessionUpdated)
                     {
                         return BadRequest(Error.NotUpdatedInformation);
                     }
+                    TimeSpan? extraTime = DateTime.Now - shuttleManager.PassengerRouteDto[(int)lastPerson].EstimatedArriveTime;
+                    List<DateTime?> dateTimeList = new List<DateTime?>();
+                    for (int i = (int)lastPerson; i < shuttleManager.PassengerRouteDto.Count; i++ )
+                    {
+                        SessionPassenger sessionPassenger = _joinTableLogic.GetSessionPassengerJoinTables(shuttleManager.PassengerRouteDto[i].UserId, shuttleManager.ShuttleRouteDto.Id)[0];
+                        sessionPassenger.EstimatedPickupTime = shuttleManager.PassengerRouteDto[i].EstimatedArriveTime + extraTime;
+                        bool isSessionPassengerUpdated = await _sessionPassengerLogic.UpdateAsync(sessionPassenger.Id, sessionPassenger);
+                        if (!isSessionPassengerUpdated)
+                        {
+                            return BadRequest(Error.NotUpdatedInformation);
+                        }
+                        dateTimeList.Add(sessionPassenger.EstimatedPickupTime);
+                    }
+
+
 
                     NotificationModelToken notificationModelToken = new NotificationModelToken();
                     List<string> tokenList = new List<string>();
@@ -452,7 +468,7 @@ namespace shuttleasy.Controllers
                     notificationModelToken.Body = NotificationBody.FOR_NEXT_PASSENGER;
 
                     var notif = await _notificationService.SendNotificationByToken(notificationModelToken);
-                    return Ok(notif);                 
+                    return Ok(dateTimeList);                 
                 }
                 return Unauthorized(Error.NotMatchedToken);
             }

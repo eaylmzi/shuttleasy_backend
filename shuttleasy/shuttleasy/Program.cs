@@ -226,6 +226,7 @@ app.Use(async (context, next) =>
 // Configure the HTTP request pipeline.
 app.UseRouting();
 
+//app.UseStaticFiles();
 
 app.UseSwagger();
 app.UseSwaggerUI();
