@@ -135,7 +135,7 @@ namespace shuttleasy.DAL
                 entity.Property(e => e.WorkerType)
                     .HasMaxLength(11)
                     .HasColumnName("worker_type");
-
+                entity.Property(e => e.NotificationToken).HasColumnName("notification_token");
 
             });
 

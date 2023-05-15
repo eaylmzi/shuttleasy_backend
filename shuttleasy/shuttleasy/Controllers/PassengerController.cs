@@ -39,6 +39,9 @@ using shuttleasy.LOGIC.Logics.GeoPoints;
 using System.Globalization;
 using static System.Net.Mime.MediaTypeNames;
 using System.Collections;
+using shuttleasy.LOGIC.Logics.Companies;
+using shuttleasy.LOGIC.Logics.CompanyWorkers;
+using shuttleasy.Services.NotifService;
 
 namespace shuttleasy.Controllers
 {
@@ -53,13 +56,16 @@ namespace shuttleasy.Controllers
         private readonly IJoinTableLogic _joinTableLogic;
         private readonly IShuttleSessionLogic _shuttleSessionLogic;
         private readonly IGeoPointLogic _geoPointLogic;
+        private readonly ICompanyWorkerLogic _companyWorkerLogic;
+        private readonly INotificationService _notificationService;
         PassengerString message = new PassengerString();
         List<PassengerShuttleDetailsDto> emptyList = new List<PassengerShuttleDetailsDto>();
         
 
         public PassengerController(IMapper mapper,IUserService userService,
             IPasswordEncryption passwordEncryption, IPassengerLogic passengerLogic, IJoinTableLogic joinTableLogic,
-            IShuttleSessionLogic shuttleSessionLogic, IGeoPointLogic geoPointLogic)
+            IShuttleSessionLogic shuttleSessionLogic, IGeoPointLogic geoPointLogic, ICompanyWorkerLogic companyWorkerLogic,
+            INotificationService notificationService)
         {
             _passengerLogic = passengerLogic;
             _mapper = mapper;
@@ -68,6 +74,8 @@ namespace shuttleasy.Controllers
             _joinTableLogic = joinTableLogic;
             _shuttleSessionLogic = shuttleSessionLogic;
             _geoPointLogic = geoPointLogic;
+            _companyWorkerLogic = companyWorkerLogic;
+            _notificationService = notificationService;
         }
         //  [HttpPost, Authorize(Roles = $"{Roles.Driver},{Roles.Admin},{Roles.SuperAdmin}")]
 
@@ -372,6 +380,41 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        public async Task<ActionResult<bool>> WaitMe([FromBody] IdDto shuttleId )
+        {
+            try
+            {
+                UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
+                if (_userService.VerifyUser(userInformation))
+                {
+                    ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
+                    if (shuttleSession == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    CompanyWorker? companyWorker = _companyWorkerLogic.GetCompanyWorkerWithId(shuttleSession.DriverId);
+                    if (companyWorker == null)
+                    {
+                        return BadRequest(Error.NotFound);
+                    }
+                    NotificationModelToken notificationModelToken = new NotificationModelToken();
+                    List<string> tokenList = new List<string>();
+                    tokenList.Add(companyWorker.NotificationToken);
+                    notificationModelToken.Token = tokenList;
+                    notificationModelToken.Title = NotificationTitle.WAIT_ME;
+                    notificationModelToken.Body = NotificationBody.WAIT_ME;
+                    var notif = await _notificationService.SendNotificationByToken(notificationModelToken);
+                    return Ok(notif);
+
+                }
+                return Unauthorized(Error.NotMatchedToken);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
         public ActionResult<bool> IsNotificationTokenEqual([FromBody] PassengerNotificationTokenDto passengerNotificationTokenDto)
         {
             try
@@ -428,7 +471,7 @@ namespace shuttleasy.Controllers
 
 
         [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
-        public async Task<ActionResult<bool>> UploadImage(IFormFile file)
+        public async Task<ActionResult<Passenger>> UploadImage(IFormFile file)
         {
             try
             {
@@ -462,7 +505,7 @@ namespace shuttleasy.Controllers
                                 bool isPassengerUpdated = await _passengerLogic.UpdateAsync(passenger.Id, passenger);
                                 if (isPassengerUpdated)
                                 {
-                                    return Ok(isPassengerUpdated);
+                                    return Ok(passenger);
                                 }
                                 return BadRequest(isPassengerUpdated);
 

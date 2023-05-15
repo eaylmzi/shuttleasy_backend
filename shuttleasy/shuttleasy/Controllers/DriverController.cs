@@ -487,7 +487,7 @@ namespace shuttleasy.Controllers
             return shuttleManager;
         }
         [HttpPost, Authorize(Roles = $"{Roles.Driver}")]
-        public async Task<ActionResult<bool>> UploadImage(IFormFile file)
+        public async Task<ActionResult<CompanyWorker>> UploadImage(IFormFile file)
         {
             try
             {
@@ -521,7 +521,7 @@ namespace shuttleasy.Controllers
                                 bool isPassengerUpdated = await _driverLogic.UpdateAsync(companyWorker.Id, companyWorker);
                                 if (isPassengerUpdated)
                                 {
-                                    return Ok(isPassengerUpdated);
+                                    return Ok(companyWorker);
                                 }
                                 return BadRequest(isPassengerUpdated);
 

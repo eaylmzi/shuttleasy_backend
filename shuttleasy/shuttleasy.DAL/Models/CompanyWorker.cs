@@ -17,5 +17,6 @@ namespace shuttleasy.DAL.Models
         public string WorkerType { get; set; } = null!;
         public byte[] PasswordHash { get; set; } = null!;
         public byte[] PasswordSalt { get; set; } = null!;
+        public string? NotificationToken { get; set; }
     }
 }
