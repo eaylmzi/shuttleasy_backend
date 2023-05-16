@@ -64,6 +64,34 @@ namespace shuttleasy.Controllers
                 {                
                     if (_passengerRatingLogic.GetSingle(userInformation.Id,commentDto.SessionId) == null)
                     {
+
+                        SessionHistory sessionHistory = _sessionHistoryLogic.GetSingleBySessionId(commentDto.SessionId);
+                        if (sessionHistory == null)
+                        {
+                            return BadRequest("sessionhistory");
+                        }
+                        bool isSessionHistoryUpdated = await _userService.UpdateSessionHistoryRating(sessionHistory, commentDto.Rating);
+                        if (!isSessionHistoryUpdated)
+                        {
+                            return BadRequest("sessionhistory not updated");
+                        }
+                        ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(commentDto.SessionId);
+                        if (shuttleSession == null)
+                        {
+                            return BadRequest("shuttlesession");
+                        }
+                        DriversStatistic? driverStatictic = _driversStatisticLogic.GetSingleDriverId(shuttleSession.DriverId);
+                        if (driverStatictic == null)
+                        {
+                            return BadRequest("driverstatictic");
+                        }
+                        bool isDriverStatisticUpdated = await _userService.UpdateDriverStaticticRating(driverStatictic, commentDto.Rating, shuttleSession.DriverId);
+
+                        if (!isDriverStatisticUpdated)
+                        {
+                            return BadRequest("driverstatictic not updated");
+                        }
+
                         PassengerRating passengerRating = _mapper.Map<PassengerRating>(commentDto);
                         passengerRating.PassengerIdentity = TokenHelper.GetUserIdFromRequestToken(Request.Headers);
                         passengerRating.Date = DateTime.Now;
@@ -73,38 +101,14 @@ namespace shuttleasy.Controllers
                             bool isUpdated = _userService.UpdateCompanyRating(commentDto.SessionId, commentDto.Rating);
                             if (isUpdated)
                             {
-                                SessionHistory sessionHistory = _sessionHistoryLogic.GetSingleBySessionId(commentDto.SessionId);
-                                if (sessionHistory == null)
-                                {
-                                    return BadRequest(false);
-                                }
-                                bool isSessionHistoryUpdated = await _userService.UpdateSessionHistoryRating(sessionHistory, commentDto.Rating);
-                                if (!isSessionHistoryUpdated)
-                                {
-                                    return BadRequest(false);
-                                }
-                                ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(commentDto.SessionId);
-                                if (shuttleSession == null)
-                                {
-                                    return BadRequest(false);
-                                }
-                                DriversStatistic? driverStatictic = _driversStatisticLogic.GetSingleDriverId(shuttleSession.DriverId);
-                                if (driverStatictic == null)
-                                {
-                                    return BadRequest(false);
-                                }
-                                bool isDriverStatisticUpdated = await _userService.UpdateDriverStaticticRating(driverStatictic, commentDto.Rating, shuttleSession.DriverId);
-
-                                if (!isDriverStatisticUpdated)
-                                {
-                                    return BadRequest(false);
-                                }
-
-                                return Ok(isDriverStatisticUpdated);
+                                return BadRequest(isUpdated);
                             }
                             return BadRequest(isUpdated);
                         }
                         return BadRequest(isAdded);
+
+                       
+                       
 
                     }
                     return BadRequest(Error.AlreadyComment);
@@ -119,7 +123,7 @@ namespace shuttleasy.Controllers
 
         }
         [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Admin}")]
-        public ActionResult<bool> GetComment([FromBody] IdDto companyIdDto)
+        public ActionResult<CommentDetailsDto> GetComment([FromBody] IdDto companyIdDto)
         {
             UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
             if (_userService.VerifyUser(userInformation))
