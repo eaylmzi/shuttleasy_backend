@@ -344,21 +344,21 @@ namespace shuttleasy.Controllers
                     ShuttleSession? shuttleSession = _shuttleSessionLogic.FindShuttleSessionById(shuttleId.Id);
                     if (shuttleSession == null)
                     {
-                        return BadRequest(Error.NotFound);
+                        return Ok(new PassengerShuttleDto());
                     }
                     if (shuttleSession.RouteState == ShuttleState.NOT_CALCULATED)
                     {
-                        return BadRequest(Error.NOTCALCULATED);
+                        return Ok(new PassengerShuttleDto());
                     }
                     PassengerShuttleDto? passengerShuttleDto = _joinTableLogic.GetRouteJoinTables(shuttleId.Id)[0];
                     if(passengerShuttleDto == null)
                     {
-                        return BadRequest(Error.NotFound);
+                        return Ok(new PassengerShuttleDto());
                     }
                     List<PassengerRouteDto> passengerRouteDto = _joinTableLogic.PassengerRouteByPickupOrderJoinTables(shuttleId.Id);
                     if (passengerRouteDto == null)
                     {
-                        return BadRequest(Error.NotFound);
+                        return Ok(new PassengerShuttleDto());
                     }
                   
                     double startLong = Double.Parse(_geoPointLogic.Find((int)shuttleSession.StartGeopoint).Longtitude, CultureInfo.InvariantCulture);
