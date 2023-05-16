@@ -369,7 +369,7 @@ namespace shuttleasy.Controllers
             }
 
         }
-        [HttpPost, Authorize(Roles = $"{Roles.Passenger},{Roles.Driver},{Roles.Admin}")]
+        [HttpPost, Authorize(Roles = $"{Roles.Passenger}")]
         public async Task<ActionResult<List<int>>> EnrollPassengerMultipleSession([FromBody] SessionPassengerMultipleDto sessionPassengerMultipleDto)
         {
             try
@@ -377,6 +377,24 @@ namespace shuttleasy.Controllers
                 UserVerifyingDto userInformation = TokenHelper.GetUserInformation(Request.Headers);
                 if (_userService.VerifyUser(userInformation))
                 {
+                    foreach (int sessionId in sessionPassengerMultipleDto.SessionIdList)
+                    {
+                        PassengerPayment passengerPayment = new PassengerPayment()
+                        {
+                            PassengerIdentity = userInformation.Id,
+                            ShuttleSessionId = sessionId,
+                            IsPaymentVerified = false,
+                        };
+
+                        bool isPassengerPaymentAdded = _passengerPaymentLogic.Add(passengerPayment);
+                        if (!isPassengerPaymentAdded)
+                        {
+                            return BadRequest(Error.NotAdded);
+                        }
+                    }
+                   
+
+
                     List<int> shuttleList = new List<int>();
 
                     for (int i = 0;i < sessionPassengerMultipleDto.SessionIdList.Count; i++)
